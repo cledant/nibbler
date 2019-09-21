@@ -5,11 +5,22 @@ add_library(gfx_dyn INTERFACE)
 target_include_directories(gfx_dyn INTERFACE
 		${CMAKE_CURRENT_SOURCE_DIR}/public)
 
+#LIB GLFW
 add_library(gfx_dyn_glfw SHARED
 		private/GlfwGraphic.cpp)
 target_include_directories(gfx_dyn_glfw
 		PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/private)
 add_dependencies(gfx_dyn_glfw gfx_dyn)
-target_link_libraries(gfx_dyn_glfw gfx_dyn)
-target_compile_options(gfx_dyn_glfw PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)
+target_link_libraries(gfx_dyn_glfw PUBLIC gfx_dyn)
+target_compile_options(gfx_dyn_glfw PUBLIC -Wall -Wextra -Werror -std=c++17 -march=native)
+
+#LIB SFML
+add_library(gfx_dyn_sfml SHARED
+		private/SFMLGraphic.cpp)
+target_include_directories(gfx_dyn_sfml
+		PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/private)
+add_dependencies(gfx_dyn_sfml gfx_dyn)
+target_link_libraries(gfx_dyn_sfml PUBLIC gfx_dyn)
+target_compile_options(gfx_dyn_sfml PUBLIC -Wall -Wextra -Werror -std=c++17 -march=native)
