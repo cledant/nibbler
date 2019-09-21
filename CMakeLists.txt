@@ -24,3 +24,5 @@ add_subdirectory(gfx_dynamic_libs)
 add_executable(nibbler binary/private/nibbler.cpp)
 add_dependencies(nibbler gfx_dyn gfx_dyn_glfw test_gfx)
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)
+
+file(COPY ${CMAKE_BINARY_DIR}/gfx_dynamic_libs/libs DESTINATION ${CMAKE_BINARY_DIR})

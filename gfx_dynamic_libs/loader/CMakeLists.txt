@@ -9,4 +9,5 @@ target_include_directories(gfx_loader
 		PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/private)
 add_dependencies(gfx_loader gfx_dyn)
+target_link_libraries(gfx_loader PUBLIC gfx_dyn)
 target_compile_options(gfx_loader PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
