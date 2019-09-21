@@ -13,5 +13,8 @@ option(GLFW_INSTALL "" ON)
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw ${CMAKE_BINARY_DIR}/external/glfw/build)
 
-add_executable(nibbler packages/test_binary_libs/private/test_binary.cpp)
-add_dependencies(nibbler glad glfw)
+add_subdirectory(gfx_dynamic_libs)
+
+add_executable(nibbler binary/private/nibbler.cpp)
+add_dependencies(nibbler gfx_dyn gfx_dyn_glfw test_gfx)
+target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)
