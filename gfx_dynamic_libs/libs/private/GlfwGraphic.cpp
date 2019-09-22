@@ -134,7 +134,7 @@ GlfwGraphic::_initCallbacks()
       };
     glfwSetKeyCallback(_win.win, input_callback);
 
-    // CLose
+    // Close
     auto close_callback = [](GLFWwindow *win) {
         glfwSetWindowShouldClose(win, GLFW_TRUE);
     };
@@ -177,7 +177,7 @@ GlfwGraphic::toggleFullscreen()
           _win.win, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
     } else {
         glfwSetWindowMonitor(
-          _win.win, NULL, 100, 100, WIN_W, WIN_H, GLFW_DONT_CARE);
+          _win.win, nullptr, 100, 100, WIN_W, WIN_H, GLFW_DONT_CARE);
     }
 }
 

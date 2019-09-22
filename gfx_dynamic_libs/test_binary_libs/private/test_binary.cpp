@@ -76,7 +76,7 @@ main()
         gfx_loader.getDeleter()(gfx_interface);
     } catch (std::exception const &e) {
         std::cout << e.what() << std::endl;
-        if (!gfx_interface) {
+        if (gfx_interface) {
             gfx_interface->terminate();
             gfx_loader.getDeleter()(gfx_interface);
         }

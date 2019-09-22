@@ -11,8 +11,8 @@ add_library(gfx_dyn_glfw SHARED
 target_include_directories(gfx_dyn_glfw
 		PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/private)
-add_dependencies(gfx_dyn_glfw gfx_dyn glfw glad)
-target_link_libraries(gfx_dyn_glfw PUBLIC gfx_dyn glfw glad)
+add_dependencies(gfx_dyn_glfw gfx_dyn glad glfw)
+target_link_libraries(gfx_dyn_glfw PUBLIC gfx_dyn glad glfw)
 target_compile_options(gfx_dyn_glfw PUBLIC -Wall -Wextra -Werror -std=c++17 -march=native)
 
 #LIB SFML
@@ -27,4 +27,9 @@ target_compile_options(gfx_dyn_glfw PUBLIC -Wall -Wextra -Werror -std=c++17 -mar
 
 set_target_properties(gfx_dyn_glfw
 		PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/nibbler_libs)
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/nibbler_libs
+		SKIP_BUILD_RPATH FALSE
+		BUILD_WITH_INSTALL_RPATH TRUE
+		INSTALL_RPATH_USE_LINK_PATH TRUE
+		INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib64"
+		INSTALL_RPATH_USE_LINK_PATH TRUE)
