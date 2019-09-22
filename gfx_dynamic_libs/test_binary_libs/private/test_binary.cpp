@@ -5,19 +5,24 @@
 int
 main()
 {
-    std::cout << "Hello Test World" << std::endl;
+    std::string home(getenv("HOME"));
     GfxLoader gfx_loader;
+    IGraphic *gfx_interface = nullptr;
 
-    //GLFW
-    gfx_loader.openLib("./dyn_libs/libgfx_dyn_glfw.so");
-    IGraphic *interface = gfx_loader.getCreator()();
-    interface->init();
-    gfx_loader.getDeleter()(interface);
-
-    //SFML
-    gfx_loader.openLib("./dyn_libs/libgfx_dyn_sfml.so");
-    interface = gfx_loader.getCreator()();
-    interface->init();
-    gfx_loader.getDeleter()(interface);
+    if (home.empty()) {
+        std::cout << "Home not set" << std::endl;
+        return (0);
+    }
+    try {
+        gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so");
+        gfx_interface = gfx_loader.getCreator()();
+        gfx_interface->init();
+        gfx_loader.getDeleter()(gfx_interface);
+    } catch (std::exception const &e) {
+        e.what();
+        if (!gfx_interface) {
+            gfx_loader.getDeleter()(gfx_interface);
+        }
+    }
     return (0);
 }
