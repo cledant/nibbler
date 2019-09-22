@@ -14,10 +14,10 @@ option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw ${CMAKE_BINARY_DIR}/external/glfw/build)
 
 #Setup glm
-option(BUILD_SHARED_LIBS "" OFF)
-option(BUILD_STATIC_LIBS "" OFF)
-option(GLM_TEST_ENABLE OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glm ${CMAKE_BINARY_DIR}/external/glm/build)
+#option(BUILD_SHARED_LIBS "" OFF)
+#option(BUILD_STATIC_LIBS "" OFF)
+#option(GLM_TEST_ENABLE OFF)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glm ${CMAKE_BINARY_DIR}/external/glm/build)
 
 add_subdirectory(gfx_dynamic_libs)
 
