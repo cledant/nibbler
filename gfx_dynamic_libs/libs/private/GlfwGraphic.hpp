@@ -3,6 +3,7 @@
 
 #include <array>
 
+#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include "IGraphic.hpp"
@@ -10,18 +11,22 @@
 class GlfwGraphic : public IGraphic
 {
   public:
-    GlfwGraphic() = default;
+    GlfwGraphic();
     ~GlfwGraphic() override = default;
 
     void init() override;
     void terminate() override;
-    void createWindow(int32_t w, int32_t h, std::string &&name) override;
+    void createWindow(std::string &&name) override;
     void deleteWindow() override;
     uint8_t shouldClose() override;
+    void triggerClose() override;
     void getEvents(uint8_t (&buffer)[NB_EVENT]) override;
+    void draw() override;
+    void render() override;
+    void toggleFullscreen() override;
 
   private:
-    static void error_callback(int error, char const *description);
+    void _initCallbacks();
 
     struct Input
     {
@@ -31,8 +36,11 @@ class GlfwGraphic : public IGraphic
     struct Win
     {
         GLFWwindow *win;
+        uint8_t fullscreen;
         int32_t w;
         int32_t h;
+        int32_t w_viewport;
+        int32_t h_viewport;
         std::string win_name;
     };
 

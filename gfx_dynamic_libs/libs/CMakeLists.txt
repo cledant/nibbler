@@ -11,8 +11,8 @@ add_library(gfx_dyn_glfw SHARED
 target_include_directories(gfx_dyn_glfw
 		PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/private)
-add_dependencies(gfx_dyn_glfw gfx_dyn glfw)
-target_link_libraries(gfx_dyn_glfw PUBLIC gfx_dyn glfw)
+add_dependencies(gfx_dyn_glfw gfx_dyn glfw glad)
+target_link_libraries(gfx_dyn_glfw PUBLIC gfx_dyn glfw glad)
 target_compile_options(gfx_dyn_glfw PUBLIC -Wall -Wextra -Werror -std=c++17 -march=native)
 
 #LIB SFML

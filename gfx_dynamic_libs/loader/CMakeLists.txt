@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(gfx_loader_lib_nibbler)
 
-add_library(gfx_loader SHARED
+add_library(gfx_loader STATIC
 		private/gfx_loader.cpp)
 target_include_directories(gfx_loader
 		PUBLIC
