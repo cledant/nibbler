@@ -1,29 +1,18 @@
 #include <iostream>
-
-#include <sys/time.h>
+#include <chrono>
 
 #include "gfx_loader.hpp"
 
-uint64_t constexpr SEC_IN_US = 1000000;
-uint64_t constexpr SEC_IN_MS = 1000;
-uint64_t constexpr KEYBOARD_TIMER = SEC_IN_US / 2;
-
-uint64_t
-get_time()
-{
-    struct timeval ts = { 0, 0 };
-
-    gettimeofday(&ts, nullptr);
-    return (ts.tv_sec * SEC_IN_US + ts.tv_usec);
-}
+double constexpr KEYBOARD_TIMER = 0.5;
 
 void
 get_events(uint8_t (&buffer)[IGraphic::NB_EVENT], IGraphic &gfx_interface)
 {
-    static uint64_t last_keyboard_pressed = 0;
-    uint64_t time = get_time();
-    uint8_t accept = ((time - last_keyboard_pressed) > KEYBOARD_TIMER);
-    uint8_t update = accept;
+    static auto last_keyboard_pressed =
+      std::chrono::high_resolution_clock::now();
+    auto time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = time - last_keyboard_pressed;
+    uint8_t accept = (diff.count() > KEYBOARD_TIMER);
     uint8_t updated_keys = 0;
 
     if (buffer[IGraphic::NibblerEvent::CLOSE_WIN] && accept) {
@@ -36,7 +25,7 @@ get_events(uint8_t (&buffer)[IGraphic::NB_EVENT], IGraphic &gfx_interface)
         accept = 0;
         ++updated_keys;
     }
-    if (update && updated_keys) {
+    if (updated_keys) {
         last_keyboard_pressed = time;
     }
 }

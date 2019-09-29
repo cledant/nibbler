@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
 #include <cstring>
 
 #include "GlfwGraphic.hpp"
