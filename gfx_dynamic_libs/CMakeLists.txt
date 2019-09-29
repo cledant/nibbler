@@ -3,11 +3,12 @@ project(gfx_dynamic_lib)
 
 add_subdirectory(libs)
 add_subdirectory(loader)
+add_subdirectory(shader)
 
 add_executable(test_gfx
 		test_binary_libs/private/test_binary.cpp)
-add_dependencies(test_gfx glad glfw gfx_dyn gfx_dyn_glfw gfx_loader glm)
-target_link_libraries(test_gfx PUBLIC gfx_loader gfx_dyn dl glm)
+add_dependencies(test_gfx glad glfw gfx_dyn gfx_dyn_glfw gfx_loader shader)
+target_link_libraries(test_gfx PUBLIC glad glfw gfx_loader gfx_dyn dl shader)
 target_compile_options(test_gfx PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 set_target_properties(test_gfx
 		PROPERTIES
