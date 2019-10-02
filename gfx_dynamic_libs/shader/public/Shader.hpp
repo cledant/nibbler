@@ -2,8 +2,10 @@
 #define SHADER_HPP
 
 #include <string>
+#include <map>
 
 #include "glad/glad.h"
+#include "glm/glm.hpp"
 
 class Shader
 {
@@ -22,7 +24,7 @@ class Shader
     Shader &operator=(Shader const &rhs) = delete;
 
     void use() const;
-    void reset() const;
+    void setVec2(std::string const &name, glm::vec2 data);
 
   private:
     void _readFile(std::string const &path, std::string content) const;
@@ -34,6 +36,7 @@ class Shader
                                         int32_t fs) const;
 
     uint32_t _program;
+    std::map<std::string, int32_t> _uniform_id;
 };
 
 #endif

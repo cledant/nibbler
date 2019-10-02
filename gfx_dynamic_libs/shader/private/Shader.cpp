@@ -90,9 +90,18 @@ Shader::use() const
 }
 
 void
-Shader::reset() const
+Shader::setVec2(std::string const &name, glm::vec2 data)
 {
-    glUseProgram(0);
+    auto entry = _uniform_id.find(name);
+    if (entry == _uniform_id.end()) {
+        int32_t id = glGetUniformLocation(_program, name.c_str());
+        if (id < 0) {
+            throw std::runtime_error("Shader: Invalid uniforn name: " + name);
+        }
+        _uniform_id[name] = id;
+    }
+    glUniform2fv(
+      _uniform_id[name], 1, reinterpret_cast<GLfloat const *>(&data));
 }
 
 void

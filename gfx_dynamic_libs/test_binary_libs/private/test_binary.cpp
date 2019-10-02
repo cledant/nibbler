@@ -2,6 +2,7 @@
 #include <chrono>
 
 #include "gfx_loader.hpp"
+#include "Shader.hpp"
 
 double constexpr KEYBOARD_TIMER = 0.5;
 
@@ -31,9 +32,13 @@ get_events(uint8_t (&buffer)[IGraphic::NB_EVENT], IGraphic &gfx_interface)
 }
 
 void
-main_loop(IGraphic &gfx_interface)
+main_loop(IGraphic &gfx_interface, std::string const &home)
 {
     uint8_t buffer[IGraphic::NB_EVENT] = { 0 };
+    Shader shader(home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
+                  home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
+                  home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
+                  "draw_rectangle");
 
     while (!gfx_interface.shouldClose()) {
         get_events(buffer, gfx_interface);
@@ -60,7 +65,7 @@ main()
         gfx_interface = gfx_loader.getCreator()();
         gfx_interface->init();
         gfx_interface->createWindow("Glfw_Nibbler");
-        main_loop(*gfx_interface);
+        main_loop(*gfx_interface, home);
         gfx_interface->terminate();
         gfx_loader.getDeleter()(gfx_interface);
     } catch (std::exception const &e) {
