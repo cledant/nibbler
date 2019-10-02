@@ -8,6 +8,6 @@ out VS_OUT {
 
 void main()
 {
-    gl_position = vec4(pos, 0.0, 1.0);
+    gl_Position = vec4(pos, 0.0, 1.0);
     vs_out.color = color;
 }

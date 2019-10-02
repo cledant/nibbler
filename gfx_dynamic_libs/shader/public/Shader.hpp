@@ -27,13 +27,14 @@ class Shader
     void setVec2(std::string const &name, glm::vec2 data);
 
   private:
-    void _readFile(std::string const &path, std::string content) const;
+    void _readFile(std::string const &path, std::string &content) const;
     [[nodiscard]] uint32_t _loadShader(std::string const &path,
                                        int32_t shader_type) const;
     [[nodiscard]] uint32_t _linkShaders(int32_t vs, int32_t fs) const;
     [[nodiscard]] uint32_t _linkShaders(int32_t vs,
                                         int32_t gs,
                                         int32_t fs) const;
+    [[nodiscard]] std::string _shaderError(uint32_t shader) const;
 
     uint32_t _program;
     std::map<std::string, int32_t> _uniform_id;

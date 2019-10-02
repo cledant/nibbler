@@ -72,6 +72,7 @@ Shader::~Shader()
 Shader::Shader(Shader &&src) noexcept
 {
     _program = src._program;
+    _uniform_id = std::move(src._uniform_id);
     src._program = 0;
 }
 
@@ -79,6 +80,7 @@ Shader &
 Shader::operator=(Shader &&rhs) noexcept
 {
     _program = rhs._program;
+    _uniform_id = std::move(rhs._uniform_id);
     rhs._program = 0;
     return (*this);
 }
@@ -105,7 +107,7 @@ Shader::setVec2(std::string const &name, glm::vec2 data)
 }
 
 void
-Shader::_readFile(std::string const &path, std::string content) const
+Shader::_readFile(std::string const &path, std::string &content) const
 {
     try {
         std::fstream fs;
@@ -135,7 +137,8 @@ Shader::_loadShader(std::string const &path, int32_t shader_type) const
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-        throw std::runtime_error("Shader: Failed to compile shader: " + path);
+        throw std::runtime_error("Shader: Failed to compile shader: " + path +
+                                 "\n" + _shaderError(shader));
     }
     return (shader);
 }
@@ -179,4 +182,15 @@ Shader::_linkShaders(int32_t vs, int32_t gs, int32_t fs) const
         throw std::runtime_error("Shader: Failed to link shader program");
     }
     return (program);
+}
+
+std::string
+Shader::_shaderError(uint32_t shader) const
+{
+    char msg[4096];
+    int msg_len;
+
+    glGetShaderInfoLog(shader, 4095, &msg_len, msg);
+    msg[msg_len] = '\0';
+    return (std::string(msg));
 }
