@@ -92,7 +92,7 @@ Shader::use() const
 }
 
 void
-Shader::setVec2(std::string const &name, glm::vec2 data)
+Shader::setVec2(std::string const &name, glm::vec2 const &data)
 {
     auto entry = _uniform_id.find(name);
     if (entry == _uniform_id.end()) {

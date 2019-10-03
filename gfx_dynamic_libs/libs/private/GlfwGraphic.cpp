@@ -9,6 +9,7 @@
 
 GlfwGraphic::GlfwGraphic()
   : _input()
+  , _snake_array()
 {
     memset(_input.keys.data(), 0, sizeof(uint8_t) * _input.keys.size());
     _win.win = nullptr;
@@ -103,8 +104,13 @@ void GlfwGraphic::getEvents(uint8_t (&buffer)[NB_EVENT])
 }
 
 void
-GlfwGraphic::draw()
+GlfwGraphic::draw(Snake const &snake,
+                  enum SnakeType snakeType,
+                  enum DisplayType displayType)
 {
+    (void)snake;
+    (void)snakeType;
+    (void)displayType;
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }

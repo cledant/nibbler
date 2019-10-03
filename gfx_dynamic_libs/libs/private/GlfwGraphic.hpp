@@ -1,8 +1,6 @@
 #ifndef GLFWGRAPHIC_HPP
 #define GLFWGRAPHIC_HPP
 
-#include <array>
-
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
@@ -21,13 +19,13 @@ class GlfwGraphic : public IGraphic
     uint8_t shouldClose() override;
     void triggerClose() override;
     void getEvents(uint8_t (&buffer)[NB_EVENT]) override;
-    void draw() override;
+    void draw(Snake const &snake,
+              enum SnakeType snakeType,
+              enum DisplayType displayType) override;
     void render() override;
     void toggleFullscreen() override;
 
   private:
-    void _initCallbacks();
-
     struct Input
     {
         std::array<uint8_t, 1024> keys;
@@ -44,8 +42,21 @@ class GlfwGraphic : public IGraphic
         std::string win_name;
     };
 
+    struct GlfwSnake
+    {
+        uint32_t vbo_pos;
+        uint32_t vbo_color;
+        uint32_t vao;
+        struct Snake snake;
+    };
+
     Input _input;
     Win _win;
+    std::array<GlfwSnake, MAX_SNAKES> _snake_array;
+
+    void _initCallbacks();
+    void _initSnake(GlfwSnake &snake);
+    void _updateSnake(GlfwSnake &snake);
 };
 
 #endif

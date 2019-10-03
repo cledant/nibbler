@@ -24,7 +24,7 @@ class Shader
     Shader &operator=(Shader const &rhs) = delete;
 
     void use() const;
-    void setVec2(std::string const &name, glm::vec2 data);
+    void setVec2(std::string const &name, glm::vec2 const &data);
 
   private:
     void _readFile(std::string const &path, std::string &content) const;

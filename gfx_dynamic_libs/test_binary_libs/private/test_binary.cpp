@@ -35,14 +35,22 @@ void
 main_loop(IGraphic &gfx_interface, std::string const &home)
 {
     uint8_t buffer[IGraphic::NB_EVENT] = { 0 };
-    Shader shader(home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
-                  home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
-                  home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
-                  "draw_rectangle");
+    Shader shader(
+      home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
+      home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
+      home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
+      "draw_rectangle");
+
+    shader.use();
+
+    glm::vec2 scale(0.1, 0.1);
+    shader.setVec2("uniform_scale", scale);
+
+    IGraphic::Snake snake;
 
     while (!gfx_interface.shouldClose()) {
         get_events(buffer, gfx_interface);
-        gfx_interface.draw();
+        gfx_interface.draw(snake, IGraphic::P1, IGraphic::DIRECT);
         gfx_interface.render();
         gfx_interface.getEvents(buffer);
     }
