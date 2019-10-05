@@ -10,19 +10,21 @@
 class Shader
 {
   public:
-    Shader(std::string const &path_vs,
-           std::string const &path_fs,
-           std::string const &prog_name);
-    Shader(std::string const &path_vs,
-           std::string const &path_gs,
-           std::string const &path_fs,
-           std::string const &prog_name);
-    virtual ~Shader();
+    Shader();
+    virtual ~Shader() = default;
     Shader(Shader &&src) noexcept;
     Shader &operator=(Shader &&rhs) noexcept;
     Shader(Shader const &src) = delete;
     Shader &operator=(Shader const &rhs) = delete;
 
+    void init(std::string const &path_vs,
+              std::string const &path_fs,
+              std::string const &prog_name);
+    void init(std::string const &path_vs,
+              std::string const &path_gs,
+              std::string const &path_fs,
+              std::string const &prog_name);
+    void clear();
     void use() const;
     void setVec2(std::string const &name, glm::vec2 const &data);
 
@@ -36,6 +38,7 @@ class Shader
                                         int32_t fs) const;
     [[nodiscard]] std::string _shaderError(uint32_t shader) const;
 
+    uint8_t _is_init;
     uint32_t _program;
     std::map<std::string, int32_t> _uniform_id;
 };

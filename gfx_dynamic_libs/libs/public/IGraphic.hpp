@@ -20,7 +20,7 @@ class IGraphic
     IGraphic(IGraphic &&src) = delete;
     IGraphic &operator=(IGraphic &&rhs) = delete;
 
-    virtual void init() = 0;
+    virtual void init(std::string const &home) = 0;
     virtual void terminate() = 0;
     virtual void createWindow(std::string &&name) = 0;
     virtual void deleteWindow() = 0;
@@ -30,12 +30,15 @@ class IGraphic
     virtual void draw(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+      IGraphicTypes::SnakeType type,
       uint32_t size) = 0;
     virtual void draw(
       std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+      IGraphicTypes::SnakeType type,
       uint32_t size) = 0;
     virtual void render() = 0;
+    virtual void clear() = 0;
     virtual void toggleFullscreen() = 0;
 };
 

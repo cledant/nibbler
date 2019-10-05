@@ -3,11 +3,37 @@
 
 #include "Shader.hpp"
 
-Shader::Shader(std::string const &path_vs,
-               std::string const &path_fs,
-               std::string const &prog_name)
-  : _program(0)
+Shader::Shader()
+  : _is_init(0)
+  , _program(0)
+{}
+
+Shader::Shader(Shader &&src) noexcept
 {
+    _is_init = src._is_init;
+    _program = src._program;
+    _uniform_id = std::move(src._uniform_id);
+    src._program = 0;
+}
+
+Shader &
+Shader::operator=(Shader &&rhs) noexcept
+{
+    _is_init = rhs._is_init;
+    _program = rhs._program;
+    _uniform_id = std::move(rhs._uniform_id);
+    rhs._program = 0;
+    return (*this);
+}
+
+void
+Shader::init(std::string const &path_vs,
+             std::string const &path_fs,
+             std::string const &prog_name)
+{
+    if (_is_init) {
+        return;
+    }
     uint32_t vs = 0;
     uint32_t fs = 0;
     std::cout << "Loading : " << prog_name << std::endl;
@@ -27,14 +53,18 @@ Shader::Shader(std::string const &path_vs,
     }
     glDeleteShader(vs);
     glDeleteShader(fs);
+    _is_init = 1;
 }
 
-Shader::Shader(std::string const &path_vs,
-               std::string const &path_gs,
-               std::string const &path_fs,
-               std::string const &prog_name)
-  : _program(0)
+void
+Shader::init(std::string const &path_vs,
+             std::string const &path_gs,
+             std::string const &path_fs,
+             std::string const &prog_name)
 {
+    if (_is_init) {
+        return;
+    }
     uint32_t vs = 0;
     uint32_t gs = 0;
     uint32_t fs = 0;
@@ -60,29 +90,18 @@ Shader::Shader(std::string const &path_vs,
     glDeleteShader(vs);
     glDeleteShader(gs);
     glDeleteShader(fs);
+    _is_init = 1;
 }
 
-Shader::~Shader()
+void
+Shader::clear()
 {
     if (_program) {
         glDeleteShader(_program);
     }
-}
-
-Shader::Shader(Shader &&src) noexcept
-{
-    _program = src._program;
-    _uniform_id = std::move(src._uniform_id);
-    src._program = 0;
-}
-
-Shader &
-Shader::operator=(Shader &&rhs) noexcept
-{
-    _program = rhs._program;
-    _uniform_id = std::move(rhs._uniform_id);
-    rhs._program = 0;
-    return (*this);
+    _program = 0;
+    _uniform_id.clear();
+    _is_init = 0;
 }
 
 void
@@ -158,6 +177,7 @@ Shader::_linkShaders(int32_t vs, int32_t fs) const
     int32_t success;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
+        glDeleteShader(program);
         throw std::runtime_error("Shader: Failed to link shader program");
     }
     return (program);
@@ -179,6 +199,7 @@ Shader::_linkShaders(int32_t vs, int32_t gs, int32_t fs) const
     int32_t success;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
+        glDeleteShader(program);
         throw std::runtime_error("Shader: Failed to link shader program");
     }
     return (program);

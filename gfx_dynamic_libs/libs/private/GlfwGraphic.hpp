@@ -6,14 +6,15 @@
 
 #include "IGraphic.hpp"
 #include "GLSnake.hpp"
+#include "Shader.hpp"
 
 class GlfwGraphic : public IGraphic
 {
   public:
     GlfwGraphic();
-    ~GlfwGraphic() override = default;
+    ~GlfwGraphic() override;
 
-    void init() override;
+    void init(std::string const &home) override;
     void terminate() override;
     void createWindow(std::string &&name) override;
     void deleteWindow() override;
@@ -23,12 +24,15 @@ class GlfwGraphic : public IGraphic
     void draw(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+      IGraphicTypes::SnakeType type,
       uint32_t size) override;
     void draw(
       std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+      IGraphicTypes::SnakeType type,
       uint32_t size) override;
     void render() override;
+    void clear() override;
     void toggleFullscreen() override;
 
   private:
@@ -48,9 +52,11 @@ class GlfwGraphic : public IGraphic
         std::string win_name;
     };
 
+    std::string _home;
     Input _input;
     Win _win;
-    //std::array<GLSnake, IGraphicConstants::MAX_SNAKES> _snake_array;
+    Shader _snake_shader;
+    std::array<GLSnake, IGraphicConstants::MAX_SNAKES> _snake_array;
 
     void _initCallbacks();
 };
