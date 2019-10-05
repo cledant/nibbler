@@ -7,7 +7,8 @@
 double constexpr KEYBOARD_TIMER = 0.5;
 
 void
-get_events(uint8_t (&buffer)[IGraphic::NB_EVENT], IGraphic &gfx_interface)
+get_events(uint8_t (&buffer)[IGraphicConstants::NB_EVENT],
+           IGraphic &gfx_interface)
 {
     static auto last_keyboard_pressed =
       std::chrono::high_resolution_clock::now();
@@ -16,12 +17,12 @@ get_events(uint8_t (&buffer)[IGraphic::NB_EVENT], IGraphic &gfx_interface)
     uint8_t accept = (diff.count() > KEYBOARD_TIMER);
     uint8_t updated_keys = 0;
 
-    if (buffer[IGraphic::NibblerEvent::CLOSE_WIN] && accept) {
+    if (buffer[IGraphicTypes::NibblerEvent::CLOSE_WIN] && accept) {
         gfx_interface.triggerClose();
         accept = 0;
         ++updated_keys;
     }
-    if (buffer[IGraphic::NibblerEvent::TOGGLE_WIN] && accept) {
+    if (buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] && accept) {
         gfx_interface.toggleFullscreen();
         accept = 0;
         ++updated_keys;
@@ -34,23 +35,36 @@ get_events(uint8_t (&buffer)[IGraphic::NB_EVENT], IGraphic &gfx_interface)
 void
 main_loop(IGraphic &gfx_interface, std::string const &home)
 {
-    uint8_t buffer[IGraphic::NB_EVENT] = { 0 };
+    uint8_t buffer[IGraphicConstants::NB_EVENT] = { 0 };
+
+    // Shader init
     Shader shader(
       home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
       home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
       home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
       "draw_rectangle");
-
     shader.use();
-
     glm::vec2 scale(0.1, 0.1);
     shader.setVec2("uniform_scale", scale);
 
-    IGraphic::Snake snake;
+    // Display elmts init
+    std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> pos = {
+        glm::vec2{ 0.5, 0.5 },
+        glm::vec2{ -0.5, -0.5 },
+        glm::vec2{ 0.5, -0.5 },
+        glm::vec2{ -0.5, 0.5 }
+    };
+    std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> color = {
+        glm::vec3{ 1.0, 0.0, 0.0 },
+        glm::vec3{ 0.0, 1.0, 0.0 },
+        glm::vec3{ 0.0, 0.0, 1.0 },
+        glm::vec3{ 1.0, 1.0, 1.0 },
+    };
+    uint32_t size = 4;
 
     while (!gfx_interface.shouldClose()) {
         get_events(buffer, gfx_interface);
-        gfx_interface.draw(snake, IGraphic::P1, IGraphic::DIRECT);
+        gfx_interface.draw(pos, color, size);
         gfx_interface.render();
         gfx_interface.getEvents(buffer);
     }

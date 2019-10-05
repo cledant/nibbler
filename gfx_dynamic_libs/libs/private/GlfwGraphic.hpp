@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 
 #include "IGraphic.hpp"
+#include "GLSnake.hpp"
 
 class GlfwGraphic : public IGraphic
 {
@@ -18,10 +19,15 @@ class GlfwGraphic : public IGraphic
     void deleteWindow() override;
     uint8_t shouldClose() override;
     void triggerClose() override;
-    void getEvents(uint8_t (&buffer)[NB_EVENT]) override;
-    void draw(Snake const &snake,
-              enum SnakeType snakeType,
-              enum DisplayType displayType) override;
+    void getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT]) override;
+    void draw(
+      std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+      std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+      uint32_t size) override;
+    void draw(
+      std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+      std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+      uint32_t size) override;
     void render() override;
     void toggleFullscreen() override;
 
@@ -42,21 +48,11 @@ class GlfwGraphic : public IGraphic
         std::string win_name;
     };
 
-    struct GlfwSnake
-    {
-        uint32_t vbo_pos;
-        uint32_t vbo_color;
-        uint32_t vao;
-        struct Snake snake;
-    };
-
     Input _input;
     Win _win;
-    std::array<GlfwSnake, MAX_SNAKES> _snake_array;
+    //std::array<GLSnake, IGraphicConstants::MAX_SNAKES> _snake_array;
 
     void _initCallbacks();
-    void _initSnake(GlfwSnake &snake);
-    void _updateSnake(GlfwSnake &snake);
 };
 
 #endif

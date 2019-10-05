@@ -9,7 +9,7 @@
 
 GlfwGraphic::GlfwGraphic()
   : _input()
-  , _snake_array()
+//  , _snake_array()
 {
     memset(_input.keys.data(), 0, sizeof(uint8_t) * _input.keys.size());
     _win.win = nullptr;
@@ -48,8 +48,11 @@ GlfwGraphic::createWindow(std::string &&name)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
     _win.win_name = name;
-    _win.win =
-      glfwCreateWindow(WIN_W, WIN_H, _win.win_name.c_str(), nullptr, nullptr);
+    _win.win = glfwCreateWindow(IGraphicConstants::WIN_W,
+                                IGraphicConstants::WIN_H,
+                                _win.win_name.c_str(),
+                                nullptr,
+                                nullptr);
     if (!_win.win) {
         throw std::runtime_error("Glfw : failed to create window");
     }
@@ -84,33 +87,49 @@ GlfwGraphic::triggerClose()
     glfwSetWindowShouldClose(_win.win, 1);
 }
 
-void GlfwGraphic::getEvents(uint8_t (&buffer)[NB_EVENT])
+void GlfwGraphic::getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT])
 {
     glfwPollEvents();
-    buffer[IGraphic::NibblerEvent::CLOSE_WIN] = _input.keys[GLFW_KEY_ESCAPE];
-    buffer[IGraphic::NibblerEvent::PAUSE] = _input.keys[GLFW_KEY_SPACE];
-    buffer[IGraphic::NibblerEvent::TOGGLE_WIN] = _input.keys[GLFW_KEY_F5];
-    buffer[IGraphic::NibblerEvent::P1_UP] = _input.keys[GLFW_KEY_W];
-    buffer[IGraphic::NibblerEvent::P1_RIGHT] = _input.keys[GLFW_KEY_A];
-    buffer[IGraphic::NibblerEvent::P1_DOWN] = _input.keys[GLFW_KEY_S];
-    buffer[IGraphic::NibblerEvent::P1_LEFT] = _input.keys[GLFW_KEY_D];
-    buffer[IGraphic::NibblerEvent::P2_UP] = _input.keys[GLFW_KEY_UP];
-    buffer[IGraphic::NibblerEvent::P2_RIGHT] = _input.keys[GLFW_KEY_RIGHT];
-    buffer[IGraphic::NibblerEvent::P2_DOWN] = _input.keys[GLFW_KEY_DOWN];
-    buffer[IGraphic::NibblerEvent::P2_LEFT] = _input.keys[GLFW_KEY_LEFT];
-    buffer[IGraphic::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_F1];
-    buffer[IGraphic::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_F2];
-    buffer[IGraphic::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_F3];
+    buffer[IGraphicTypes::NibblerEvent::CLOSE_WIN] =
+      _input.keys[GLFW_KEY_ESCAPE];
+    buffer[IGraphicTypes::NibblerEvent::PAUSE] = _input.keys[GLFW_KEY_SPACE];
+    buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] = _input.keys[GLFW_KEY_F5];
+    buffer[IGraphicTypes::NibblerEvent::P1_UP] = _input.keys[GLFW_KEY_W];
+    buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] = _input.keys[GLFW_KEY_A];
+    buffer[IGraphicTypes::NibblerEvent::P1_DOWN] = _input.keys[GLFW_KEY_S];
+    buffer[IGraphicTypes::NibblerEvent::P1_LEFT] = _input.keys[GLFW_KEY_D];
+    buffer[IGraphicTypes::NibblerEvent::P2_UP] = _input.keys[GLFW_KEY_UP];
+    buffer[IGraphicTypes::NibblerEvent::P2_RIGHT] = _input.keys[GLFW_KEY_RIGHT];
+    buffer[IGraphicTypes::NibblerEvent::P2_DOWN] = _input.keys[GLFW_KEY_DOWN];
+    buffer[IGraphicTypes::NibblerEvent::P2_LEFT] = _input.keys[GLFW_KEY_LEFT];
+    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_F1];
+    buffer[IGraphicTypes::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_F2];
+    buffer[IGraphicTypes::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_F3];
 }
 
 void
-GlfwGraphic::draw(Snake const &snake,
-                  enum SnakeType snakeType,
-                  enum DisplayType displayType)
+
+GlfwGraphic::draw(
+  std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+  std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+  uint32_t size)
 {
-    (void)snake;
-    (void)snakeType;
-    (void)displayType;
+    (void)pos;
+    (void)color;
+    (void)size;
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void
+GlfwGraphic::draw(
+  std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+  std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+  uint32_t size)
+{
+    (void)pos;
+    (void)color;
+    (void)size;
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -181,8 +200,13 @@ GlfwGraphic::toggleFullscreen()
         glfwSetWindowMonitor(
           _win.win, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
     } else {
-        glfwSetWindowMonitor(
-          _win.win, nullptr, 100, 100, WIN_W, WIN_H, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(_win.win,
+                             nullptr,
+                             100,
+                             100,
+                             IGraphicConstants::WIN_W,
+                             IGraphicConstants::WIN_H,
+                             GLFW_DONT_CARE);
     }
 }
 
