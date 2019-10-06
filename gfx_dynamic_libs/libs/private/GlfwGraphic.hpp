@@ -19,19 +19,22 @@ class GlfwGraphic : public IGraphic
     GlfwGraphic(GlfwGraphic &&src) = delete;
     GlfwGraphic &operator=(GlfwGraphic &&rhs) = delete;
 
-    void init(std::string const &home, int32_t w_square, int32_t h_square) override;
+    void init(std::string const &home,
+              int32_t w_square,
+              int32_t h_square) override;
     void terminate() override;
     void createWindow(std::string &&name) override;
     void deleteWindow() override;
     uint8_t shouldClose() override;
     void triggerClose() override;
     void getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT]) override;
-    void draw(
+    void drawBoard() override;
+    void drawSnake(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
       IGraphicTypes::SnakeType type,
       uint32_t size) override;
-    void draw(
+    void drawSnake(
       std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
       IGraphicTypes::SnakeType type,
@@ -58,7 +61,8 @@ class GlfwGraphic : public IGraphic
         glm::vec2 _screen_ratio;
     };
 
-    struct Board {
+    struct Board
+    {
         int32_t w;
         int32_t h;
         glm::vec2 gl_board_size;

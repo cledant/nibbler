@@ -130,16 +130,23 @@ void GlfwGraphic::getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT])
 }
 
 void
-GlfwGraphic::draw(
+GlfwGraphic::drawBoard()
+{
+    _gl_snake_shader.use();
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_board_size);
+    glBindVertexArray(_gl_board.getVao());
+    glDrawArrays(GL_POINTS, 0, 1);
+    glBindVertexArray(0);
+}
+
+void
+GlfwGraphic::drawSnake(
   std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
   std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
   IGraphicTypes::SnakeType type,
   uint32_t size)
 {
     _gl_snake_shader.use();
-    _gl_snake_shader.setVec2("uniform_scale", _board.gl_board_size);
-    glBindVertexArray(_gl_board.getVao());
-    glDrawArrays(GL_POINTS, 0, 1);
     glBindVertexArray(_gl_snake_array[type].getVao());
     _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
     _gl_snake_array[type].updateVbo(pos, color, size);
@@ -148,16 +155,19 @@ GlfwGraphic::draw(
 }
 
 void
-GlfwGraphic::draw(
+GlfwGraphic::drawSnake(
   std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
   std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
   IGraphicTypes::SnakeType type,
   uint32_t size)
 {
-    (void)pos;
-    (void)color;
-    (void)size;
-    (void)type;
+    _gl_snake_shader.use();
+    glBindVertexArray(_gl_snake_array[type].getVao());
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
+    _gl_snake_array[type].updateVbo(
+      pos, _board.gl_snake_board_size, _board.w, _board.h, color, size);
+    glDrawArrays(GL_POINTS, 0, size);
+    glBindVertexArray(0);
 }
 
 void

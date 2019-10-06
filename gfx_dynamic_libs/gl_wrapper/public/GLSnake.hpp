@@ -22,17 +22,15 @@ class GLSnake
 
     void init();
     void clear();
-    void updateScreenPos(
-      std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
-      void (*converter)(
-        std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &src,
-        std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> &dst),
-      uint32_t size);
     void updateVbo(
-      std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+      std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+      glm::vec2 const &square_size,
+      int32_t board_w,
+      int32_t board_h,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
       uint32_t size);
     void updateVbo(
+      std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
       uint32_t size);
 
@@ -46,7 +44,6 @@ class GLSnake
     uint32_t _vbo_color;
     uint32_t _vao;
     std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> _screen_pos;
-    uint32_t _screen_pos_size;
 };
 
 #endif

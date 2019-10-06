@@ -6,7 +6,6 @@ GLSnake::GLSnake()
   , _vbo_color(0)
   , _vao(0)
   , _screen_pos()
-  , _screen_pos_size(0)
 {}
 
 GLSnake::GLSnake(GLSnake &&src) noexcept
@@ -16,12 +15,10 @@ GLSnake::GLSnake(GLSnake &&src) noexcept
     _vbo_color = src._vbo_color;
     _vbo_pos = src._vbo_pos;
     _vao = src._vao;
-    _screen_pos_size = src._screen_pos_size;
     src._vbo_pos = 0;
     src._vbo_color = 0;
     src._vao = 0;
     src._is_init = 0;
-    src._screen_pos_size = 0;
 }
 
 GLSnake &
@@ -31,12 +28,10 @@ GLSnake::operator=(GLSnake &&rhs) noexcept
     _vbo_color = rhs._vbo_color;
     _vbo_pos = rhs._vbo_pos;
     _vao = rhs._vao;
-    _screen_pos_size = rhs._screen_pos_size;
     rhs._vbo_pos = 0;
     rhs._vbo_color = 0;
     rhs._vao = 0;
     rhs._is_init = 0;
-    rhs._screen_pos_size = 0;
     return (*this);
 }
 
@@ -83,7 +78,6 @@ GLSnake::clear()
     _vbo_color = 0;
     _vao = 0;
     _is_init = 0;
-    _screen_pos_size = 0;
 }
 
 uint32_t
@@ -93,18 +87,28 @@ GLSnake::getVao() const
 }
 
 void
-GLSnake::updateScreenPos(
+GLSnake::updateVbo(
   std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
-  void (*converter)(
-    std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &src,
-    std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> &dst),
+  glm::vec2 const &square_size,
+  int32_t board_w,
+  int32_t board_h,
+  std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
   uint32_t size)
 {
-    // TODO
-    (void)pos;
-    (void)size;
-    (void)converter;
-    (void)_screen_pos;
+    glm::vec2 board_size = glm::vec2(board_w, board_h) * square_size;
+    glm::vec2 init_pos = glm::vec2(-1.0f, 1.0f) * board_size;
+    init_pos += glm::vec2(1.0f, -1.0f) * square_size;
+
+    for (uint32_t i = 0; i < size; ++i) {
+        _screen_pos[i] = init_pos + glm::vec2(1.0f, -1.0f) * square_size *
+                                      2.0f * glm::vec2(pos[i].x, pos[i].y);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_pos);
+    glBufferSubData(
+      GL_ARRAY_BUFFER, 0, sizeof(glm::vec2) * size, _screen_pos.data());
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_color);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * size, color.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void
@@ -115,21 +119,6 @@ GLSnake::updateVbo(
 {
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_pos);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec2) * size, pos.data());
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo_color);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * size, color.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void
-GLSnake::updateVbo(
-  std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
-  uint32_t size)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo_pos);
-    glBufferSubData(GL_ARRAY_BUFFER,
-                    0,
-                    sizeof(glm::vec2) * _screen_pos_size,
-                    _screen_pos.data());
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_color);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * size, color.data());
     glBindBuffer(GL_ARRAY_BUFFER, 0);

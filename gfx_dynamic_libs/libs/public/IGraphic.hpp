@@ -20,19 +20,22 @@ class IGraphic
     IGraphic(IGraphic &&src) = delete;
     IGraphic &operator=(IGraphic &&rhs) = delete;
 
-    virtual void init(std::string const &home, int32_t w_square, int32_t h_square) = 0;
+    virtual void init(std::string const &home,
+                      int32_t w_square,
+                      int32_t h_square) = 0;
     virtual void terminate() = 0;
     virtual void createWindow(std::string &&name) = 0;
     virtual void deleteWindow() = 0;
     virtual uint8_t shouldClose() = 0;
     virtual void triggerClose() = 0;
     virtual void getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT]) = 0;
-    virtual void draw(
+    virtual void drawBoard() = 0;
+    virtual void drawSnake(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
       IGraphicTypes::SnakeType type,
       uint32_t size) = 0;
-    virtual void draw(
+    virtual void drawSnake(
       std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
       IGraphicTypes::SnakeType type,
