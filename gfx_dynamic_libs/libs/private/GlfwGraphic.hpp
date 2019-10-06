@@ -32,12 +32,10 @@ class GlfwGraphic : public IGraphic
     void drawSnake(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
-      IGraphicTypes::SnakeType type,
       uint32_t size) override;
     void drawSnake(
       std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
-      IGraphicTypes::SnakeType type,
       uint32_t size) override;
     void render() override;
     void clear() override;
@@ -78,7 +76,7 @@ class GlfwGraphic : public IGraphic
 
     Shader _gl_snake_shader;
     GLBoard _gl_board;
-    std::array<GLSnake, IGraphicConstants::MAX_SNAKES> _gl_snake_array;
+    GLSnake _gl_snake;
 
     void _initCallbacks();
     void _computeSquareRatio();

@@ -33,12 +33,10 @@ class IGraphic
     virtual void drawSnake(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
-      IGraphicTypes::SnakeType type,
       uint32_t size) = 0;
     virtual void drawSnake(
       std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
-      IGraphicTypes::SnakeType type,
       uint32_t size) = 0;
     virtual void render() = 0;
     virtual void clear() = 0;

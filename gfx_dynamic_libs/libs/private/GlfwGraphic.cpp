@@ -9,6 +9,8 @@
 
 GlfwGraphic::GlfwGraphic()
   : _input()
+  , _win()
+  , _board()
 {
     memset(_input.keys.data(), 0, sizeof(uint8_t) * _input.keys.size());
     _win.win = nullptr;
@@ -18,6 +20,10 @@ GlfwGraphic::GlfwGraphic()
     _win.w_viewport = 0;
     _win.h_viewport = 0;
     _win._screen_ratio = glm::vec2(1.0f);
+    _board.h = 0;
+    _board.w = 0;
+    _board.gl_snake_board_size = glm::vec2(1.0f);
+    _board.gl_board_size = glm::vec2(1.0f);
 }
 
 void
@@ -68,9 +74,6 @@ GlfwGraphic::createWindow(std::string &&name)
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             throw std::runtime_error("GLAD not loaded");
         }
-        for (auto &it : _gl_snake_array) {
-            it.init();
-        }
         _gl_snake_shader.init(
           _home +
             "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
@@ -79,6 +82,7 @@ GlfwGraphic::createWindow(std::string &&name)
           _home +
             "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
           "draw_rectangle");
+        _gl_snake.init();
         _gl_board.init();
     }
 }
@@ -87,9 +91,7 @@ void
 GlfwGraphic::deleteWindow()
 {
     _gl_board.clear();
-    for (auto &it : _gl_snake_array) {
-        it.clear();
-    }
+    _gl_snake.clear();
     _gl_snake_shader.clear();
     if (!_win.win) {
         glfwDestroyWindow(_win.win);
@@ -124,9 +126,9 @@ void GlfwGraphic::getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT])
     buffer[IGraphicTypes::NibblerEvent::P2_RIGHT] = _input.keys[GLFW_KEY_RIGHT];
     buffer[IGraphicTypes::NibblerEvent::P2_DOWN] = _input.keys[GLFW_KEY_DOWN];
     buffer[IGraphicTypes::NibblerEvent::P2_LEFT] = _input.keys[GLFW_KEY_LEFT];
-    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_F1];
-    buffer[IGraphicTypes::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_F2];
-    buffer[IGraphicTypes::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_F3];
+    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_1];
+    buffer[IGraphicTypes::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_2];
+    buffer[IGraphicTypes::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_3];
 }
 
 void
@@ -143,13 +145,12 @@ void
 GlfwGraphic::drawSnake(
   std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
   std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
-  IGraphicTypes::SnakeType type,
   uint32_t size)
 {
     _gl_snake_shader.use();
-    glBindVertexArray(_gl_snake_array[type].getVao());
+    glBindVertexArray(_gl_snake.getVao());
     _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
-    _gl_snake_array[type].updateVbo(pos, color, size);
+    _gl_snake.updateVbo(pos, color, size);
     glDrawArrays(GL_POINTS, 0, size);
     glBindVertexArray(0);
 }
@@ -158,13 +159,12 @@ void
 GlfwGraphic::drawSnake(
   std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
   std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
-  IGraphicTypes::SnakeType type,
   uint32_t size)
 {
     _gl_snake_shader.use();
-    glBindVertexArray(_gl_snake_array[type].getVao());
+    glBindVertexArray(_gl_snake.getVao());
     _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
-    _gl_snake_array[type].updateVbo(
+    _gl_snake.updateVbo(
       pos, _board.gl_snake_board_size, _board.w, _board.h, color, size);
     glDrawArrays(GL_POINTS, 0, size);
     glBindVertexArray(0);

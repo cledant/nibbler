@@ -21,12 +21,5 @@ enum NibblerEvent
     SET_SDL,
 };
 
-enum SnakeType
-{
-    APPLES = 0,
-    P1,
-    P2,
-};
-
 }
 #endif

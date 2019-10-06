@@ -61,10 +61,8 @@ main_loop(IGraphic &gfx_interface)
         get_events(buffer, gfx_interface);
         gfx_interface.clear();
         gfx_interface.drawBoard();
-        gfx_interface.drawSnake(
-          apple_pos, apple_color, IGraphicTypes::APPLES, apple_size);
-        gfx_interface.drawSnake(
-          snake_pos, snake_color, IGraphicTypes::P1, snake_size);
+        gfx_interface.drawSnake(apple_pos, apple_color, apple_size);
+        gfx_interface.drawSnake(snake_pos, snake_color, snake_size);
         gfx_interface.render();
         gfx_interface.getEvents(buffer);
     }
