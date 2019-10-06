@@ -74,7 +74,7 @@ main()
     try {
         gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so");
         gfx_interface = gfx_loader.getCreator()();
-        gfx_interface->init(home);
+        gfx_interface->init(home, 10, 20);
         gfx_interface->createWindow("Glfw_Nibbler");
         main_loop(*gfx_interface);
         gfx_interface->deleteWindow();

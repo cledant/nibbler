@@ -17,13 +17,14 @@ GlfwGraphic::GlfwGraphic()
     _win.h = 0;
     _win.w_viewport = 0;
     _win.h_viewport = 0;
+    _win._screen_ratio = glm::vec2(1.0f);
 }
 
-GlfwGraphic::~GlfwGraphic() {}
-
 void
-GlfwGraphic::init(std::string const &home)
+GlfwGraphic::init(std::string const &home, int32_t w_square, int32_t h_square)
 {
+    _board.w = w_square;
+    _board.h = h_square;
     _home = home;
     if (!glfwInit()) {
         throw std::runtime_error("Glfw : failed to init");
@@ -67,10 +68,10 @@ GlfwGraphic::createWindow(std::string &&name)
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             throw std::runtime_error("GLAD not loaded");
         }
-        for (auto &it : _snake_array) {
+        for (auto &it : _gl_snake_array) {
             it.init();
         }
-        _snake_shader.init(
+        _gl_snake_shader.init(
           _home +
             "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
           _home +
@@ -78,16 +79,18 @@ GlfwGraphic::createWindow(std::string &&name)
           _home +
             "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
           "draw_rectangle");
+        _gl_board.init();
     }
 }
 
 void
 GlfwGraphic::deleteWindow()
 {
-    for (auto &it : _snake_array) {
+    _gl_board.clear();
+    for (auto &it : _gl_snake_array) {
         it.clear();
     }
-    _snake_shader.clear();
+    _gl_snake_shader.clear();
     if (!_win.win) {
         glfwDestroyWindow(_win.win);
         _win.win = nullptr;
@@ -133,12 +136,13 @@ GlfwGraphic::draw(
   IGraphicTypes::SnakeType type,
   uint32_t size)
 {
-    glm::vec2 scale(0.1, 0.1);
-
-    _snake_shader.use();
-    _snake_shader.setVec2("uniform_scale", scale);
-    _snake_array[type].updateVbo(pos, color, size);
-    glBindVertexArray(_snake_array[type].getVao());
+    _gl_snake_shader.use();
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_board_size);
+    glBindVertexArray(_gl_board.getVao());
+    glDrawArrays(GL_POINTS, 0, 1);
+    glBindVertexArray(_gl_snake_array[type].getVao());
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
+    _gl_snake_array[type].updateVbo(pos, color, size);
     glDrawArrays(GL_POINTS, 0, size);
     glBindVertexArray(0);
 }
@@ -165,7 +169,7 @@ GlfwGraphic::render()
 void
 GlfwGraphic::clear()
 {
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.086f, 0.317f, 0.427f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -235,8 +239,35 @@ GlfwGraphic::_initCallbacks()
         THIS_WIN_PTR->_win.w_viewport = w;
         THIS_WIN_PTR->_win.h_viewport = h;
         glViewport(0, 0, w, h);
+        THIS_WIN_PTR->_computeSquareRatio();
+        THIS_WIN_PTR->_computeBoardSize();
     };
     glfwSetFramebufferSizeCallback(_win.win, framebuffer_size_callback);
+}
+
+void
+GlfwGraphic::_computeSquareRatio()
+{
+    float w =
+      (_win.w_viewport >= _win.h_viewport) ? _win.w_viewport : _win.h_viewport;
+    float h =
+      (_win.w_viewport >= _win.h_viewport) ? _win.h_viewport : _win.w_viewport;
+
+    _win._screen_ratio = (_win.w_viewport >= _win.h_viewport)
+                           ? glm::vec2(h / w, 1.0f)
+                           : glm::vec2(1.0f, h / w);
+}
+
+void
+GlfwGraphic::_computeBoardSize()
+{
+    _board.gl_board_size = _win._screen_ratio * (1.0f - VERTICAL_BORDER);
+
+    float largest = (_board.w >= _board.h) ? _board.w : _board.h;
+    _board.gl_snake_board_size = _board.gl_board_size / largest;
+
+    _board.gl_board_size =
+      glm::vec2(_board.w, _board.h) * _board.gl_snake_board_size;
 }
 
 extern "C" IGraphic *

@@ -20,7 +20,7 @@ class IGraphic
     IGraphic(IGraphic &&src) = delete;
     IGraphic &operator=(IGraphic &&rhs) = delete;
 
-    virtual void init(std::string const &home) = 0;
+    virtual void init(std::string const &home, int32_t w_square, int32_t h_square) = 0;
     virtual void terminate() = 0;
     virtual void createWindow(std::string &&name) = 0;
     virtual void deleteWindow() = 0;

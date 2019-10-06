@@ -97,7 +97,7 @@ GLSnake::updateScreenPos(
   std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
   void (*converter)(
     std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &src,
-    std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &dst),
+    std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> &dst),
   uint32_t size)
 {
     // TODO

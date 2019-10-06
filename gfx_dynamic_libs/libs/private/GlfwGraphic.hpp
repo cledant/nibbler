@@ -6,15 +6,20 @@
 
 #include "IGraphic.hpp"
 #include "GLSnake.hpp"
+#include "GLBoard.hpp"
 #include "Shader.hpp"
 
 class GlfwGraphic : public IGraphic
 {
   public:
     GlfwGraphic();
-    ~GlfwGraphic() override;
+    ~GlfwGraphic() override = default;
+    GlfwGraphic(GlfwGraphic const &src) = delete;
+    GlfwGraphic &operator=(GlfwGraphic const &rhs) = delete;
+    GlfwGraphic(GlfwGraphic &&src) = delete;
+    GlfwGraphic &operator=(GlfwGraphic &&rhs) = delete;
 
-    void init(std::string const &home) override;
+    void init(std::string const &home, int32_t w_square, int32_t h_square) override;
     void terminate() override;
     void createWindow(std::string &&name) override;
     void deleteWindow() override;
@@ -50,15 +55,30 @@ class GlfwGraphic : public IGraphic
         int32_t w_viewport;
         int32_t h_viewport;
         std::string win_name;
+        glm::vec2 _screen_ratio;
     };
+
+    struct Board {
+        int32_t w;
+        int32_t h;
+        glm::vec2 gl_board_size;
+        glm::vec2 gl_snake_board_size;
+    };
+
+    static constexpr float VERTICAL_BORDER = 0.10f;
 
     std::string _home;
     Input _input;
     Win _win;
-    Shader _snake_shader;
-    std::array<GLSnake, IGraphicConstants::MAX_SNAKES> _snake_array;
+    Board _board;
+
+    Shader _gl_snake_shader;
+    GLBoard _gl_board;
+    std::array<GLSnake, IGraphicConstants::MAX_SNAKES> _gl_snake_array;
 
     void _initCallbacks();
+    void _computeSquareRatio();
+    void _computeBoardSize();
 };
 
 #endif
