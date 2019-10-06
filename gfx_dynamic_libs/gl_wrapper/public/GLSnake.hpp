@@ -37,7 +37,8 @@ class GLSnake
       uint32_t size);
 
   private:
-    static uint32_t _allocate_vbo(uint64_t type_size, uint32_t size);
+    [[nodiscard]] uint32_t _allocate_vbo(uint64_t type_size,
+                                         uint32_t size) const;
     uint32_t _set_vao();
 
     uint8_t _is_init;

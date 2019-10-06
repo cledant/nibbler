@@ -136,7 +136,7 @@ GLSnake::updateVbo(
 }
 
 uint32_t
-GLSnake::_allocate_vbo(uint64_t type_size, uint32_t size)
+GLSnake::_allocate_vbo(uint64_t type_size, uint32_t size) const
 {
     uint32_t vbo;
 
@@ -165,16 +165,14 @@ GLSnake::_set_vao()
     }
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_pos);
-    glEnableVertexAttribArray(0);
     glVertexAttribPointer(
       0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_color);
-    glEnableVertexAttribArray(1);
     glVertexAttribPointer(
       1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor(0, 1);
-    glVertexAttribDivisor(1, 1);
     glBindVertexArray(0);
     return (vao);
 }

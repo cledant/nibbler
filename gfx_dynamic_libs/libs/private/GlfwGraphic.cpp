@@ -139,7 +139,7 @@ GlfwGraphic::draw(
     _snake_shader.setVec2("uniform_scale", scale);
     _snake_array[type].updateVbo(pos, color, size);
     glBindVertexArray(_snake_array[type].getVao());
-    glDrawArraysInstanced(GL_POINT, 0, 1, size);
+    glDrawArrays(GL_POINTS, 0, size);
     glBindVertexArray(0);
 }
 
@@ -165,7 +165,7 @@ GlfwGraphic::render()
 void
 GlfwGraphic::clear()
 {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
