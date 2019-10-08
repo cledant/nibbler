@@ -49,14 +49,15 @@ GlfwGraphic::createWindow(std::string &&name)
     if (!_win.win) {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RED_BITS, 8);
         glfwWindowHint(GLFW_GREEN_BITS, 8);
         glfwWindowHint(GLFW_BLUE_BITS, 8);
         glfwWindowHint(GLFW_ALPHA_BITS, 8);
 #ifdef __APPLE__
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+        glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
 #endif
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         _win.win_name = name;
         _win.win = glfwCreateWindow(IGraphicConstants::WIN_W,
                                     IGraphicConstants::WIN_H,
@@ -74,6 +75,10 @@ GlfwGraphic::createWindow(std::string &&name)
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             throw std::runtime_error("GLAD not loaded");
         }
+#ifdef __APPLE__
+        glfwSetWindowSize(_win.win, 680, 480);
+        glfwSetWindowSize(_win.win, IGraphicConstants::WIN_W, IGraphicConstants::WIN_H);
+#endif
         _gl_snake_shader.init(
           _home +
             "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",

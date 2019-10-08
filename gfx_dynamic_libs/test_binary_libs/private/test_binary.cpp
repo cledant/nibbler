@@ -56,7 +56,6 @@ main_loop(IGraphic &gfx_interface)
         glm::vec3{ 0.0, 0.5, 0.0 },
     };
     uint32_t snake_size = 5;
-
     while (!gfx_interface.shouldClose()) {
         get_events(buffer, gfx_interface);
         gfx_interface.clear();
@@ -80,7 +79,11 @@ main()
         return (0);
     }
     try {
+#ifdef __APPLE__
+        gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.dylib");
+#elif
         gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so");
+#endif
         gfx_interface = gfx_loader.getCreator()();
         gfx_interface->init(home, 20, 10);
         gfx_interface->createWindow("Glfw_Nibbler");
