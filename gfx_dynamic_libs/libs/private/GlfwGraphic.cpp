@@ -76,8 +76,8 @@ GlfwGraphic::createWindow(std::string &&name)
             throw std::runtime_error("GLAD not loaded");
         }
 #ifdef __APPLE__
-        glfwSetWindowSize(_win.win, 680, 480);
-        glfwSetWindowSize(_win.win, IGraphicConstants::WIN_W, IGraphicConstants::WIN_H);
+        toggleFullscreen();
+        toggleFullscreen();
 #endif
         _gl_snake_shader.init(
           _home +
