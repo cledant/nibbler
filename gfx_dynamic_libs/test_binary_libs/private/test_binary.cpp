@@ -81,7 +81,7 @@ main()
     try {
 #ifdef __APPLE__
         gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.dylib");
-#elif
+#else
         gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so");
 #endif
         gfx_interface = gfx_loader.getCreator()();
