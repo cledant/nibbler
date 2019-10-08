@@ -59,8 +59,8 @@ GlfwGraphic::createWindow(std::string &&name)
 #endif
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         _win.win_name = name;
-        _win.win = glfwCreateWindow(IGraphicConstants::WIN_W,
-                                    IGraphicConstants::WIN_H,
+        _win.win = glfwCreateWindow(640,
+                                    480,
                                     _win.win_name.c_str(),
                                     nullptr,
                                     nullptr);
@@ -75,10 +75,7 @@ GlfwGraphic::createWindow(std::string &&name)
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             throw std::runtime_error("GLAD not loaded");
         }
-#ifdef __APPLE__
-        toggleFullscreen();
-        toggleFullscreen();
-#endif
+        glfwSetWindowSize(_win.win, IGraphicConstants::WIN_W, IGraphicConstants::WIN_H);
         _gl_snake_shader.init(
           _home +
             "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
