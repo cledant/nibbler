@@ -31,7 +31,7 @@ add_subdirectory(backend/main_loop)
 add_executable(nibbler binary/private/nibbler.cpp)
 target_link_libraries(nibbler main_loop gfx_dyn_glfw dl)
 add_dependencies(nibbler gfx_dyn gfx_dyn_glfw main_loop)
-target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)
+target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
 #test_binary
 add_executable(test_gfx
