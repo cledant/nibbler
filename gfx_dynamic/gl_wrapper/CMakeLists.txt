@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(gl_wrapper_lib)
 
 add_library(glwrapper STATIC
-		private/Shader.cpp private/GLSnake.cpp private/GLBoard.cpp)
+		private/GLShader.cpp private/GLSnake.cpp private/GLBoard.cpp)
 target_include_directories(glwrapper
 		PUBLIC
 		${CMAKE_CURRENT_SOURCE_DIR}/public

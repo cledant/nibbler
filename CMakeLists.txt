@@ -19,10 +19,25 @@ option(GLFW_INSTALL "" ON)
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw ${CMAKE_BINARY_DIR}/external/glfw/build)
 
-add_subdirectory(gfx_dynamic_libs)
+#gfx_dynamic libs
+add_subdirectory(gfx_dynamic/libs)
+add_subdirectory(gfx_dynamic/loader)
+add_subdirectory(gfx_dynamic/gl_wrapper)
 
-add_executable(nibbler binary/nibbler.cpp)
-add_dependencies(nibbler glfw glad gfx_dyn gfx_dyn_glfw test_gfx)
+#backend libs
+add_subdirectory(backend/main_loop)
+
+#Main binary
+add_executable(nibbler binary/private/nibbler.cpp)
+target_link_libraries(nibbler main_loop gfx_dyn_glfw)
+add_dependencies(nibbler gfx_dyn gfx_dyn_glfw main_loop)
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)
+
+#test_binary
+add_executable(test_gfx
+		test_binary_libs/private/test_binary.cpp)
+add_dependencies(test_gfx glad glfw gfx_dyn gfx_dyn_glfw gfx_loader glwrapper)
+target_link_libraries(test_gfx PUBLIC glad glfw glm gfx_loader gfx_dyn dl glwrapper)
+target_compile_options(test_gfx PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)

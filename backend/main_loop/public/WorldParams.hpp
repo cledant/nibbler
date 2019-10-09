@@ -1,18 +1,22 @@
 #ifndef WORLDPARAMS_HPP
 #define WORLDPARAMS_HPP
 
+#include <string>
+
+#include <cstdint>
+
 enum GfxLib
 {
-    GLFW = 0,
-    SFML,
-    SDL,
-    NONE,
+    GFX_GLFW = 0,
+    GFX_SFML,
+    GFX_SDL,
+    GFX_NONE,
 };
 
 enum SoundLib
 {
-    SFML = 0,
-    NONE,
+    SOUND_SFML = 0,
+    SOUND_NONE,
 };
 
 enum Gametype
@@ -24,11 +28,11 @@ enum Gametype
 struct WorldParams
 {
     int32_t board_w;
-    int32_t board_w;
+    int32_t board_h;
     enum GfxLib gfx_lib;
-    enum Gametype game_type;
     enum SoundLib sound_lib;
-    std::string _home;
+    enum Gametype game_type;
+    std::string home;
 };
 
 #endif

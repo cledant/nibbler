@@ -1,14 +1,14 @@
 #include <iostream>
 #include <fstream>
 
-#include "Shader.hpp"
+#include "GLShader.hpp"
 
-Shader::Shader()
+GLShader::GLShader()
   : _is_init(0)
   , _program(0)
 {}
 
-Shader::Shader(Shader &&src) noexcept
+GLShader::GLShader(GLShader &&src) noexcept
 {
     _is_init = src._is_init;
     _program = src._program;
@@ -16,8 +16,8 @@ Shader::Shader(Shader &&src) noexcept
     src._program = 0;
 }
 
-Shader &
-Shader::operator=(Shader &&rhs) noexcept
+GLShader &
+GLShader::operator=(GLShader &&rhs) noexcept
 {
     _is_init = rhs._is_init;
     _program = rhs._program;
@@ -27,7 +27,7 @@ Shader::operator=(Shader &&rhs) noexcept
 }
 
 void
-Shader::init(std::string const &path_vs,
+GLShader::init(std::string const &path_vs,
              std::string const &path_fs,
              std::string const &prog_name)
 {
@@ -57,7 +57,7 @@ Shader::init(std::string const &path_vs,
 }
 
 void
-Shader::init(std::string const &path_vs,
+GLShader::init(std::string const &path_vs,
              std::string const &path_gs,
              std::string const &path_fs,
              std::string const &prog_name)
@@ -94,7 +94,7 @@ Shader::init(std::string const &path_vs,
 }
 
 void
-Shader::clear()
+GLShader::clear()
 {
     if (_program) {
         glDeleteShader(_program);
@@ -105,19 +105,19 @@ Shader::clear()
 }
 
 void
-Shader::use() const
+GLShader::use() const
 {
     glUseProgram(_program);
 }
 
 void
-Shader::setVec2(std::string const &name, glm::vec2 const &data)
+GLShader::setVec2(std::string const &name, glm::vec2 const &data)
 {
     auto entry = _uniform_id.find(name);
     if (entry == _uniform_id.end()) {
         int32_t id = glGetUniformLocation(_program, name.c_str());
         if (id < 0) {
-            throw std::runtime_error("Shader: Invalid uniforn name: " + name);
+            throw std::runtime_error("GLShader: Invalid uniforn name: " + name);
         }
         _uniform_id[name] = id;
     }
@@ -126,7 +126,7 @@ Shader::setVec2(std::string const &name, glm::vec2 const &data)
 }
 
 void
-Shader::_readFile(std::string const &path, std::string &content) const
+GLShader::_readFile(std::string const &path, std::string &content) const
 {
     try {
         std::fstream fs;
@@ -136,12 +136,12 @@ Shader::_readFile(std::string const &path, std::string &content) const
                        std::istreambuf_iterator<char>());
         fs.close();
     } catch (std::exception &e) {
-        throw std::runtime_error("Shader: Failed to open: " + path);
+        throw std::runtime_error("GLShader: Failed to open: " + path);
     }
 }
 
 uint32_t
-Shader::_loadShader(std::string const &path, int32_t shader_type) const
+GLShader::_loadShader(std::string const &path, int32_t shader_type) const
 {
     std::string shader_code;
     _readFile(path, shader_code);
@@ -150,25 +150,25 @@ Shader::_loadShader(std::string const &path, int32_t shader_type) const
     int32_t success;
     uint32_t shader = glCreateShader(shader_type);
     if (!shader) {
-        throw std::runtime_error("Shader: Failed to allocate shader: " + path);
+        throw std::runtime_error("GLShader: Failed to allocate shader: " + path);
     }
     glShaderSource(shader, 1, &c_shader_code, nullptr);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-        throw std::runtime_error("Shader: Failed to compile shader: " + path +
+        throw std::runtime_error("GLShader: Failed to compile shader: " + path +
                                  "\n" + _shaderError(shader));
     }
     return (shader);
 }
 
 uint32_t
-Shader::_linkShaders(int32_t vs, int32_t fs) const
+GLShader::_linkShaders(int32_t vs, int32_t fs) const
 {
     uint32_t program = glCreateProgram();
 
     if (!program) {
-        throw std::runtime_error("Shader: Failed to allocate shader program");
+        throw std::runtime_error("GLShader: Failed to allocate shader program");
     }
     glAttachShader(program, vs);
     glAttachShader(program, fs);
@@ -178,18 +178,18 @@ Shader::_linkShaders(int32_t vs, int32_t fs) const
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
         glDeleteShader(program);
-        throw std::runtime_error("Shader: Failed to link shader program");
+        throw std::runtime_error("GLShader: Failed to link shader program");
     }
     return (program);
 }
 
 uint32_t
-Shader::_linkShaders(int32_t vs, int32_t gs, int32_t fs) const
+GLShader::_linkShaders(int32_t vs, int32_t gs, int32_t fs) const
 {
     uint32_t program = glCreateProgram();
 
     if (!program) {
-        throw std::runtime_error("Shader: Failed to allocate shader program");
+        throw std::runtime_error("GLShader: Failed to allocate shader program");
     }
     glAttachShader(program, vs);
     glAttachShader(program, gs);
@@ -200,13 +200,13 @@ Shader::_linkShaders(int32_t vs, int32_t gs, int32_t fs) const
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
         glDeleteShader(program);
-        throw std::runtime_error("Shader: Failed to link shader program");
+        throw std::runtime_error("GLShader: Failed to link shader program");
     }
     return (program);
 }
 
 std::string
-Shader::_shaderError(uint32_t shader) const
+GLShader::_shaderError(uint32_t shader) const
 {
     char msg[4096];
     int msg_len;

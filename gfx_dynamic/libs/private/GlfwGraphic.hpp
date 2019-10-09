@@ -7,7 +7,7 @@
 #include "IGraphic.hpp"
 #include "GLSnake.hpp"
 #include "GLBoard.hpp"
-#include "Shader.hpp"
+#include "GLShader.hpp"
 
 class GlfwGraphic : public IGraphic
 {
@@ -74,7 +74,7 @@ class GlfwGraphic : public IGraphic
     Win _win;
     Board _board;
 
-    Shader _gl_snake_shader;
+    GLShader _gl_snake_shader;
     GLBoard _gl_board;
     GLSnake _gl_snake;
 

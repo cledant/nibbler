@@ -7,15 +7,15 @@
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 
-class Shader
+class GLShader
 {
   public:
-    Shader();
-    virtual ~Shader() = default;
-    Shader(Shader &&src) noexcept;
-    Shader &operator=(Shader &&rhs) noexcept;
-    Shader(Shader const &src) = delete;
-    Shader &operator=(Shader const &rhs) = delete;
+    GLShader();
+    virtual ~GLShader() = default;
+    GLShader(GLShader &&src) noexcept;
+    GLShader &operator=(GLShader &&rhs) noexcept;
+    GLShader(GLShader const &src) = delete;
+    GLShader &operator=(GLShader const &rhs) = delete;
 
     void init(std::string const &path_vs,
               std::string const &path_fs,
