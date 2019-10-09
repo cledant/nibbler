@@ -8,6 +8,6 @@ target_include_directories(main_loop
 		${CMAKE_CURRENT_SOURCE_DIR}/public
 		PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/private)
-add_dependencies(main_loop gfx_dyn)
-target_link_libraries(main_loop PUBLIC gfx_dyn)
+add_dependencies(main_loop gfx_dyn gfx_loader)
+target_link_libraries(main_loop PUBLIC gfx_dyn gfx_loader)
 target_compile_options(main_loop PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
