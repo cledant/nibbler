@@ -27,8 +27,8 @@ enum Gametype
 
 struct WorldParams
 {
-    int32_t board_w;
-    int32_t board_h;
+    uint32_t board_w;
+    uint32_t board_h;
     enum GfxLib gfx_lib;
     enum SoundLib sound_lib;
     enum Gametype game_type;

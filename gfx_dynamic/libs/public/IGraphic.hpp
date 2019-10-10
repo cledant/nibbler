@@ -28,7 +28,8 @@ class IGraphic
     virtual void deleteWindow() = 0;
     virtual uint8_t shouldClose() = 0;
     virtual void triggerClose() = 0;
-    virtual void getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT]) = 0;
+    virtual void getEvents(
+      std::array<uint8_t, IGraphicConstants::NB_EVENT> &events) = 0;
     virtual void drawBoard() = 0;
     virtual void drawSnake(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,

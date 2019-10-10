@@ -27,7 +27,8 @@ class GlfwGraphic : public IGraphic
     void deleteWindow() override;
     uint8_t shouldClose() override;
     void triggerClose() override;
-    void getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT]) override;
+    void getEvents(
+      std::array<uint8_t, IGraphicConstants::NB_EVENT> &events) override;
     void drawBoard() override;
     void drawSnake(
       std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,

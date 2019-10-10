@@ -1,25 +1,17 @@
-#include <chrono>
-
 #include "World.hpp"
 
 World::World(WorldParams const &params)
   : _params(params)
+  , _home()
   , _gfx_loader()
   , _gfx_interface(nullptr)
-  , _home()
   , _path_gfx_lib()
-  , _snake_pos({ glm::uvec2{ 0, 0 },
-                 glm::uvec2{ 0, 1 },
-                 glm::uvec2{ 0, 2 },
-                 glm::uvec2{ 0, 3 },
-                 glm::uvec2{ 0, 4 } })
-  , _snake_color({ glm::vec3{ 0.0, 1.0, 0.0 },
-                   glm::vec3{ 0.0, 0.5, 0.0 },
-                   glm::vec3{ 0.0, 0.5, 0.0 },
-                   glm::vec3{ 0.0, 0.5, 0.0 },
-                   glm::vec3{ 0.0, 0.5, 0.0 } })
-  , _snake_size(5)
+  , _events()
+  , _snake_pos({ glm::uvec2{ 5, 5 } })
+  , _snake_color({ glm::vec3{ 0.0, 1.0, 0.0 } })
+  , _snake_size(1)
   , _is_init(0)
+  , _time_ref(std::chrono::high_resolution_clock::now())
 {}
 
 World::~World()
@@ -33,7 +25,7 @@ World::init()
     if (!_is_init) {
         _home = getenv("HOME");
         if (_home.empty()) {
-            std::runtime_error("Home not set");
+            throw std::runtime_error("Home not set");
         }
 #ifdef __APPLE__
         _path_gfx_lib[GFX_GLFW] =
@@ -61,6 +53,7 @@ World::run()
     while (!_gfx_interface->shouldClose()) {
         _gfx_interface->getEvents(_events);
         _get_events();
+        _move_snakes();
         _gfx_interface->clear();
         _gfx_interface->drawBoard();
         _gfx_interface->drawSnake(_snake_pos, _snake_color, _snake_size);
@@ -93,12 +86,12 @@ World::_clear_dyn_lib()
 void
 World::_get_events()
 {
-    // TODO Clean gettime fuction
     static auto last_keyboard_pressed =
       std::chrono::high_resolution_clock::now();
     auto time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> diff = time - last_keyboard_pressed;
-    uint8_t accept = (diff.count() > KEYBOARD_TIMER);
+
+    uint8_t accept = (diff.count() > KEYBOARD_TIMER_SECONDS);
     uint8_t updated_keys = 0;
 
     if (_events[IGraphicTypes::NibblerEvent::CLOSE_WIN] && accept) {
@@ -114,4 +107,24 @@ World::_get_events()
     if (updated_keys) {
         last_keyboard_pressed = time;
     }
+}
+
+void
+World::_move_snakes()
+{
+    if (_events[IGraphicTypes::P1_UP] && _snake_pos[0].y > 0) {
+        _snake_pos[0].y -= 1;
+    }
+    if (_events[IGraphicTypes::P1_LEFT] && _snake_pos[0].x > 0) {
+        _snake_pos[0].x -= 1;
+    }
+    if (_events[IGraphicTypes::P1_DOWN] &&
+        _snake_pos[0].y < _params.board_h - 1) {
+        _snake_pos[0].y += 1;
+    }
+    if (_events[IGraphicTypes::P1_RIGHT] &&
+        _snake_pos[0].x < _params.board_w - 1) {
+        _snake_pos[0].x += 1;
+    }
+
 }

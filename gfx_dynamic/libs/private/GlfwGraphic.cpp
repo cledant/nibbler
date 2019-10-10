@@ -59,11 +59,8 @@ GlfwGraphic::createWindow(std::string &&name)
 #endif
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         _win.win_name = name;
-        _win.win = glfwCreateWindow(640,
-                                    480,
-                                    _win.win_name.c_str(),
-                                    nullptr,
-                                    nullptr);
+        _win.win =
+          glfwCreateWindow(640, 480, _win.win_name.c_str(), nullptr, nullptr);
         if (!_win.win) {
             throw std::runtime_error("Glfw : failed to create window");
         }
@@ -75,7 +72,8 @@ GlfwGraphic::createWindow(std::string &&name)
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             throw std::runtime_error("GLAD not loaded");
         }
-        glfwSetWindowSize(_win.win, IGraphicConstants::WIN_W, IGraphicConstants::WIN_H);
+        glfwSetWindowSize(
+          _win.win, IGraphicConstants::WIN_W, IGraphicConstants::WIN_H);
         _gl_snake_shader.init(
           _home +
             "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
@@ -113,17 +111,20 @@ GlfwGraphic::triggerClose()
     glfwSetWindowShouldClose(_win.win, 1);
 }
 
-void GlfwGraphic::getEvents(uint8_t (&buffer)[IGraphicConstants::NB_EVENT])
+void
+GlfwGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
 {
     glfwPollEvents();
+    auto buffer = events.data();
+
     buffer[IGraphicTypes::NibblerEvent::CLOSE_WIN] =
       _input.keys[GLFW_KEY_ESCAPE];
     buffer[IGraphicTypes::NibblerEvent::PAUSE] = _input.keys[GLFW_KEY_SPACE];
     buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] = _input.keys[GLFW_KEY_F5];
     buffer[IGraphicTypes::NibblerEvent::P1_UP] = _input.keys[GLFW_KEY_W];
-    buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] = _input.keys[GLFW_KEY_A];
+    buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] = _input.keys[GLFW_KEY_D];
     buffer[IGraphicTypes::NibblerEvent::P1_DOWN] = _input.keys[GLFW_KEY_S];
-    buffer[IGraphicTypes::NibblerEvent::P1_LEFT] = _input.keys[GLFW_KEY_D];
+    buffer[IGraphicTypes::NibblerEvent::P1_LEFT] = _input.keys[GLFW_KEY_A];
     buffer[IGraphicTypes::NibblerEvent::P2_UP] = _input.keys[GLFW_KEY_UP];
     buffer[IGraphicTypes::NibblerEvent::P2_RIGHT] = _input.keys[GLFW_KEY_RIGHT];
     buffer[IGraphicTypes::NibblerEvent::P2_DOWN] = _input.keys[GLFW_KEY_DOWN];
