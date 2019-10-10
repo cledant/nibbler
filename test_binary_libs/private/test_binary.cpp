@@ -6,9 +6,11 @@
 double constexpr KEYBOARD_TIMER = 0.5;
 
 void
-get_events(uint8_t (&buffer)[IGraphicConstants::NB_EVENT],
+get_events(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events,
            IGraphic &gfx_interface)
 {
+    auto buffer = events.data();
+
     static auto last_keyboard_pressed =
       std::chrono::high_resolution_clock::now();
     auto time = std::chrono::high_resolution_clock::now();
@@ -34,7 +36,7 @@ get_events(uint8_t (&buffer)[IGraphicConstants::NB_EVENT],
 void
 main_loop(IGraphic &gfx_interface)
 {
-    uint8_t buffer[IGraphicConstants::NB_EVENT] = { 0 };
+    std::array<uint8_t, IGraphicConstants::NB_EVENT> events;
 
     // Apple
     std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> apple_pos = {
@@ -57,13 +59,13 @@ main_loop(IGraphic &gfx_interface)
     };
     uint32_t snake_size = 5;
     while (!gfx_interface.shouldClose()) {
-        get_events(buffer, gfx_interface);
+        get_events(events, gfx_interface);
         gfx_interface.clear();
         gfx_interface.drawBoard();
         gfx_interface.drawSnake(apple_pos, apple_color, apple_size);
         gfx_interface.drawSnake(snake_pos, snake_color, snake_size);
         gfx_interface.render();
-        gfx_interface.getEvents(buffer);
+        gfx_interface.getEvents(events);
     }
 }
 
@@ -80,7 +82,8 @@ main()
     }
     try {
 #ifdef __APPLE__
-        gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.dylib");
+        gfx_loader.openLib(home +
+                           "/.nibbler/nibbler_libs/libgfx_dyn_glfw.dylib");
 #else
         gfx_loader.openLib(home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so");
 #endif

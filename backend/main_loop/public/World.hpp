@@ -22,11 +22,13 @@ class World
     void run();
 
   private:
-    static double constexpr KEYBOARD_TIMER_SECONDS = 0.5;
     static uint32_t constexpr NB_GFX_LIB = 3;
     static uint16_t constexpr MAX_FPS = 60;
     static double constexpr FRAME_LENGTH_SECONDS =
       1 / static_cast<float>(MAX_FPS);
+    static double constexpr SYSTEM_TIMER_SECONDS = 1.0;
+    static double constexpr DEFAULT_SNAKE_TIMER_SECONDS =
+      FRAME_LENGTH_SECONDS * 30;
 
     WorldParams _params;
 
@@ -44,9 +46,10 @@ class World
 
     uint8_t _is_init;
 
-    std::chrono::high_resolution_clock ::time_point _time_ref;
+    std::chrono::high_resolution_clock ::time_point _loop_time_ref;
+    std::chrono::high_resolution_clock ::time_point _system_time_ref;
+    std::chrono::high_resolution_clock ::time_point _snake_time_ref;
 
-    void _move_snakes();
     void _load_dyn_lib();
     void _clear_dyn_lib();
     void _get_events();

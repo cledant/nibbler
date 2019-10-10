@@ -11,7 +11,9 @@ World::World(WorldParams const &params)
   , _snake_color({ glm::vec3{ 0.0, 1.0, 0.0 } })
   , _snake_size(1)
   , _is_init(0)
-  , _time_ref(std::chrono::high_resolution_clock::now())
+  , _loop_time_ref(std::chrono::high_resolution_clock::now())
+  , _system_time_ref(std::chrono::high_resolution_clock::now())
+  , _snake_time_ref(std::chrono::high_resolution_clock::now())
 {}
 
 World::~World()
@@ -51,13 +53,18 @@ void
 World::run()
 {
     while (!_gfx_interface->shouldClose()) {
-        _gfx_interface->getEvents(_events);
-        _get_events();
-        _move_snakes();
-        _gfx_interface->clear();
-        _gfx_interface->drawBoard();
-        _gfx_interface->drawSnake(_snake_pos, _snake_color, _snake_size);
-        _gfx_interface->render();
+        auto now = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> loop_diff = now - _loop_time_ref;
+
+        if (loop_diff.count() > FRAME_LENGTH_SECONDS) {
+            _gfx_interface->getEvents(_events);
+            _get_events();
+            _gfx_interface->clear();
+            _gfx_interface->drawBoard();
+            _gfx_interface->drawSnake(_snake_pos, _snake_color, _snake_size);
+            _gfx_interface->render();
+            _loop_time_ref = now;
+        }
     }
 }
 
@@ -86,45 +93,51 @@ World::_clear_dyn_lib()
 void
 World::_get_events()
 {
-    static auto last_keyboard_pressed =
-      std::chrono::high_resolution_clock::now();
-    auto time = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> diff = time - last_keyboard_pressed;
+    // TODO Use a for loop and functions pointers
+    auto now = std::chrono::high_resolution_clock::now();
 
-    uint8_t accept = (diff.count() > KEYBOARD_TIMER_SECONDS);
-    uint8_t updated_keys = 0;
+    std::chrono::duration<double> system_diff = now - _system_time_ref;
+    std::chrono::duration<double> snake_diff = now - _snake_time_ref;
 
-    if (_events[IGraphicTypes::NibblerEvent::CLOSE_WIN] && accept) {
+    uint8_t system_accept = (system_diff.count() > SYSTEM_TIMER_SECONDS);
+    uint8_t system_updated = 0;
+
+    uint8_t snake_accept = (snake_diff.count() > DEFAULT_SNAKE_TIMER_SECONDS);
+    uint8_t snake_updated = 0;
+
+    if (_events[IGraphicTypes::NibblerEvent::CLOSE_WIN] && system_accept) {
         _gfx_interface->triggerClose();
-        accept = 0;
-        ++updated_keys;
+        system_accept = 0;
+        system_updated = 1;
     }
-    if (_events[IGraphicTypes::NibblerEvent::TOGGLE_WIN] && accept) {
+    if (_events[IGraphicTypes::NibblerEvent::TOGGLE_WIN] && system_accept) {
         _gfx_interface->toggleFullscreen();
-        accept = 0;
-        ++updated_keys;
+        system_accept = 0;
+        system_updated = 1;
     }
-    if (updated_keys) {
-        last_keyboard_pressed = time;
-    }
-}
-
-void
-World::_move_snakes()
-{
-    if (_events[IGraphicTypes::P1_UP] && _snake_pos[0].y > 0) {
+    if (snake_accept && _events[IGraphicTypes::P1_UP] && _snake_pos[0].y > 0) {
         _snake_pos[0].y -= 1;
+        snake_updated = 1;
     }
-    if (_events[IGraphicTypes::P1_LEFT] && _snake_pos[0].x > 0) {
+    if (snake_accept && _events[IGraphicTypes::P1_LEFT] &&
+        _snake_pos[0].x > 0) {
         _snake_pos[0].x -= 1;
+        snake_updated = 1;
     }
-    if (_events[IGraphicTypes::P1_DOWN] &&
+    if (snake_accept && _events[IGraphicTypes::P1_DOWN] &&
         _snake_pos[0].y < _params.board_h - 1) {
         _snake_pos[0].y += 1;
+        snake_updated = 1;
     }
-    if (_events[IGraphicTypes::P1_RIGHT] &&
+    if (snake_accept && _events[IGraphicTypes::P1_RIGHT] &&
         _snake_pos[0].x < _params.board_w - 1) {
         _snake_pos[0].x += 1;
+        snake_updated = 1;
     }
-
+    if (system_updated) {
+        _system_time_ref = now;
+    }
+    if (snake_updated) {
+        _snake_time_ref = now;
+    }
 }
