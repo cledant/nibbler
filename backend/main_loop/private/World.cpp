@@ -1,3 +1,6 @@
+#include <functional>
+#include <iostream>
+
 #include "World.hpp"
 
 World::World(WorldParams const &params)
@@ -7,14 +10,20 @@ World::World(WorldParams const &params)
   , _gfx_interface(nullptr)
   , _path_gfx_lib()
   , _events()
+  , _event_timers()
   , _snake_pos({ glm::uvec2{ 5, 5 } })
   , _snake_color({ glm::vec3{ 0.0, 1.0, 0.0 } })
   , _snake_size(1)
   , _is_init(0)
   , _loop_time_ref(std::chrono::high_resolution_clock::now())
-  , _system_time_ref(std::chrono::high_resolution_clock::now())
-  , _snake_time_ref(std::chrono::high_resolution_clock::now())
-{}
+{
+    _event_timers.timer_values = { SYSTEM_TIMER_SECONDS,
+                                   DEFAULT_SNAKE_TIMER_SECONDS,
+                                   DEFAULT_SNAKE_TIMER_SECONDS };
+    _event_timers.time_ref = { std::chrono::high_resolution_clock::now(),
+                               std::chrono::high_resolution_clock::now(),
+                               std::chrono::high_resolution_clock::now() };
+}
 
 World::~World()
 {
@@ -58,7 +67,7 @@ World::run()
 
         if (loop_diff.count() > FRAME_LENGTH_SECONDS) {
             _gfx_interface->getEvents(_events);
-            _get_events();
+            _interpret_events();
             _gfx_interface->clear();
             _gfx_interface->drawBoard();
             _gfx_interface->drawSnake(_snake_pos, _snake_color, _snake_size);
@@ -91,53 +100,124 @@ World::_clear_dyn_lib()
 }
 
 void
-World::_get_events()
+World::_interpret_events()
 {
-    // TODO Use a for loop and functions pointers
+    static std::array<void (World::*)(), IGraphicConstants::NB_EVENT> func = {
+        &World::_close_win_event, &World::_pause,    &World::_toggle_fullscreen,
+        &World::_p1_up,           &World::_p1_right, &World::_p1_down,
+        &World::_p1_left,         &World::_p2_up,    &World::_p2_right,
+        &World::_p2_down,         &World::_p2_left,  &World::_set_glfw,
+        &World::_set_sfml,        &World::_set_sdl
+    };
     auto now = std::chrono::high_resolution_clock::now();
 
-    std::chrono::duration<double> system_diff = now - _system_time_ref;
-    std::chrono::duration<double> snake_diff = now - _snake_time_ref;
-
-    uint8_t system_accept = (system_diff.count() > SYSTEM_TIMER_SECONDS);
-    uint8_t system_updated = 0;
-
-    uint8_t snake_accept = (snake_diff.count() > DEFAULT_SNAKE_TIMER_SECONDS);
-    uint8_t snake_updated = 0;
-
-    if (_events[IGraphicTypes::NibblerEvent::CLOSE_WIN] && system_accept) {
-        _gfx_interface->triggerClose();
-        system_accept = 0;
-        system_updated = 1;
+    for (uint8_t i = 0; i < NB_EVENT_TIMER_TYPES; ++i) {
+        std::chrono::duration<double> time_diff =
+          now - _event_timers.time_ref[i];
+        _event_timers.accept_event[i] =
+          (time_diff.count() > _event_timers.timer_values[i]);
     }
-    if (_events[IGraphicTypes::NibblerEvent::TOGGLE_WIN] && system_accept) {
-        _gfx_interface->toggleFullscreen();
-        system_accept = 0;
-        system_updated = 1;
+    for (auto &it : func) {
+        std::invoke(it, this);
     }
-    if (snake_accept && _events[IGraphicTypes::P1_UP] && _snake_pos[0].y > 0) {
-        _snake_pos[0].y -= 1;
-        snake_updated = 1;
-    }
-    if (snake_accept && _events[IGraphicTypes::P1_LEFT] &&
-        _snake_pos[0].x > 0) {
-        _snake_pos[0].x -= 1;
-        snake_updated = 1;
-    }
-    if (snake_accept && _events[IGraphicTypes::P1_DOWN] &&
-        _snake_pos[0].y < _params.board_h - 1) {
-        _snake_pos[0].y += 1;
-        snake_updated = 1;
-    }
-    if (snake_accept && _events[IGraphicTypes::P1_RIGHT] &&
-        _snake_pos[0].x < _params.board_w - 1) {
-        _snake_pos[0].x += 1;
-        snake_updated = 1;
-    }
-    if (system_updated) {
-        _system_time_ref = now;
-    }
-    if (snake_updated) {
-        _snake_time_ref = now;
+    for (uint8_t i = 0; i < NB_EVENT_TIMER_TYPES; ++i) {
+        if (_event_timers.updated[i]) {
+            _event_timers.time_ref[i] = now;
+        }
+        _event_timers.updated[i] = 0;
     }
 }
+
+void
+World::_close_win_event()
+{
+    if (_events[IGraphicTypes::NibblerEvent::CLOSE_WIN] &&
+        _event_timers.accept_event[SYSTEM]) {
+        _gfx_interface->triggerClose();
+        _event_timers.accept_event[SYSTEM] = 0;
+        _event_timers.updated[SYSTEM] = 1;
+    }
+}
+
+void
+World::_pause()
+{}
+
+void
+World::_toggle_fullscreen()
+{
+    if (_events[IGraphicTypes::NibblerEvent::TOGGLE_WIN] &&
+        _event_timers.accept_event[SYSTEM]) {
+        _gfx_interface->toggleFullscreen();
+        _event_timers.accept_event[SYSTEM] = 0;
+        _event_timers.updated[SYSTEM] = 1;
+    }
+}
+
+void
+World::_p1_up()
+{
+    if (_event_timers.accept_event[P1] && _events[IGraphicTypes::P1_UP] &&
+        _snake_pos[0].y > 0) {
+        _snake_pos[0].y -= 1;
+        _event_timers.updated[P1] = 1;
+    }
+}
+
+void
+World::_p1_right()
+{
+    if (_event_timers.accept_event[P1] && _events[IGraphicTypes::P1_RIGHT] &&
+        _snake_pos[0].x < _params.board_w - 1) {
+        _snake_pos[0].x += 1;
+        _event_timers.updated[P1] = 1;
+    }
+}
+
+void
+World::_p1_down()
+{
+    if (_event_timers.accept_event[P1] && _events[IGraphicTypes::P1_DOWN] &&
+        _snake_pos[0].y < _params.board_h - 1) {
+        _snake_pos[0].y += 1;
+        _event_timers.updated[P1] = 1;
+    }
+}
+
+void
+World::_p1_left()
+{
+    if (_event_timers.accept_event[P1] && _events[IGraphicTypes::P1_LEFT] &&
+        _snake_pos[0].x > 0) {
+        _snake_pos[0].x -= 1;
+        _event_timers.updated[P1] = 1;
+    }
+}
+
+void
+World::_p2_up()
+{}
+
+void
+World::_p2_right()
+{}
+
+void
+World::_p2_down()
+{}
+
+void
+World::_p2_left()
+{}
+
+void
+World::_set_glfw()
+{}
+
+void
+World::_set_sfml()
+{}
+
+void
+World::_set_sdl()
+{}
