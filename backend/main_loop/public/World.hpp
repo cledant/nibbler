@@ -67,6 +67,7 @@ class World
     uint32_t _snake_size;
 
     uint8_t _is_init;
+    uint8_t _paused;
 
     std::chrono::high_resolution_clock ::time_point _loop_time_ref;
 

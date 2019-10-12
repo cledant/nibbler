@@ -1,6 +1,9 @@
-#include "gfx_loader.hpp"
-#include <dlfcn.h>
 #include <stdexcept>
+#include <iostream>
+
+#include <dlfcn.h>
+
+#include "gfx_loader.hpp"
 
 GfxLoader::GfxLoader()
   : _handler(nullptr)
@@ -17,6 +20,7 @@ GfxLoader::~GfxLoader()
 void
 GfxLoader::openLib(std::string const &libpath)
 {
+    std::cout << "Loading Shared Lib : " << libpath << std::endl;
     if (_handler)
         closeLib();
     if (!(_handler = dlopen(libpath.c_str(), RTLD_LAZY))) {

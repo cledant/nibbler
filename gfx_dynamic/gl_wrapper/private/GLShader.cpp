@@ -36,7 +36,7 @@ GLShader::init(std::string const &path_vs,
     }
     uint32_t vs = 0;
     uint32_t fs = 0;
-    std::cout << "Loading : " << prog_name << std::endl;
+    std::cout << "Loading Shader : " << prog_name << std::endl;
 
     try {
         vs = _loadShader(path_vs, GL_VERTEX_SHADER);
@@ -68,7 +68,7 @@ GLShader::init(std::string const &path_vs,
     uint32_t vs = 0;
     uint32_t gs = 0;
     uint32_t fs = 0;
-    std::cout << "Loading : " << prog_name << std::endl;
+    std::cout << "Loading Shader : " << prog_name << std::endl;
 
     try {
         vs = _loadShader(path_vs, GL_VERTEX_SHADER);
