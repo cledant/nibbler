@@ -129,9 +129,9 @@ GlfwGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     buffer[IGraphicTypes::NibblerEvent::P2_RIGHT] = _input.keys[GLFW_KEY_RIGHT];
     buffer[IGraphicTypes::NibblerEvent::P2_DOWN] = _input.keys[GLFW_KEY_DOWN];
     buffer[IGraphicTypes::NibblerEvent::P2_LEFT] = _input.keys[GLFW_KEY_LEFT];
-    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_1];
-    buffer[IGraphicTypes::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_2];
-    buffer[IGraphicTypes::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_3];
+    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_F1];
+    buffer[IGraphicTypes::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_F2];
+    buffer[IGraphicTypes::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_F3];
 }
 
 void
