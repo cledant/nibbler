@@ -11,6 +11,7 @@
 class World
 {
   public:
+    World() = delete;
     explicit World(WorldParams const &params);
     virtual ~World();
     World(World const &src) = delete;

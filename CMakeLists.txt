@@ -33,11 +33,4 @@ target_link_libraries(nibbler gfx_dyn_glfw dl main_loop)
 add_dependencies(nibbler gfx_dyn gfx_dyn_glfw main_loop)
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
-#test_binary
-add_executable(test_gfx
-		test_binary_libs/private/test_binary.cpp)
-add_dependencies(test_gfx glad glfw gfx_dyn gfx_dyn_glfw gfx_loader glwrapper)
-target_link_libraries(test_gfx PUBLIC glad glfw glm gfx_loader gfx_dyn dl glwrapper)
-target_compile_options(test_gfx PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
-
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)

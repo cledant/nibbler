@@ -20,11 +20,12 @@ parse_int(char const *arg, int32_t min, int32_t max)
     try {
         size = std::stoi(arg);
     } catch (std::exception const &e) {
-        throw std::runtime_error("Nibbler: Invalid argument: " + std::string(arg));
+        throw std::runtime_error("Nibbler: Invalid argument: " +
+                                 std::string(arg));
     }
 
     if (size < min || size > max) {
-        throw std::runtime_error("Nibbler: Invalid Size");
+        throw std::runtime_error("Nibbler: Invalid Size: " + std::string(arg));
     }
     return (size);
 }
@@ -36,7 +37,8 @@ parse_gametype(char const *arg)
     try {
         nb_player = std::stoi(arg);
     } catch (std::exception const &e) {
-        throw std::runtime_error("Nibbler: Invalid argument: " + std::string(arg));
+        throw std::runtime_error("Nibbler: Invalid argument: " +
+                                 std::string(arg));
     }
 
     if (nb_player == 1) {
@@ -44,7 +46,8 @@ parse_gametype(char const *arg)
     } else if (nb_player == 2) {
         return (Gametype::TWO_PLAYER);
     } else {
-        throw std::runtime_error("Nibbler: Invalid number of player");
+        throw std::runtime_error("Nibbler: Invalid number of player: " +
+                                 std::string(arg));
     }
 }
 
