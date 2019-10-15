@@ -1,15 +1,12 @@
 #include <stdexcept>
-#include <cstring>
 
 #include "SFMLGraphic.hpp"
 
 SFMLGraphic::SFMLGraphic()
-  : _input()
-  , _win()
+  : _win()
   , _board()
   , _should_close(0)
 {
-    memset(_input.keys.data(), 0, sizeof(uint8_t) * _input.keys.size());
     _win.fullscreen = 0;
     _win.w = 0;
     _win.h = 0;
@@ -93,7 +90,23 @@ SFMLGraphic::triggerClose()
 void
 SFMLGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
 {
-    (void)events;
+    auto buffer = events.data();
+
+    buffer[IGraphicTypes::NibblerEvent::CLOSE_WIN] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::Escape);
+    buffer[IGraphicTypes::NibblerEvent::PAUSE] = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+    buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] = sf::Keyboard::isKeyPressed(sf::Keyboard::F5);
+    buffer[IGraphicTypes::NibblerEvent::P1_UP] = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
+    buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+    buffer[IGraphicTypes::NibblerEvent::P1_DOWN] = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+    buffer[IGraphicTypes::NibblerEvent::P1_LEFT] = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
+    buffer[IGraphicTypes::NibblerEvent::P2_UP] = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    buffer[IGraphicTypes::NibblerEvent::P2_RIGHT] = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    buffer[IGraphicTypes::NibblerEvent::P2_DOWN] = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+    buffer[IGraphicTypes::NibblerEvent::P2_LEFT] = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = sf::Keyboard::isKeyPressed(sf::Keyboard::F1);
+    buffer[IGraphicTypes::NibblerEvent::SET_SFML] = sf::Keyboard::isKeyPressed(sf::Keyboard::F2);
+    buffer[IGraphicTypes::NibblerEvent::SET_SDL] = sf::Keyboard::isKeyPressed(sf::Keyboard::F3);
 }
 
 void

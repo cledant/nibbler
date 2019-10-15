@@ -43,11 +43,6 @@ class SFMLGraphic : public IGraphic
     void toggleFullscreen() override;
 
   private:
-    struct Input
-    {
-        std::array<uint8_t, 1024> keys;
-    };
-
     struct Win
     {
         sf::Window win;
@@ -56,7 +51,6 @@ class SFMLGraphic : public IGraphic
         int32_t h;
         int32_t w_viewport;
         int32_t h_viewport;
-        std::string win_name;
         glm::vec2 _screen_ratio;
     };
 
@@ -71,7 +65,6 @@ class SFMLGraphic : public IGraphic
     static constexpr float VERTICAL_BORDER = 0.10f;
 
     std::string _home;
-    Input _input;
     Win _win;
     Board _board;
 
