@@ -1,11 +1,180 @@
-#include <iostream>
+#include <stdexcept>
+#include <cstring>
 
 #include "SFMLGraphic.hpp"
 
-void
-SFMLGraphic::init()
+SFMLGraphic::SFMLGraphic()
+  : _input()
+  , _win()
+  , _board()
+  , _should_close(0)
 {
-    std::cout << "HI THIS IS SFML LIB" << std::endl;
+    memset(_input.keys.data(), 0, sizeof(uint8_t) * _input.keys.size());
+    _win.fullscreen = 0;
+    _win.w = 0;
+    _win.h = 0;
+    _win.w_viewport = 0;
+    _win.h_viewport = 0;
+    _win._screen_ratio = glm::vec2(1.0f);
+    _board.h = 0;
+    _board.w = 0;
+    _board.gl_snake_board_size = glm::vec2(1.0f);
+    _board.gl_board_size = glm::vec2(1.0f);
+}
+
+void
+SFMLGraphic::init(std::string const &home, int32_t w_square, int32_t h_square)
+{
+    _board.w = w_square;
+    _board.h = h_square;
+    _home = home;
+}
+
+void
+SFMLGraphic::terminate()
+{}
+
+void
+SFMLGraphic::createWindow(std::string &&name)
+{
+    sf::ContextSettings context;
+
+    context.majorVersion = 4;
+    context.minorVersion = 1;
+    context.depthBits = 24;
+    context.stencilBits = 8;
+    _win.win.create(
+      sf::VideoMode(IGraphicConstants::WIN_W, IGraphicConstants::WIN_H),
+      name,
+      sf::Style::Titlebar | sf::Style::Close,
+      context);
+    _win.win.setVerticalSyncEnabled(false);
+    _win.w = IGraphicConstants::WIN_W;
+    _win.h = IGraphicConstants::WIN_H;
+    _win.w_viewport = IGraphicConstants::WIN_W;
+    _win.h_viewport = IGraphicConstants::WIN_H;
+    _computeSquareRatio();
+    _computeBoardSize();
+
+    if (!gladLoadGL()) {
+        throw std::runtime_error("GLAD not loaded");
+    }
+    glViewport(0, 0, _win.w_viewport, _win.h_viewport);
+    _gl_snake_shader.init(
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
+      "draw_rectangle");
+    _gl_snake.init();
+    _gl_board.init();
+}
+
+void
+SFMLGraphic::deleteWindow()
+{
+    _gl_board.clear();
+    _gl_snake.clear();
+    _gl_snake_shader.clear();
+    _win.win.close();
+}
+
+uint8_t
+SFMLGraphic::shouldClose()
+{
+    return (_should_close);
+}
+
+void
+SFMLGraphic::triggerClose()
+{
+    _should_close = 1;
+}
+
+void
+SFMLGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
+{
+    (void)events;
+}
+
+void
+SFMLGraphic::drawBoard()
+{
+    _gl_snake_shader.use();
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_board_size);
+    glBindVertexArray(_gl_board.getVao());
+    glDrawArrays(GL_POINTS, 0, 1);
+    glBindVertexArray(0);
+}
+
+void
+SFMLGraphic::drawSnake(
+  std::array<glm::vec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+  std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+  uint32_t size)
+{
+    _gl_snake_shader.use();
+    glBindVertexArray(_gl_snake.getVao());
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
+    _gl_snake.updateVbo(pos, color, size);
+    glDrawArrays(GL_POINTS, 0, size);
+    glBindVertexArray(0);
+}
+
+void
+SFMLGraphic::drawSnake(
+  std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+  std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
+  uint32_t size)
+{
+    _gl_snake_shader.use();
+    glBindVertexArray(_gl_snake.getVao());
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
+    _gl_snake.updateVbo(
+      pos, _board.gl_snake_board_size, _board.w, _board.h, color, size);
+    glDrawArrays(GL_POINTS, 0, size);
+    glBindVertexArray(0);
+}
+
+void
+SFMLGraphic::render()
+{
+    _win.win.display();
+}
+
+void
+SFMLGraphic::clear()
+{
+    glClearColor(0.086f, 0.317f, 0.427f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void
+SFMLGraphic::toggleFullscreen()
+{}
+
+void
+SFMLGraphic::_computeSquareRatio()
+{
+    float w =
+      (_win.w_viewport >= _win.h_viewport) ? _win.w_viewport : _win.h_viewport;
+    float h =
+      (_win.w_viewport >= _win.h_viewport) ? _win.h_viewport : _win.w_viewport;
+
+    _win._screen_ratio = (_win.w_viewport >= _win.h_viewport)
+                           ? glm::vec2(h / w, 1.0f)
+                           : glm::vec2(1.0f, h / w);
+}
+
+void
+SFMLGraphic::_computeBoardSize()
+{
+    _board.gl_board_size = _win._screen_ratio * (1.0f - VERTICAL_BORDER);
+
+    float largest = (_board.w >= _board.h) ? _board.w : _board.h;
+    _board.gl_snake_board_size = _board.gl_board_size / largest;
+
+    _board.gl_board_size =
+      glm::vec2(_board.w, _board.h) * _board.gl_snake_board_size;
 }
 
 extern "C" IGraphic *

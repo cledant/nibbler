@@ -19,6 +19,12 @@ option(GLFW_INSTALL "" ON)
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw ${CMAKE_BINARY_DIR}/external/glfw/build)
 
+#Setup SFML Window + Audio Lib
+option(SFML_BUILD_GRAPHICS "" FALSE)
+option(SFML_BUILD_NETWORK "" FALSE)
+option(SFML_BUILD_DOC "" FALSE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sfml ${CMAKE_BINARY_DIR}/SFML/build)
+
 #gfx_dynamic libs
 add_subdirectory(gfx_dynamic/libs)
 add_subdirectory(gfx_dynamic/loader)
@@ -29,8 +35,8 @@ add_subdirectory(backend/main_loop)
 
 #Main binary
 add_executable(nibbler binary/private/nibbler.cpp)
-target_link_libraries(nibbler gfx_dyn_glfw dl main_loop)
-add_dependencies(nibbler gfx_dyn gfx_dyn_glfw main_loop)
+target_link_libraries(nibbler dl main_loop)
+add_dependencies(nibbler gfx_dyn gfx_dyn_glfw gfx_dyn_sfml main_loop)
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
