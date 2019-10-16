@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <cstring>
 
 #include "SFMLGraphic.hpp"
 
@@ -34,36 +35,8 @@ SFMLGraphic::terminate()
 void
 SFMLGraphic::createWindow(std::string &&name)
 {
-    sf::ContextSettings context;
-
-    context.majorVersion = 4;
-    context.minorVersion = 1;
-    context.depthBits = 24;
-    context.stencilBits = 8;
-    _win.win.create(
-      sf::VideoMode(IGraphicConstants::WIN_W, IGraphicConstants::WIN_H),
-      name,
-      sf::Style::Titlebar | sf::Style::Close,
-      context);
-    _win.win.setVerticalSyncEnabled(false);
-    _win.w = IGraphicConstants::WIN_W;
-    _win.h = IGraphicConstants::WIN_H;
-    _win.w_viewport = IGraphicConstants::WIN_W;
-    _win.h_viewport = IGraphicConstants::WIN_H;
-    _computeSquareRatio();
-    _computeBoardSize();
-
-    if (!gladLoadGL()) {
-        throw std::runtime_error("GLAD not loaded");
-    }
-    glViewport(0, 0, _win.w_viewport, _win.h_viewport);
-    _gl_snake_shader.init(
-      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
-      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
-      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
-      "draw_rectangle");
-    _gl_snake.init();
-    _gl_board.init();
+    _win._win_name = name;
+    _createWindow();
 }
 
 void
@@ -92,21 +65,38 @@ SFMLGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
 {
     auto buffer = events.data();
 
+    if (!_win.win.hasFocus()) {
+        std::memset(buffer, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
+        return;
+    }
     buffer[IGraphicTypes::NibblerEvent::CLOSE_WIN] =
       sf::Keyboard::isKeyPressed(sf::Keyboard::Escape);
-    buffer[IGraphicTypes::NibblerEvent::PAUSE] = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
-    buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] = sf::Keyboard::isKeyPressed(sf::Keyboard::F5);
-    buffer[IGraphicTypes::NibblerEvent::P1_UP] = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
-    buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
-    buffer[IGraphicTypes::NibblerEvent::P1_DOWN] = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
-    buffer[IGraphicTypes::NibblerEvent::P1_LEFT] = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
-    buffer[IGraphicTypes::NibblerEvent::P2_UP] = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-    buffer[IGraphicTypes::NibblerEvent::P2_RIGHT] = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
-    buffer[IGraphicTypes::NibblerEvent::P2_DOWN] = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
-    buffer[IGraphicTypes::NibblerEvent::P2_LEFT] = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
-    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = sf::Keyboard::isKeyPressed(sf::Keyboard::F1);
-    buffer[IGraphicTypes::NibblerEvent::SET_SFML] = sf::Keyboard::isKeyPressed(sf::Keyboard::F2);
-    buffer[IGraphicTypes::NibblerEvent::SET_SDL] = sf::Keyboard::isKeyPressed(sf::Keyboard::F3);
+    buffer[IGraphicTypes::NibblerEvent::PAUSE] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+    buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F5);
+    buffer[IGraphicTypes::NibblerEvent::P1_UP] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::W);
+    buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+    buffer[IGraphicTypes::NibblerEvent::P1_DOWN] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+    buffer[IGraphicTypes::NibblerEvent::P1_LEFT] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::A);
+    buffer[IGraphicTypes::NibblerEvent::P2_UP] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    buffer[IGraphicTypes::NibblerEvent::P2_RIGHT] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    buffer[IGraphicTypes::NibblerEvent::P2_DOWN] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+    buffer[IGraphicTypes::NibblerEvent::P2_LEFT] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    buffer[IGraphicTypes::NibblerEvent::SET_GLFW] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F1);
+    buffer[IGraphicTypes::NibblerEvent::SET_SFML] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F2);
+    buffer[IGraphicTypes::NibblerEvent::SET_SDL] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F3);
 }
 
 void
@@ -157,13 +147,17 @@ SFMLGraphic::render()
 void
 SFMLGraphic::clear()
 {
-    glClearColor(0.086f, 0.317f, 0.427f, 1.0f);
+    glClearColor(0.321f, 0.254f, 0.361f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void
 SFMLGraphic::toggleFullscreen()
-{}
+{
+    _win.fullscreen = !_win.fullscreen;
+    deleteWindow();
+    _createWindow();
+}
 
 void
 SFMLGraphic::_computeSquareRatio()
@@ -188,6 +182,53 @@ SFMLGraphic::_computeBoardSize()
 
     _board.gl_board_size =
       glm::vec2(_board.w, _board.h) * _board.gl_snake_board_size;
+}
+
+void
+SFMLGraphic::_createWindow()
+{
+    sf::ContextSettings context;
+    context.majorVersion = 4;
+    context.minorVersion = 1;
+    context.depthBits = 24;
+    context.stencilBits = 8;
+    if (_win.fullscreen) {
+        _win.win.create(sf::VideoMode(),
+                        _win._win_name,
+                        sf::Style::Titlebar | sf::Style::Close |
+                          sf::Style::Fullscreen,
+                        context);
+        _win.w = _win.win.getSize().x;
+        _win.h = _win.win.getSize().y;
+        _win.w_viewport = _win.w;
+        _win.h_viewport = _win.h;
+    } else {
+        _win.win.create(
+          sf::VideoMode(IGraphicConstants::WIN_W, IGraphicConstants::WIN_H),
+          _win._win_name,
+          sf::Style::Titlebar | sf::Style::Close,
+          context);
+        _win.w = IGraphicConstants::WIN_W;
+        _win.h = IGraphicConstants::WIN_H;
+        _win.w_viewport = IGraphicConstants::WIN_W;
+        _win.h_viewport = IGraphicConstants::WIN_H;
+        _win.win.setPosition({ 100, 100 });
+    }
+    _win.win.setVerticalSyncEnabled(false);
+    _computeSquareRatio();
+    _computeBoardSize();
+
+    if (!gladLoadGL()) {
+        throw std::runtime_error("GLAD not loaded");
+    }
+    glViewport(0, 0, _win.w_viewport, _win.h_viewport);
+    _gl_snake_shader.init(
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
+      "draw_rectangle");
+    _gl_snake.init();
+    _gl_board.init();
 }
 
 extern "C" IGraphic *

@@ -46,6 +46,7 @@ class SFMLGraphic : public IGraphic
     struct Win
     {
         sf::Window win;
+        std::string _win_name;
         uint8_t fullscreen;
         int32_t w;
         int32_t h;
@@ -76,6 +77,7 @@ class SFMLGraphic : public IGraphic
 
     void _computeSquareRatio();
     void _computeBoardSize();
+    void _createWindow();
 };
 
 #endif
