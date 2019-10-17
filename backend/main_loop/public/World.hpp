@@ -6,7 +6,7 @@
 
 #include "WorldParams.hpp"
 #include "IGraphic.hpp"
-#include "gfx_loader.hpp"
+#include "dyn_lib_loader.hpp"
 
 class World
 {
@@ -55,7 +55,7 @@ class World
     WorldParams _params;
 
     std::string _home;
-    GfxLoader _gfx_loader;
+    DynLibLoader<IGraphic> _gfx_loader;
     IGraphic *_gfx_interface;
 
     std::array<std::string, NB_GFX_LIB> _path_gfx_lib;

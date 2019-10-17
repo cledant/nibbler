@@ -42,9 +42,9 @@ class IGraphic
     virtual void render() = 0;
     virtual void clear() = 0;
     virtual void toggleFullscreen() = 0;
-};
 
-typedef IGraphic *gfx_creator_t();
-typedef void gfx_deleter_t(IGraphic *);
+    typedef IGraphic *creator_t();
+    typedef void deleter_t(IGraphic *);
+};
 
 #endif

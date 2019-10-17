@@ -27,16 +27,16 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sfml ${CMAKE_BINARY_DIR}/S
 
 #gfx_dynamic libs
 add_subdirectory(gfx_dynamic/libs)
-add_subdirectory(gfx_dynamic/loader)
 add_subdirectory(gfx_dynamic/gl_wrapper)
 
 #backend libs
+add_subdirectory(backend/dyn_lib_loader)
 add_subdirectory(backend/main_loop)
 
 #Main binary
 add_executable(nibbler binary/private/nibbler.cpp)
 target_link_libraries(nibbler dl main_loop)
-add_dependencies(nibbler gfx_dyn gfx_dyn_glfw gfx_dyn_sfml main_loop)
+add_dependencies(nibbler gfx_dyn dyn_lib_loader gfx_dyn_glfw gfx_dyn_sfml main_loop)
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)

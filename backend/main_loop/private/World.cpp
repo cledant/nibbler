@@ -41,11 +41,11 @@ World::init()
         }
 #ifdef __APPLE__
         _path_gfx_lib[GFX_GLFW] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so";
+          _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.dylib";
         _path_gfx_lib[GFX_SFML] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so";
+          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sfml.dylib";
         _path_gfx_lib[GFX_SDL] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so";
+          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl.dylib";
 #else
         _path_gfx_lib[GFX_GLFW] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so";
