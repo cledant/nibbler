@@ -36,11 +36,20 @@ class World
       FRAME_LENGTH_SECONDS * 30;
     static uint8_t constexpr NB_EVENT_TIMER_TYPES = 3;
 
+    // Player related
+    static constexpr uint8_t NB_PLAYER_MAX = 2;
+
     enum EventTimersTypes
     {
         SYSTEM = 0,
         P1,
         P2,
+    };
+
+    enum Player
+    {
+        PLAYER_1 = 0,
+        PLAYER_2,
     };
 
     struct EventTimers
@@ -53,6 +62,12 @@ class World
         std::array<double, NB_EVENT_TIMER_TYPES> timer_values;
     };
 
+    struct WinCondition
+    {
+        uint8_t out_of_map;
+        uint8_t touch_player;
+    };
+
     WorldParams _params;
 
     std::string _home;
@@ -63,11 +78,12 @@ class World
     std::array<uint8_t, IGraphicConstants::NB_EVENT> _events;
     EventTimers _event_timers;
 
-    Snake _p1;
-    uint8_t _p1_out_of_map;
+    std::array<Snake, NB_PLAYER_MAX> _player;
+    std::array<WinCondition, NB_PLAYER_MAX> _win_con;
 
     uint8_t _is_init;
     uint8_t _paused;
+    uint8_t _nb_player;
 
     std::chrono::high_resolution_clock ::time_point _loop_time_ref;
 
@@ -90,6 +106,11 @@ class World
     void _set_glfw();
     void _set_sfml();
     void _set_sdl();
+
+    // Win conditions handling
+    void _check_player_overlap();
+    void _check_draw();
+    void _check_win();
 };
 
 #endif

@@ -40,7 +40,10 @@ Snake::getSnakeMaxSize() const
 glm::uvec2 const &
 Snake::getSnakeHeadPos() const
 {
-    return (_snake_pos[_cur_size]);
+    if (!_cur_size) {
+        return (_snake_pos[0]);
+    }
+    return (_snake_pos[_cur_size - 1]);
 }
 
 void
@@ -63,7 +66,63 @@ Snake::init(glm::uvec2 const &start_pos,
     _snake_color[3] = _head_color;
 }
 
-#include <iostream>
+void
+Snake::addToSnake(glm::uvec2 const &pos)
+{
+    if (_cur_size < _max_size) {
+        _snake_pos[_cur_size] = pos;
+        _snake_color[_cur_size] = _body_color;
+        ++_cur_size;
+    }
+}
+
+void
+Snake::addToSnake(glm::uvec2 const &pos, glm::vec3 const &color)
+{
+    if (_cur_size < _max_size) {
+        _snake_pos[_cur_size] = pos;
+        std::memmove(_snake_color.data() + 1,
+                     _snake_color.data(),
+                     sizeof(glm::uvec2) * (_cur_size - 1));
+        _snake_color[_cur_size] = color;
+        ++_cur_size;
+    }
+}
+
+void
+Snake::removeFromSnake(glm::uvec2 const &pos)
+{
+    if (!_cur_size) {
+        return;
+    }
+    uint32_t i;
+    for (i = 0; i < _cur_size; ++i) {
+        if (_snake_pos[i] == pos) {
+            break;
+        }
+    }
+    if (i == _cur_size) {
+        return;
+    }
+    std::memmove(_snake_pos.data() + i,
+                 _snake_pos.data() + i + 1,
+                 sizeof(glm::uvec2) * (_cur_size - 1 - i));
+    std::memmove(_snake_color.data() + i,
+                 _snake_color.data() + i + 1,
+                 sizeof(glm::vec3) * (_cur_size - 1 - i));
+    --_cur_size;
+}
+
+uint8_t
+Snake::isInsideSnake(glm::uvec2 const &pos)
+{
+    for (auto const &it : _snake_pos) {
+        if (it == pos) {
+            return (1);
+        }
+    }
+    return (0);
+}
 
 uint8_t
 Snake::moveSnake(enum Direction dir)

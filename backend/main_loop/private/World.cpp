@@ -1,5 +1,6 @@
 #include <functional>
 #include <iostream>
+#include <cstring>
 
 #include "World.hpp"
 
@@ -11,10 +12,11 @@ World::World(WorldParams const &params)
   , _path_gfx_lib()
   , _events()
   , _event_timers()
-  , _p1()
-  , _p1_out_of_map(0)
+  , _player()
+  , _win_con()
   , _is_init(0)
   , _paused(0)
+  , _nb_player(_params.game_type + 1)
   , _loop_time_ref(std::chrono::high_resolution_clock::now())
 {
     _event_timers.timer_values = { SYSTEM_TIMER_SECONDS,
@@ -23,10 +25,24 @@ World::World(WorldParams const &params)
     _event_timers.time_ref = { std::chrono::high_resolution_clock::now(),
                                std::chrono::high_resolution_clock::now(),
                                std::chrono::high_resolution_clock::now() };
-    _p1.init(glm::uvec2{ _params.board_w / 2, _params.board_h / 2 },
-             glm::vec3{ 0.0f, 1.0f, 0.0f },
-             _params.board_w,
-             _params.board_h);
+    if (_params.game_type == ONE_PLAYER) {
+        _player[PLAYER_1].init(
+          glm::uvec2{ _params.board_w / 2, _params.board_h / 2 },
+          glm::vec3{ 0.0f, 1.0f, 0.0f },
+          _params.board_w,
+          _params.board_h);
+    } else {
+        _player[PLAYER_1].init(
+          glm::uvec2{ _params.board_w / 4, _params.board_h / 2 },
+          glm::vec3{ 0.0f, 1.0f, 0.0f },
+          _params.board_w,
+          _params.board_h);
+        _player[PLAYER_2].init(
+          glm::uvec2{ 3 * _params.board_w / 4, _params.board_h / 2 },
+          glm::vec3{ 0.0f, 0.0f, 1.0f },
+          _params.board_w,
+          _params.board_h);
+    }
 }
 
 World::~World()
@@ -72,11 +88,14 @@ World::run()
         if (loop_diff.count() > FRAME_LENGTH_SECONDS) {
             _gfx_interface->getEvents(_events);
             _interpret_events();
+            _check_player_overlap();
             _gfx_interface->clear();
             _gfx_interface->drawBoard();
-            _gfx_interface->drawSnake(_p1.getSnakePosArray(),
-                                      _p1.getSnakeColorArray(),
-                                      _p1.getSnakeCurrentSize());
+            for (uint8_t i = 0; i < _nb_player; ++i) {
+                _gfx_interface->drawSnake(_player[i].getSnakePosArray(),
+                                          _player[i].getSnakeColorArray(),
+                                          _player[i].getSnakeCurrentSize());
+            }
             _gfx_interface->render();
             _loop_time_ref = now;
         }
@@ -174,7 +193,7 @@ World::_p1_up()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_UP]) {
-        _p1_out_of_map = _p1.moveSnake(Snake::UP);
+        _win_con[PLAYER_1].out_of_map = _player[PLAYER_1].moveSnake(Snake::UP);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -185,7 +204,8 @@ World::_p1_right()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_RIGHT]) {
-        _p1_out_of_map = _p1.moveSnake(Snake::RIGHT);
+        _win_con[PLAYER_1].out_of_map =
+          _player[PLAYER_1].moveSnake(Snake::RIGHT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -196,7 +216,8 @@ World::_p1_down()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_DOWN]) {
-        _p1_out_of_map = _p1.moveSnake(Snake::DOWN);
+        _win_con[PLAYER_1].out_of_map =
+          _player[PLAYER_1].moveSnake(Snake::DOWN);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -207,7 +228,8 @@ World::_p1_left()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_LEFT]) {
-        _p1_out_of_map = _p1.moveSnake(Snake::LEFT);
+        _win_con[PLAYER_1].out_of_map =
+          _player[PLAYER_1].moveSnake(Snake::LEFT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -215,19 +237,54 @@ World::_p1_left()
 
 void
 World::_p2_up()
-{}
+{
+    if (!_paused && _event_timers.accept_event[P2] &&
+        _events[IGraphicTypes::P2_UP] &&
+        _params.game_type == Gametype::TWO_PLAYER) {
+        _win_con[PLAYER_2].out_of_map = _player[PLAYER_2].moveSnake(Snake::UP);
+        _event_timers.updated[P2] = 1;
+        _event_timers.accept_event[P2] = 0;
+    }
+}
 
 void
 World::_p2_right()
-{}
+{
+    if (!_paused && _event_timers.accept_event[P2] &&
+        _events[IGraphicTypes::P2_RIGHT] &&
+        _params.game_type == Gametype::TWO_PLAYER) {
+        _win_con[PLAYER_2].out_of_map =
+          _player[PLAYER_2].moveSnake(Snake::RIGHT);
+        _event_timers.updated[P2] = 1;
+        _event_timers.accept_event[P2] = 0;
+    }
+}
 
 void
 World::_p2_down()
-{}
+{
+    if (!_paused && _event_timers.accept_event[P2] &&
+        _events[IGraphicTypes::P2_DOWN] &&
+        _params.game_type == Gametype::TWO_PLAYER) {
+        _win_con[PLAYER_2].out_of_map =
+          _player[PLAYER_2].moveSnake(Snake::DOWN);
+        _event_timers.updated[P2] = 1;
+        _event_timers.accept_event[P2] = 0;
+    }
+}
 
 void
 World::_p2_left()
-{}
+{
+    if (!_paused && _event_timers.accept_event[P2] &&
+        _events[IGraphicTypes::P2_LEFT] &&
+        _params.game_type == Gametype::TWO_PLAYER) {
+        _win_con[PLAYER_2].out_of_map =
+          _player[PLAYER_2].moveSnake(Snake::LEFT);
+        _event_timers.updated[P2] = 1;
+        _event_timers.accept_event[P2] = 0;
+    }
+}
 
 void
 World::_set_glfw()
@@ -269,4 +326,13 @@ World::_set_sdl()
         _event_timers.accept_event[SYSTEM] = 0;
         _event_timers.updated[SYSTEM] = 1;
     }
+}
+
+void
+World::_check_player_overlap()
+{
+    _win_con[PLAYER_1].touch_player =
+      _player[PLAYER_2].isInsideSnake(_player[PLAYER_1].getSnakeHeadPos());
+    _win_con[PLAYER_2].touch_player =
+      _player[PLAYER_1].isInsideSnake(_player[PLAYER_2].getSnakeHeadPos());
 }
