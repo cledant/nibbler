@@ -7,6 +7,7 @@
 #include "WorldParams.hpp"
 #include "IGraphic.hpp"
 #include "dyn_lib_loader.hpp"
+#include "Snake.hpp"
 
 class World
 {
@@ -62,10 +63,8 @@ class World
     std::array<uint8_t, IGraphicConstants::NB_EVENT> _events;
     EventTimers _event_timers;
 
-    // TODO Use proper class + array to store P1 / P2 / Apples
-    std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> _snake_pos;
-    std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> _snake_color;
-    uint32_t _snake_size;
+    Snake _p1;
+    uint8_t _p1_out_of_map;
 
     uint8_t _is_init;
     uint8_t _paused;

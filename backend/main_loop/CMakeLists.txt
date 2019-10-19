@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(binary_main_loop)
 
 add_library(main_loop STATIC
-		private/World.cpp)
+		private/World.cpp
+		private/Snake.cpp)
 target_include_directories(main_loop
 		PUBLIC
 		${CMAKE_CURRENT_SOURCE_DIR}/public

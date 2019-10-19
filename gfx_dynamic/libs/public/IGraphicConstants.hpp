@@ -9,8 +9,8 @@ static uint32_t constexpr WIN_W = 1280;
 
 static constexpr uint32_t MIN_W = 10;
 static constexpr uint32_t MIN_H = 10;
-static constexpr uint32_t MAX_W = 100;
-static constexpr uint32_t MAX_H = 100;
+static constexpr uint32_t MAX_W = 50;
+static constexpr uint32_t MAX_H = 50;
 static constexpr uint32_t MAX_SNAKE_SIZE = MAX_W * MAX_H;
 
 }

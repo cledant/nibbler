@@ -11,9 +11,8 @@ World::World(WorldParams const &params)
   , _path_gfx_lib()
   , _events()
   , _event_timers()
-  , _snake_pos({ glm::uvec2{ 4, 4 } })
-  , _snake_color({ glm::vec3{ 0.0, 1.0, 0.0 } })
-  , _snake_size(1)
+  , _p1()
+  , _p1_out_of_map(0)
   , _is_init(0)
   , _paused(0)
   , _loop_time_ref(std::chrono::high_resolution_clock::now())
@@ -24,6 +23,10 @@ World::World(WorldParams const &params)
     _event_timers.time_ref = { std::chrono::high_resolution_clock::now(),
                                std::chrono::high_resolution_clock::now(),
                                std::chrono::high_resolution_clock::now() };
+    _p1.init(glm::uvec2{ _params.board_w / 2, _params.board_h / 2 },
+             glm::vec3{ 0.0f, 1.0f, 0.0f },
+             _params.board_w,
+             _params.board_h);
 }
 
 World::~World()
@@ -71,7 +74,9 @@ World::run()
             _interpret_events();
             _gfx_interface->clear();
             _gfx_interface->drawBoard();
-            _gfx_interface->drawSnake(_snake_pos, _snake_color, _snake_size);
+            _gfx_interface->drawSnake(_p1.getSnakePosArray(),
+                                      _p1.getSnakeColorArray(),
+                                      _p1.getSnakeCurrentSize());
             _gfx_interface->render();
             _loop_time_ref = now;
         }
@@ -168,9 +173,10 @@ void
 World::_p1_up()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
-        _events[IGraphicTypes::P1_UP] && _snake_pos[0].y > 0) {
-        _snake_pos[0].y -= 1;
+        _events[IGraphicTypes::P1_UP]) {
+        _p1_out_of_map = _p1.moveSnake(Snake::UP);
         _event_timers.updated[P1] = 1;
+        _event_timers.accept_event[P1] = 0;
     }
 }
 
@@ -178,10 +184,10 @@ void
 World::_p1_right()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
-        _events[IGraphicTypes::P1_RIGHT] &&
-        _snake_pos[0].x < _params.board_w - 1) {
-        _snake_pos[0].x += 1;
+        _events[IGraphicTypes::P1_RIGHT]) {
+        _p1_out_of_map = _p1.moveSnake(Snake::RIGHT);
         _event_timers.updated[P1] = 1;
+        _event_timers.accept_event[P1] = 0;
     }
 }
 
@@ -189,10 +195,10 @@ void
 World::_p1_down()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
-        _events[IGraphicTypes::P1_DOWN] &&
-        _snake_pos[0].y < _params.board_h - 1) {
-        _snake_pos[0].y += 1;
+        _events[IGraphicTypes::P1_DOWN]) {
+        _p1_out_of_map = _p1.moveSnake(Snake::DOWN);
         _event_timers.updated[P1] = 1;
+        _event_timers.accept_event[P1] = 0;
     }
 }
 
@@ -200,9 +206,10 @@ void
 World::_p1_left()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
-        _events[IGraphicTypes::P1_LEFT] && _snake_pos[0].x > 0) {
-        _snake_pos[0].x -= 1;
+        _events[IGraphicTypes::P1_LEFT]) {
+        _p1_out_of_map = _p1.moveSnake(Snake::LEFT);
         _event_timers.updated[P1] = 1;
+        _event_timers.accept_event[P1] = 0;
     }
 }
 
