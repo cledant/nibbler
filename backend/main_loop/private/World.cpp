@@ -6,6 +6,7 @@
 
 World::World(WorldParams const &params)
   : _params(params)
+  , _board_size(params.board_h * params.board_w)
   , _home()
   , _gfx_loader()
   , _gfx_interface(nullptr)
@@ -14,35 +15,13 @@ World::World(WorldParams const &params)
   , _event_timers()
   , _player()
   , _win_con()
+  , _game_ended(0)
   , _is_init(0)
   , _paused(0)
   , _nb_player(_params.game_type + 1)
   , _loop_time_ref(std::chrono::high_resolution_clock::now())
 {
-    _event_timers.timer_values = { SYSTEM_TIMER_SECONDS,
-                                   DEFAULT_SNAKE_TIMER_SECONDS,
-                                   DEFAULT_SNAKE_TIMER_SECONDS };
-    _event_timers.time_ref = { std::chrono::high_resolution_clock::now(),
-                               std::chrono::high_resolution_clock::now(),
-                               std::chrono::high_resolution_clock::now() };
-    if (_params.game_type == ONE_PLAYER) {
-        _player[PLAYER_1].init(
-          glm::uvec2{ _params.board_w / 2, _params.board_h / 2 },
-          glm::vec3{ 0.0f, 1.0f, 0.0f },
-          _params.board_w,
-          _params.board_h);
-    } else {
-        _player[PLAYER_1].init(
-          glm::uvec2{ _params.board_w / 4, _params.board_h / 2 },
-          glm::vec3{ 0.0f, 1.0f, 0.0f },
-          _params.board_w,
-          _params.board_h);
-        _player[PLAYER_2].init(
-          glm::uvec2{ 3 * _params.board_w / 4, _params.board_h / 2 },
-          glm::vec3{ 0.0f, 0.0f, 1.0f },
-          _params.board_w,
-          _params.board_h);
-    }
+    _reset_board();
 }
 
 World::~World()
@@ -88,15 +67,18 @@ World::run()
         if (loop_diff.count() > FRAME_LENGTH_SECONDS) {
             _gfx_interface->getEvents(_events);
             _interpret_events();
-            _check_player_overlap();
-            _gfx_interface->clear();
-            _gfx_interface->drawBoard();
-            for (uint8_t i = 0; i < _nb_player; ++i) {
-                _gfx_interface->drawSnake(_player[i].getSnakePosArray(),
-                                          _player[i].getSnakeColorArray(),
-                                          _player[i].getSnakeCurrentSize());
+            _check_player_state();
+            _should_game_end();
+            if (!_game_ended) {
+                _gfx_interface->clear();
+                _gfx_interface->drawBoard();
+                for (uint8_t i = 0; i < _nb_player; ++i) {
+                    _gfx_interface->drawSnake(_player[i].getSnakePosArray(),
+                                              _player[i].getSnakeColorArray(),
+                                              _player[i].getSnakeCurrentSize());
+                }
+                _gfx_interface->render();
             }
-            _gfx_interface->render();
             _loop_time_ref = now;
         }
     }
@@ -172,6 +154,9 @@ World::_pause()
     if (_events[IGraphicTypes::NibblerEvent::PAUSE] &&
         _event_timers.accept_event[SYSTEM]) {
         _paused = !_paused;
+        if (_game_ended) {
+            _reset_board();
+        }
         _event_timers.accept_event[SYSTEM] = 0;
         _event_timers.updated[SYSTEM] = 1;
     }
@@ -329,10 +314,89 @@ World::_set_sdl()
 }
 
 void
-World::_check_player_overlap()
+World::_check_player_state()
 {
-    _win_con[PLAYER_1].touch_player =
-      _player[PLAYER_2].isInsideSnake(_player[PLAYER_1].getSnakeHeadPos());
-    _win_con[PLAYER_2].touch_player =
-      _player[PLAYER_1].isInsideSnake(_player[PLAYER_2].getSnakeHeadPos());
+    // P1 Checks
+    if (_player[PLAYER_1].getSnakeCurrentSize() == _board_size) {
+        _win_con[PLAYER_1].filled_map = 1;
+    }
+
+    if (_params.game_type == TWO_PLAYER) {
+        // P1 Checks
+        _win_con[PLAYER_1].touch_player =
+          _player[PLAYER_2].isInsideSnake(_player[PLAYER_1].getSnakeHeadPos());
+
+        // P2 Checks
+        if (_player[PLAYER_2].getSnakeCurrentSize() == _board_size) {
+            _win_con[PLAYER_2].filled_map = 1;
+        }
+        _win_con[PLAYER_2].touch_player =
+          _player[PLAYER_1].isInsideSnake(_player[PLAYER_2].getSnakeHeadPos());
+
+        // Common checks
+        if (_params.game_type == TWO_PLAYER &&
+            _player[PLAYER_1].getSnakeHeadPos() ==
+              _player[PLAYER_2].getSnakeHeadPos()) {
+            _win_con[PLAYER_1].touch_snake_head = 1;
+            _win_con[PLAYER_2].touch_snake_head = 1;
+        }
+    }
+}
+
+void
+World::_should_game_end()
+{
+    if (!_game_ended) {
+        WinCondition continue_game;
+        std::memset(&continue_game, 0, sizeof(WinCondition));
+
+        if (std::memcmp(
+              &_win_con[PLAYER_1], &continue_game, sizeof(WinCondition)) ||
+            std::memcmp(
+              &_win_con[PLAYER_2], &continue_game, sizeof(WinCondition))) {
+            _game_ended = 1;
+            _paused = 1;
+            _end_message();
+        }
+    }
+}
+
+void
+World::_end_message()
+{
+    // TODO MORE Message types
+    std::cout << "GAME OVER\nPress Space to restart !" << std::endl;
+}
+
+void
+World::_reset_board()
+{
+    _event_timers.timer_values = { SYSTEM_TIMER_SECONDS,
+                                   DEFAULT_SNAKE_TIMER_SECONDS,
+                                   DEFAULT_SNAKE_TIMER_SECONDS };
+    _event_timers.time_ref = { std::chrono::high_resolution_clock::now(),
+                               std::chrono::high_resolution_clock::now(),
+                               std::chrono::high_resolution_clock::now() };
+    if (_params.game_type == ONE_PLAYER) {
+        _player[PLAYER_1].init(
+          glm::uvec2{ _params.board_w / 2, _params.board_h / 2 },
+          glm::vec3{ 0.0f, 1.0f, 0.0f },
+          _params.board_w,
+          _params.board_h);
+    } else {
+        _player[PLAYER_1].init(
+          glm::uvec2{ _params.board_w / 4, _params.board_h / 2 },
+          glm::vec3{ 0.0f, 1.0f, 0.0f },
+          _params.board_w,
+          _params.board_h);
+        _player[PLAYER_2].init(
+          glm::uvec2{ 3 * _params.board_w / 4, _params.board_h / 2 },
+          glm::vec3{ 0.0f, 0.0f, 1.0f },
+          _params.board_w,
+          _params.board_h);
+    }
+    std::memset(&_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
+    std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
+    _paused = 0;
+    _game_ended = 0;
 }

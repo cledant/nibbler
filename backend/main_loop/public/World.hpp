@@ -66,9 +66,13 @@ class World
     {
         uint8_t out_of_map;
         uint8_t touch_player;
+        uint8_t filled_map;
+        uint8_t touch_snake_head;
+        uint8_t touch_obstacle;
     };
 
     WorldParams _params;
+    uint64_t _board_size;
 
     std::string _home;
     DynLibLoader<IGraphic> _gfx_loader;
@@ -80,6 +84,7 @@ class World
 
     std::array<Snake, NB_PLAYER_MAX> _player;
     std::array<WinCondition, NB_PLAYER_MAX> _win_con;
+    uint8_t _game_ended;
 
     uint8_t _is_init;
     uint8_t _paused;
@@ -108,9 +113,10 @@ class World
     void _set_sdl();
 
     // Win conditions handling
-    void _check_player_overlap();
-    void _check_draw();
-    void _check_win();
+    void _check_player_state();
+    void _should_game_end();
+    void _end_message();
+    void _reset_board();
 };
 
 #endif
