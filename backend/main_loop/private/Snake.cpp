@@ -7,11 +7,14 @@ Snake::Snake()
   , _body_color(_head_color / 2.0f)
   , _snake_pos()
   , _snake_color()
-  , _cur_size(0)
-  , _max_size(0)
+  , _cur_size(1)
+  , _max_size(1)
   , _board_w(0)
   , _board_h(0)
-{}
+{
+    _snake_pos[0] = glm::uvec2(100);
+    _snake_color[0] = glm::vec3(1.0f);
+}
 
 std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &
 Snake::getSnakePosArray() const
@@ -40,9 +43,6 @@ Snake::getSnakeMaxSize() const
 glm::uvec2 const &
 Snake::getSnakeHeadPos() const
 {
-    if (!_cur_size) {
-        return (_snake_pos[0]);
-    }
     return (_snake_pos[_cur_size - 1]);
 }
 
@@ -71,7 +71,8 @@ Snake::addToSnake(glm::uvec2 const &pos)
 {
     if (_cur_size < _max_size) {
         _snake_pos[_cur_size] = pos;
-        _snake_color[_cur_size] = _body_color;
+        _snake_color[_cur_size - 1] = _body_color;
+        _snake_color[_cur_size] = _head_color;
         ++_cur_size;
     }
 }
@@ -92,7 +93,8 @@ Snake::addToSnake(glm::uvec2 const &pos, glm::vec3 const &color)
 void
 Snake::removeFromSnake(glm::uvec2 const &pos)
 {
-    if (!_cur_size) {
+    if (_cur_size == 1) {
+        _snake_pos[0] = glm::uvec2(100);
         return;
     }
     uint32_t i;
