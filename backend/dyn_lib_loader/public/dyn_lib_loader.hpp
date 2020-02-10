@@ -51,17 +51,18 @@ void
 DynLibLoader<T>::openLib(std::string const &libpath)
 {
     std::cout << "Loading Shared Lib : " << libpath << std::endl;
-    if (_handler)
+    if (_handler) {
         closeLib();
+    }
     if (!(_handler = dlopen(libpath.c_str(), RTLD_LAZY))) {
         throw std::runtime_error(dlerror());
     }
-    if (!(_creator =
-            reinterpret_cast<typename T::creator_t *>(dlsym(_handler, "creator")))) {
+    if (!(_creator = reinterpret_cast<typename T::creator_t *>(
+            dlsym(_handler, "creator")))) {
         throw std::runtime_error(dlerror());
     }
-    if (!(_deleter =
-            reinterpret_cast<typename T::deleter_t *>(dlsym(_handler, "deleter")))) {
+    if (!(_deleter = reinterpret_cast<typename T::deleter_t *>(
+            dlsym(_handler, "deleter")))) {
         throw std::runtime_error(dlerror());
     }
 }

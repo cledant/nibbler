@@ -47,6 +47,7 @@ void
 GlfwGraphic::createWindow(std::string &&name)
 {
     if (!_win.win) {
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_RED_BITS, 8);
@@ -65,6 +66,7 @@ GlfwGraphic::createWindow(std::string &&name)
             throw std::runtime_error("Glfw : failed to create window");
         }
         glfwSetInputMode(_win.win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        glfwSetWindowPos(_win.win, 100, 100);
         glfwSetWindowUserPointer(_win.win, this);
         _initCallbacks();
         glfwMakeContextCurrent(_win.win);

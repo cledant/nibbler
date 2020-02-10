@@ -192,6 +192,7 @@ SFMLGraphic::_createWindow()
     context.minorVersion = 1;
     context.depthBits = 24;
     context.stencilBits = 8;
+    context.attributeFlags = sf::ContextSettings::Core;
     if (_win.fullscreen) {
         _win.win.create(sf::VideoMode(),
                         _win._win_name,
