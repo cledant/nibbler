@@ -23,7 +23,12 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw ${CMAKE_BINARY_DIR}/e
 option(SFML_BUILD_GRAPHICS "" FALSE)
 option(SFML_BUILD_NETWORK "" FALSE)
 option(SFML_BUILD_DOC "" FALSE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sfml ${CMAKE_BINARY_DIR}/SFML/build)
+option(BUILD_SHARED_LIBS "" ON)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sfml ${CMAKE_BINARY_DIR}/sfml/build)
+
+#Setup SDL2
+option(BUILD_SHARED_LIBS "" ON)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sdl2 ${CMAKE_BINARY_DIR}/sdl2/build)
 
 #gfx_dynamic libs
 add_subdirectory(gfx_dynamic/libs)
