@@ -43,14 +43,14 @@ World::init()
         _path_gfx_lib[GFX_SFML] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_sfml.dylib";
         _path_gfx_lib[GFX_SDL] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl.dylib";
+          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl2.dylib";
 #else
         _path_gfx_lib[GFX_GLFW] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so";
         _path_gfx_lib[GFX_SFML] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_sfml.so";
         _path_gfx_lib[GFX_SDL] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl.so";
+          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl2.so";
 #endif
         _load_dyn_lib();
         _is_init = 1;
