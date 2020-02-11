@@ -46,13 +46,13 @@ class SFMLGraphic : public IGraphic
     struct Win
     {
         sf::Window win;
-        std::string _win_name;
+        std::string win_name;
         uint8_t fullscreen;
         int32_t w;
         int32_t h;
         int32_t w_viewport;
         int32_t h_viewport;
-        glm::vec2 _screen_ratio;
+        glm::vec2 screen_ratio;
     };
 
     struct Board

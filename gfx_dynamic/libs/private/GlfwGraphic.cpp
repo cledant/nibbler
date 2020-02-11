@@ -19,7 +19,7 @@ GlfwGraphic::GlfwGraphic()
     _win.h = 0;
     _win.w_viewport = 0;
     _win.h_viewport = 0;
-    _win._screen_ratio = glm::vec2(1.0f);
+    _win.screen_ratio = glm::vec2(1.0f);
     _board.h = 0;
     _board.w = 0;
     _board.gl_snake_board_size = glm::vec2(1.0f);
@@ -268,7 +268,7 @@ GlfwGraphic::_computeSquareRatio()
     float h =
       (_win.w_viewport >= _win.h_viewport) ? _win.h_viewport : _win.w_viewport;
 
-    _win._screen_ratio = (_win.w_viewport >= _win.h_viewport)
+    _win.screen_ratio = (_win.w_viewport >= _win.h_viewport)
                            ? glm::vec2(h / w, 1.0f)
                            : glm::vec2(1.0f, h / w);
 }
@@ -276,7 +276,7 @@ GlfwGraphic::_computeSquareRatio()
 void
 GlfwGraphic::_computeBoardSize()
 {
-    _board.gl_board_size = _win._screen_ratio * (1.0f - VERTICAL_BORDER);
+    _board.gl_board_size = _win.screen_ratio * (1.0f - VERTICAL_BORDER);
 
     float largest = (_board.w >= _board.h) ? _board.w : _board.h;
     _board.gl_snake_board_size = _board.gl_board_size / largest;

@@ -57,7 +57,7 @@ class GlfwGraphic : public IGraphic
         int32_t w_viewport;
         int32_t h_viewport;
         std::string win_name;
-        glm::vec2 _screen_ratio;
+        glm::vec2 screen_ratio;
     };
 
     struct Board
