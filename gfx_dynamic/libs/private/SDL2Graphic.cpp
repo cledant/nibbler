@@ -43,39 +43,7 @@ void
 SDL2Graphic::createWindow(std::string &&name)
 {
     _win.win_name = std::move(name);
-    _win.win = SDL_CreateWindow(_win.win_name.c_str(),
-                                100,
-                                100,
-                                IGraphicConstants::WIN_W,
-                                IGraphicConstants::WIN_H,
-                                SDL_WINDOW_OPENGL);
-    if (!_win.win) {
-        throw std::runtime_error("SDL2 : failed to create window");
-    }
-    if (!(_win.renderer =
-            SDL_CreateRenderer(_win.win, -1, SDL_RENDERER_ACCELERATED))) {
-        SDL_DestroyWindow(_win.win);
-        throw std::runtime_error("SDL2 : failed to create renderer");
-    }
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
-    if (!(_win.gl_context = SDL_GL_CreateContext(_win.win))) {
-        SDL_DestroyWindow(_win.win);
-        SDL_DestroyRenderer(_win.renderer);
-        throw std::runtime_error("SDL2 : failed to create gl context");
-    }
-    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-        throw std::runtime_error("GLAD not loaded");
-    }
+    _createWindow();
 }
 
 void
@@ -138,7 +106,13 @@ SDL2Graphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
 
 void
 SDL2Graphic::drawBoard()
-{}
+{
+    _gl_snake_shader.use();
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_board_size);
+    glBindVertexArray(_gl_board.getVao());
+    glDrawArrays(GL_POINTS, 0, 1);
+    glBindVertexArray(0);
+}
 
 void
 SDL2Graphic::drawSnake(
@@ -146,9 +120,12 @@ SDL2Graphic::drawSnake(
   std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
   uint32_t size)
 {
-    (void)pos;
-    (void)color;
-    (void)size;
+    _gl_snake_shader.use();
+    glBindVertexArray(_gl_snake.getVao());
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
+    _gl_snake.updateVbo(pos, color, size);
+    glDrawArrays(GL_POINTS, 0, size);
+    glBindVertexArray(0);
 }
 
 void
@@ -157,9 +134,13 @@ SDL2Graphic::drawSnake(
   std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,
   uint32_t size)
 {
-    (void)pos;
-    (void)color;
-    (void)size;
+    _gl_snake_shader.use();
+    glBindVertexArray(_gl_snake.getVao());
+    _gl_snake_shader.setVec2("uniform_scale", _board.gl_snake_board_size);
+    _gl_snake.updateVbo(
+      pos, _board.gl_snake_board_size, _board.w, _board.h, color, size);
+    glDrawArrays(GL_POINTS, 0, size);
+    glBindVertexArray(0);
 }
 
 void
@@ -177,7 +158,93 @@ SDL2Graphic::clear()
 
 void
 SDL2Graphic::toggleFullscreen()
-{}
+{
+    _win.fullscreen = !_win.fullscreen;
+    deleteWindow();
+    _createWindow();
+}
+
+void
+SDL2Graphic::_computeSquareRatio()
+{
+    float w =
+      (_win.w_viewport >= _win.h_viewport) ? _win.w_viewport : _win.h_viewport;
+    float h =
+      (_win.w_viewport >= _win.h_viewport) ? _win.h_viewport : _win.w_viewport;
+
+    _win.screen_ratio = (_win.w_viewport >= _win.h_viewport)
+                          ? glm::vec2(h / w, 1.0f)
+                          : glm::vec2(1.0f, h / w);
+}
+
+void
+SDL2Graphic::_computeBoardSize()
+{
+    _board.gl_board_size = _win.screen_ratio * (1.0f - VERTICAL_BORDER);
+
+    float largest = (_board.w >= _board.h) ? _board.w : _board.h;
+    _board.gl_snake_board_size = _board.gl_board_size / largest;
+
+    _board.gl_board_size =
+      glm::vec2(_board.w, _board.h) * _board.gl_snake_board_size;
+}
+
+void
+SDL2Graphic::_createWindow()
+{
+    uint32_t flags = SDL_WINDOW_OPENGL;
+
+    if (_win.fullscreen) {
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+    _win.win = SDL_CreateWindow(_win.win_name.c_str(),
+                                100,
+                                100,
+                                IGraphicConstants::WIN_W,
+                                IGraphicConstants::WIN_H,
+                                flags);
+    if (!_win.win) {
+        throw std::runtime_error("SDL2 : failed to create window");
+    }
+    if (!(_win.renderer =
+            SDL_CreateRenderer(_win.win, -1, SDL_RENDERER_ACCELERATED))) {
+        SDL_DestroyWindow(_win.win);
+        throw std::runtime_error("SDL2 : failed to create renderer");
+    }
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
+    if (!(_win.gl_context = SDL_GL_CreateContext(_win.win))) {
+        SDL_DestroyWindow(_win.win);
+        SDL_DestroyRenderer(_win.renderer);
+        throw std::runtime_error("SDL2 : failed to create gl context");
+    }
+    SDL_GetWindowSize(_win.win, &_win.w_viewport, &_win.h_viewport);
+    _win.h = _win.h_viewport;
+    _win.w = _win.w_viewport;
+    _computeSquareRatio();
+    _computeBoardSize();
+
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        throw std::runtime_error("GLAD not loaded");
+    }
+    glViewport(0, 0, _win.w_viewport, _win.h_viewport);
+    _gl_snake_shader.init(
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
+      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
+      "draw_rectangle");
+    _gl_snake.init();
+    _gl_board.init();
+}
 
 extern "C" IGraphic *
 creator()

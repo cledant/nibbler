@@ -75,6 +75,10 @@ class SDL2Graphic : public IGraphic
     GLShader _gl_snake_shader;
     GLBoard _gl_board;
     GLSnake _gl_snake;
+
+    void _computeSquareRatio();
+    void _computeBoardSize();
+    void _createWindow();
 };
 
 #endif
