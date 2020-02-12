@@ -1,4 +1,3 @@
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <cstring>
@@ -188,6 +187,8 @@ GlfwGraphic::clear()
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
+#include <iostream>
+
 void
 GlfwGraphic::toggleFullscreen()
 {
@@ -198,8 +199,7 @@ GlfwGraphic::toggleFullscreen()
         throw std::runtime_error("Glfw : No primary monitor");
     }
 
-    int32_t count;
-    GLFWvidmode const *mode = glfwGetVideoModes(monitor, &count);
+    GLFWvidmode const *mode = glfwGetVideoMode(monitor);
     if (!mode) {
         throw std::runtime_error("Glfw : failed to fetch monitor mode");
     }
@@ -269,8 +269,8 @@ GlfwGraphic::_computeSquareRatio()
       (_win.w_viewport >= _win.h_viewport) ? _win.h_viewport : _win.w_viewport;
 
     _win.screen_ratio = (_win.w_viewport >= _win.h_viewport)
-                           ? glm::vec2(h / w, 1.0f)
-                           : glm::vec2(1.0f, h / w);
+                          ? glm::vec2(h / w, 1.0f)
+                          : glm::vec2(1.0f, h / w);
 }
 
 void
