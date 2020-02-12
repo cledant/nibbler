@@ -227,6 +227,7 @@ SDL2Graphic::_createWindow()
         SDL_DestroyRenderer(_win.renderer);
         throw std::runtime_error("SDL2 : failed to create gl context");
     }
+    SDL_GL_SetSwapInterval(0);
     SDL_GetWindowSize(_win.win, &_win.w_viewport, &_win.h_viewport);
     _win.h = _win.h_viewport;
     _win.w = _win.w_viewport;
