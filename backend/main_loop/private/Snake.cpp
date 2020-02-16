@@ -3,7 +3,8 @@
 #include <cstring>
 
 Snake::Snake()
-  : _head_color(1.0f)
+  : _dir(UP)
+  , _head_color(1.0f)
   , _body_color(_head_color / 2.0f)
   , _snake_pos()
   , _snake_color()
@@ -46,6 +47,12 @@ Snake::getSnakeHeadPos() const
     return (_snake_pos[_cur_size - 1]);
 }
 
+enum Snake::snakeDirection
+Snake::getSnakeDirection() const
+{
+    return (_dir);
+}
+
 void
 Snake::init(glm::ivec2 const &start_pos,
             glm::vec3 base_color,
@@ -58,12 +65,19 @@ Snake::init(glm::ivec2 const &start_pos,
     _board_h = board_h;
     _max_size = _board_h * _board_w;
     _cur_size = 4;
+    _dir = UP;
 
     for (uint32_t i = 0; i < 4; ++i) {
         _snake_pos[i] = glm::ivec2{ start_pos.x, start_pos.y + (3 - i) };
         _snake_color[i] = _body_color;
     }
     _snake_color[3] = _head_color;
+}
+
+void
+Snake::setSnakeDirection(enum snakeDirection dir)
+{
+    _dir = dir;
 }
 
 void
@@ -127,13 +141,27 @@ Snake::isInsideSnake(glm::ivec2 const &pos)
 }
 
 void
-Snake::moveSnake(enum Direction dir)
+Snake::moveSnake(enum snakeDirection dir)
 {
     if (!_cur_size) {
         return;
     }
     glm::ivec2 updated_head_pos = _snake_pos[_cur_size - 1];
     updated_head_pos += _offset[dir];
+    std::memmove(_snake_pos.data(),
+                 _snake_pos.data() + 1,
+                 sizeof(glm::ivec2) * (_cur_size - 1));
+    _snake_pos[_cur_size - 1] = updated_head_pos;
+}
+
+void
+Snake::moveSnakeWithCurrentDirection()
+{
+    if (!_cur_size) {
+        return;
+    }
+    glm::ivec2 updated_head_pos = _snake_pos[_cur_size - 1];
+    updated_head_pos += _offset[_dir];
     std::memmove(_snake_pos.data(),
                  _snake_pos.data() + 1,
                  sizeof(glm::ivec2) * (_cur_size - 1));

@@ -68,6 +68,7 @@ World::run()
         if (loop_diff.count() > FRAME_LENGTH_SECONDS) {
             _gfx_interface->getEvents(_events);
             _interpret_events();
+            _move_snakes();
             _check_player_state();
             _should_game_end();
             if (!_game_ended) {
@@ -179,7 +180,7 @@ World::_p1_up()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_UP]) {
-        _player[PLAYER_1].moveSnake(Snake::UP);
+        _player[PLAYER_1].setSnakeDirection(Snake::UP);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -190,7 +191,7 @@ World::_p1_right()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_RIGHT]) {
-        _player[PLAYER_1].moveSnake(Snake::RIGHT);
+        _player[PLAYER_1].setSnakeDirection(Snake::RIGHT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -201,7 +202,7 @@ World::_p1_down()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_DOWN]) {
-        _player[PLAYER_1].moveSnake(Snake::DOWN);
+        _player[PLAYER_1].setSnakeDirection(Snake::DOWN);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -212,7 +213,7 @@ World::_p1_left()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_LEFT]) {
-        _player[PLAYER_1].moveSnake(Snake::LEFT);
+        _player[PLAYER_1].setSnakeDirection(Snake::LEFT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -224,7 +225,7 @@ World::_p2_up()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_UP] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _player[PLAYER_2].moveSnake(Snake::UP);
+        _player[PLAYER_2].setSnakeDirection(Snake::UP);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -236,7 +237,7 @@ World::_p2_right()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_RIGHT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _player[PLAYER_2].moveSnake(Snake::RIGHT);
+        _player[PLAYER_2].setSnakeDirection(Snake::RIGHT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -248,7 +249,7 @@ World::_p2_down()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_DOWN] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _player[PLAYER_2].moveSnake(Snake::DOWN);
+        _player[PLAYER_2].setSnakeDirection(Snake::DOWN);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -260,7 +261,7 @@ World::_p2_left()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_LEFT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _player[PLAYER_2].moveSnake(Snake::LEFT);
+        _player[PLAYER_2].setSnakeDirection(Snake::LEFT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -309,26 +310,66 @@ World::_set_sdl()
 }
 
 void
+World::_move_snakes()
+{
+    if (_paused) {
+        return;
+    }
+    auto now = std::chrono::high_resolution_clock::now();
+
+    for (uint8_t i = 0; i < _nb_player; ++i) {
+        std::chrono::duration<double> time_diff =
+          now - _player_mvt_timer.time_ref[i];
+
+        if (time_diff.count() > _player_mvt_timer.timer_values[i]) {
+            _player[i].moveSnakeWithCurrentDirection();
+            _player_mvt_timer.time_ref[i] = now;
+        }
+    }
+}
+
+void
 World::_check_player_state()
-{}
+{
+    if (_paused) {
+        return;
+    }
+    for (uint8_t i = 0; i < _nb_player; ++i) {
+        auto head_pos = _player[i].getSnakeHeadPos();
+
+        if (head_pos.x < 0 || head_pos.y < 0 || head_pos.x >= _params.board_w ||
+            head_pos.y >= _params.board_h) {
+            _player_win_con[i].out_of_map = 1;
+        }
+    }
+}
 
 void
 World::_should_game_end()
-{}
-
-void
-World::_end_message()
 {
-    // TODO MORE Message types
-    std::cout << "GAME OVER\nPress Space to restart !" << std::endl;
+    if (_game_ended) {
+        return;
+    }
+
+    // Check if players are outside map
+    if (_player_win_con[0].out_of_map && _player_win_con[1].out_of_map) {
+        _game_ended = 1;
+        std::cout << "Draw: Both Players out of map" << std::endl;
+    } else if (_player_win_con[0].out_of_map) {
+        _game_ended = 1;
+        std::cout << "Player 1 Lost: Out of map" << std::endl;
+    } else if (_player_win_con[1].out_of_map) {
+        _game_ended = 1;
+        std::cout << "Player 2 Lost: Out of map" << std::endl;
+    }
 }
 
 void
 World::_reset_board()
 {
     _event_timers.timer_values = { SYSTEM_TIMER_SECONDS,
-                                   DEFAULT_SNAKE_TIMER_SECONDS,
-                                   DEFAULT_SNAKE_TIMER_SECONDS };
+                                   PLAYER_TIMER_SECONDS,
+                                   PLAYER_TIMER_SECONDS };
     _event_timers.time_ref = { std::chrono::high_resolution_clock::now(),
                                std::chrono::high_resolution_clock::now(),
                                std::chrono::high_resolution_clock::now() };
@@ -338,17 +379,26 @@ World::_reset_board()
           glm::vec3{ 0.0f, 1.0f, 0.0f },
           _params.board_w,
           _params.board_h);
+        _player_mvt_timer.time_ref[PLAYER_1] =
+          std::chrono::high_resolution_clock::now();
+        _player_mvt_timer.timer_values[PLAYER_1] = DEFAULT_SNAKE_TIMER_SECONDS;
     } else {
         _player[PLAYER_1].init(
           glm::uvec2{ _params.board_w / 4, _params.board_h / 2 },
           glm::vec3{ 0.0f, 1.0f, 0.0f },
           _params.board_w,
           _params.board_h);
+        _player_mvt_timer.time_ref[PLAYER_1] =
+          std::chrono::high_resolution_clock::now();
+        _player_mvt_timer.timer_values[PLAYER_1] = DEFAULT_SNAKE_TIMER_SECONDS;
         _player[PLAYER_2].init(
           glm::uvec2{ 3 * _params.board_w / 4, _params.board_h / 2 },
           glm::vec3{ 0.0f, 0.0f, 1.0f },
           _params.board_w,
           _params.board_h);
+        _player_mvt_timer.time_ref[PLAYER_2] =
+          std::chrono::high_resolution_clock::now();
+        _player_mvt_timer.timer_values[PLAYER_2] = DEFAULT_SNAKE_TIMER_SECONDS;
     }
     std::memset(&_player_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
     std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);

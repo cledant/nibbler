@@ -32,8 +32,9 @@ class World
 
     // Timer related
     static double constexpr SYSTEM_TIMER_SECONDS = 1.0;
+    static double constexpr PLAYER_TIMER_SECONDS = FRAME_LENGTH_SECONDS;
     static double constexpr DEFAULT_SNAKE_TIMER_SECONDS =
-      FRAME_LENGTH_SECONDS * 30;
+      FRAME_LENGTH_SECONDS * 60;
     static uint8_t constexpr NB_EVENT_TIMER_TYPES = 3;
 
     // Player related
@@ -62,6 +63,14 @@ class World
         std::array<double, NB_EVENT_TIMER_TYPES> timer_values;
     };
 
+    struct SnakeTimers
+    {
+        std::array<std::chrono::high_resolution_clock::time_point,
+                   NB_PLAYER_MAX>
+          time_ref;
+        std::array<double, NB_PLAYER_MAX> timer_values;
+    };
+
     struct WinCondition
     {
         uint8_t out_of_map;
@@ -83,6 +92,7 @@ class World
 
     std::array<Snake, NB_PLAYER_MAX> _player;
     std::array<WinCondition, NB_PLAYER_MAX> _player_win_con;
+    SnakeTimers _player_mvt_timer;
     uint8_t _is_map_full;
     uint8_t _game_ended;
 
@@ -115,10 +125,11 @@ class World
     void _set_sfml();
     void _set_sdl();
 
+    void _move_snakes();
+
     // Win conditions handling
     void _check_player_state();
     void _should_game_end();
-    void _end_message();
     void _reset_board();
 };
 
