@@ -66,7 +66,6 @@ class World
     {
         uint8_t out_of_map;
         uint8_t touch_player;
-        uint8_t filled_map;
         uint8_t touch_snake_head;
         uint8_t touch_obstacle;
     };
@@ -83,8 +82,12 @@ class World
     EventTimers _event_timers;
 
     std::array<Snake, NB_PLAYER_MAX> _player;
-    std::array<WinCondition, NB_PLAYER_MAX> _win_con;
+    std::array<WinCondition, NB_PLAYER_MAX> _player_win_con;
+    uint8_t _is_map_full;
     uint8_t _game_ended;
+
+    Snake _food;
+    Snake _obstacle;
 
     uint8_t _is_init;
     uint8_t _paused;

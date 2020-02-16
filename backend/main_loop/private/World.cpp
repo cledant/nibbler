@@ -14,7 +14,8 @@ World::World(WorldParams const &params)
   , _events()
   , _event_timers()
   , _player()
-  , _win_con()
+  , _player_win_con()
+  , _is_map_full(0)
   , _game_ended(0)
   , _is_init(0)
   , _paused(0)
@@ -178,7 +179,7 @@ World::_p1_up()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_UP]) {
-        _win_con[PLAYER_1].out_of_map = _player[PLAYER_1].moveSnake(Snake::UP);
+        _player[PLAYER_1].moveSnake(Snake::UP);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -189,8 +190,7 @@ World::_p1_right()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_RIGHT]) {
-        _win_con[PLAYER_1].out_of_map =
-          _player[PLAYER_1].moveSnake(Snake::RIGHT);
+        _player[PLAYER_1].moveSnake(Snake::RIGHT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -201,8 +201,7 @@ World::_p1_down()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_DOWN]) {
-        _win_con[PLAYER_1].out_of_map =
-          _player[PLAYER_1].moveSnake(Snake::DOWN);
+        _player[PLAYER_1].moveSnake(Snake::DOWN);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -213,8 +212,7 @@ World::_p1_left()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_LEFT]) {
-        _win_con[PLAYER_1].out_of_map =
-          _player[PLAYER_1].moveSnake(Snake::LEFT);
+        _player[PLAYER_1].moveSnake(Snake::LEFT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -226,7 +224,7 @@ World::_p2_up()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_UP] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _win_con[PLAYER_2].out_of_map = _player[PLAYER_2].moveSnake(Snake::UP);
+        _player[PLAYER_2].moveSnake(Snake::UP);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -238,8 +236,7 @@ World::_p2_right()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_RIGHT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _win_con[PLAYER_2].out_of_map =
-          _player[PLAYER_2].moveSnake(Snake::RIGHT);
+        _player[PLAYER_2].moveSnake(Snake::RIGHT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -251,8 +248,7 @@ World::_p2_down()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_DOWN] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _win_con[PLAYER_2].out_of_map =
-          _player[PLAYER_2].moveSnake(Snake::DOWN);
+        _player[PLAYER_2].moveSnake(Snake::DOWN);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -264,8 +260,7 @@ World::_p2_left()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_LEFT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        _win_con[PLAYER_2].out_of_map =
-          _player[PLAYER_2].moveSnake(Snake::LEFT);
+        _player[PLAYER_2].moveSnake(Snake::LEFT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -315,51 +310,11 @@ World::_set_sdl()
 
 void
 World::_check_player_state()
-{
-    // P1 Checks
-    if (_player[PLAYER_1].getSnakeCurrentSize() == _board_size) {
-        _win_con[PLAYER_1].filled_map = 1;
-    }
-
-    if (_params.game_type == TWO_PLAYER) {
-        // P1 Checks
-        _win_con[PLAYER_1].touch_player =
-          _player[PLAYER_2].isInsideSnake(_player[PLAYER_1].getSnakeHeadPos());
-
-        // P2 Checks
-        if (_player[PLAYER_2].getSnakeCurrentSize() == _board_size) {
-            _win_con[PLAYER_2].filled_map = 1;
-        }
-        _win_con[PLAYER_2].touch_player =
-          _player[PLAYER_1].isInsideSnake(_player[PLAYER_2].getSnakeHeadPos());
-
-        // Common checks
-        if (_params.game_type == TWO_PLAYER &&
-            _player[PLAYER_1].getSnakeHeadPos() ==
-              _player[PLAYER_2].getSnakeHeadPos()) {
-            _win_con[PLAYER_1].touch_snake_head = 1;
-            _win_con[PLAYER_2].touch_snake_head = 1;
-        }
-    }
-}
+{}
 
 void
 World::_should_game_end()
-{
-    if (!_game_ended) {
-        WinCondition continue_game;
-        std::memset(&continue_game, 0, sizeof(WinCondition));
-
-        if (std::memcmp(
-              &_win_con[PLAYER_1], &continue_game, sizeof(WinCondition)) ||
-            std::memcmp(
-              &_win_con[PLAYER_2], &continue_game, sizeof(WinCondition))) {
-            _game_ended = 1;
-            _paused = 1;
-            _end_message();
-        }
-    }
-}
+{}
 
 void
 World::_end_message()
@@ -395,7 +350,7 @@ World::_reset_board()
           _params.board_w,
           _params.board_h);
     }
-    std::memset(&_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
+    std::memset(&_player_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
     std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
     _paused = 0;
     _game_ended = 0;

@@ -23,7 +23,7 @@ class GLSnake
     void init();
     void clear();
     void updateVbo(
-      std::array<glm::uvec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
+      std::array<glm::ivec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
       glm::vec2 const &square_size,
       int32_t board_w,
       int32_t board_h,
