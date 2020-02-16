@@ -75,6 +75,18 @@ Snake::init(glm::ivec2 const &start_pos,
 }
 
 void
+Snake::init(glm::vec3 base_color, uint32_t board_w, uint32_t board_h)
+{
+    _head_color = base_color;
+    _body_color = base_color;
+    _board_w = board_w;
+    _board_h = board_h;
+    _max_size = _board_h * _board_w;
+    _cur_size = 0;
+    _dir = UP;
+}
+
+void
 Snake::setSnakeDirection(enum snakeDirection dir)
 {
     _dir = dir;
@@ -96,9 +108,6 @@ Snake::addToSnake(glm::ivec2 const &pos, glm::vec3 const &color)
 {
     if (_cur_size < _max_size) {
         _snake_pos[_cur_size] = pos;
-        std::memmove(_snake_color.data() + 1,
-                     _snake_color.data(),
-                     sizeof(glm::ivec2) * (_cur_size - 1));
         _snake_color[_cur_size] = color;
         ++_cur_size;
     }

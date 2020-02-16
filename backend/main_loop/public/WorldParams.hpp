@@ -32,6 +32,7 @@ struct WorldParams
     enum GfxLib gfx_lib;
     enum SoundLib sound_lib;
     enum Gametype game_type;
+    uint8_t obstacles;
 };
 
 #endif

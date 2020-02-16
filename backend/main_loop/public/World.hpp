@@ -130,6 +130,9 @@ class World
     // Win conditions handling
     void _check_player_state();
     void _should_game_end();
+
+    // Generating board
+    void _generate_obstacles();
     void _reset_board();
 };
 

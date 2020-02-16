@@ -41,6 +41,7 @@ class Snake
               glm::vec3 base_color,
               uint32_t board_w,
               uint32_t board_h);
+    void init(glm::vec3 base_color, uint32_t board_w, uint32_t board_h);
     void setSnakeDirection(enum snakeDirection dir);
     void addToSnake(glm::ivec2 const &pos);
     void addToSnake(glm::ivec2 const &pos, glm::vec3 const &color);

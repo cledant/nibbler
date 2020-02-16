@@ -1,6 +1,7 @@
 #include <functional>
 #include <iostream>
 #include <cstring>
+#include <random>
 
 #include "World.hpp"
 
@@ -79,6 +80,9 @@ World::run()
                                               _player[i].getSnakeColorArray(),
                                               _player[i].getSnakeCurrentSize());
                 }
+                _gfx_interface->drawSnake(_obstacle.getSnakePosArray(),
+                                          _obstacle.getSnakeColorArray(),
+                                          _obstacle.getSnakeCurrentSize());
                 _gfx_interface->render();
             }
             _loop_time_ref = now;
@@ -334,12 +338,21 @@ World::_check_player_state()
     if (_paused) {
         return;
     }
+
     for (uint8_t i = 0; i < _nb_player; ++i) {
         auto head_pos = _player[i].getSnakeHeadPos();
 
+        // Check if player is inside board
         if (head_pos.x < 0 || head_pos.y < 0 || head_pos.x >= _params.board_w ||
             head_pos.y >= _params.board_h) {
             _player_win_con[i].out_of_map = 1;
+            continue;
+        }
+
+        // Check if players touch obstacles
+        if (_obstacle.isInsideSnake(head_pos)) {
+            _player_win_con[i].touch_obstacle = 1;
+            continue;
         }
     }
 }
@@ -351,16 +364,68 @@ World::_should_game_end()
         return;
     }
 
-    // Check if players are outside map
-    if (_player_win_con[0].out_of_map && _player_win_con[1].out_of_map) {
+    // Outside map
+    if (_player_win_con[PLAYER_1].out_of_map &&
+        _player_win_con[PLAYER_2].out_of_map) {
         _game_ended = 1;
         std::cout << "Draw: Both Players out of map" << std::endl;
-    } else if (_player_win_con[0].out_of_map) {
+        return;
+    } else if (_player_win_con[PLAYER_1].out_of_map) {
         _game_ended = 1;
         std::cout << "Player 1 Lost: Out of map" << std::endl;
-    } else if (_player_win_con[1].out_of_map) {
+        return;
+    } else if (_player_win_con[PLAYER_2].out_of_map) {
         _game_ended = 1;
         std::cout << "Player 2 Lost: Out of map" << std::endl;
+        return;
+    }
+
+    // Obstacle
+    if (_player_win_con[PLAYER_1].touch_obstacle &&
+        _player_win_con[PLAYER_2].touch_obstacle) {
+        _game_ended = 1;
+        std::cout << "Draw: Both Players touched obstacle" << std::endl;
+        return;
+    } else if (_player_win_con[PLAYER_1].touch_obstacle) {
+        _game_ended = 1;
+        std::cout << "Player 1 Lost: Touched obstacle" << std::endl;
+        return;
+    } else if (_player_win_con[PLAYER_2].touch_obstacle) {
+        _game_ended = 1;
+        std::cout << "Player 2 Lost: Touched obstacle" << std::endl;
+        return;
+    }
+}
+
+void
+World::_generate_obstacles()
+{
+    std::random_device rd;
+    std::mt19937_64 mt_64(rd());
+    std::uniform_int_distribution<uint64_t> dist_obstacle(0, _board_size / 20);
+    std::uniform_int_distribution<uint64_t> dist_board_w(1,
+                                                         _params.board_w - 2);
+    std::uniform_int_distribution<uint64_t> dist_board_h(1,
+                                                         _params.board_h - 2);
+
+    uint64_t nb_obstacles = dist_obstacle(mt_64);
+
+    for (uint64_t i = 0; i < nb_obstacles; ++i) {
+        uint8_t valid_position = 0;
+
+        while (!valid_position) {
+            auto new_obstacle =
+              glm::ivec2(dist_board_w(mt_64), dist_board_h(mt_64));
+
+            if (!_player[PLAYER_1].isInsideSnake(new_obstacle) &&
+                !_player[PLAYER_2].isInsideSnake(new_obstacle) &&
+                !_obstacle.isInsideSnake(new_obstacle) &&
+                !_food.isInsideSnake(new_obstacle)) {
+                valid_position = 1;
+                _obstacle.addToSnake(new_obstacle,
+                                     glm::vec3{ 0.33f, 0.33f, 0.33f });
+            }
+        }
     }
 }
 
@@ -399,6 +464,11 @@ World::_reset_board()
         _player_mvt_timer.time_ref[PLAYER_2] =
           std::chrono::high_resolution_clock::now();
         _player_mvt_timer.timer_values[PLAYER_2] = DEFAULT_SNAKE_TIMER_SECONDS;
+    }
+    if (_params.obstacles) {
+        _obstacle.init(
+          glm::vec3{ 0.33f, 0.33f, 0.33f }, _params.board_w, _params.board_h);
+        _generate_obstacles();
     }
     std::memset(&_player_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
     std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);

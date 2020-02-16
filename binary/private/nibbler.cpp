@@ -1,16 +1,19 @@
 #include <iostream>
+#include <cstring>
 
 #include "World.hpp"
 
 static void
 nibbler_usage()
 {
-    std::cout << "Usage: ./nibbler board_w board_h [nb_player]" << std::endl;
+    std::cout << "Usage: ./nibbler board_w board_h [--duel --obstacles]"
+              << std::endl;
     std::cout << "\t board_w and board_h min value = "
               << IGraphicConstants::MIN_H << std::endl;
     std::cout << "\t board_w and board_h max value = "
               << IGraphicConstants::MAX_H << std::endl;
-    std::cout << "\t nb_player is either 1 or 2" << std::endl;
+    std::cout << "\t --duel for 2 player game" << std::endl;
+    std::cout << "\t --obstacles to spawn obstacles" << std::endl;
 }
 
 static int32_t
@@ -30,42 +33,33 @@ parse_int(char const *arg, int32_t min, int32_t max)
     return (size);
 }
 
-static enum Gametype
-parse_gametype(char const *arg)
+void
+parse_options(int argc, char const **argv, struct WorldParams &params)
 {
-    int32_t nb_player;
-    try {
-        nb_player = std::stoi(arg);
-    } catch (std::exception const &e) {
-        throw std::runtime_error("Nibbler: Invalid argument: " +
-                                 std::string(arg));
-    }
-
-    if (nb_player == 1) {
-        return (Gametype::ONE_PLAYER);
-    } else if (nb_player == 2) {
-        return (Gametype::TWO_PLAYER);
-    } else {
-        throw std::runtime_error("Nibbler: Invalid number of player: " +
-                                 std::string(arg));
+    for (int32_t i = 3; i < argc; ++i) {
+        if (!strcmp(argv[i], "--duel")) {
+            params.game_type = TWO_PLAYER;
+        } else if (!strcmp(argv[i], "--obstacles")) {
+            params.obstacles = 1;
+        }
     }
 }
 
 int
 main(int32_t argc, char const **argv)
 {
-    WorldParams params = { 10, 10, GFX_GLFW, SOUND_NONE, ONE_PLAYER };
+    WorldParams params = { 10, 10, GFX_GLFW, SOUND_NONE, ONE_PLAYER, 0 };
 
     try {
-        if (argc < 3 || argc > 5) {
+        if (argc < 3) {
             throw std::runtime_error("Nibbler: Invalid number of arguments");
         }
         params.board_w = parse_int(
           argv[1], IGraphicConstants::MIN_W, IGraphicConstants::MAX_W);
         params.board_h = parse_int(
           argv[2], IGraphicConstants::MIN_H, IGraphicConstants::MAX_H);
-        if (argc == 4) {
-            params.game_type = parse_gametype(argv[3]);
+        if (argc > 3) {
+            parse_options(argc, argv, params);
         }
     } catch (std::exception const &e) {
         std::cout << e.what() << std::endl;
