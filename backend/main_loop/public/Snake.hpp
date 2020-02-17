@@ -46,7 +46,9 @@ class Snake
     void addToSnake(glm::ivec2 const &pos);
     void addToSnake(glm::ivec2 const &pos, glm::vec3 const &color);
     void removeFromSnake(glm::ivec2 const &pos);
-    uint8_t isInsideSnake(glm::ivec2 const &pos);
+    [[nodiscard]] uint8_t isInsideSnake(glm::ivec2 const &pos) const;
+    [[nodiscard]] uint8_t isInFrontOfHead(glm::ivec2 const &pos) const;
+    [[nodiscard]] uint8_t isSelfTouching() const;
     void moveSnake(enum snakeDirection dir);
     void moveSnakeWithCurrentDirection();
 

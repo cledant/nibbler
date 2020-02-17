@@ -3,6 +3,7 @@
 
 #include <array>
 #include <chrono>
+#include <random>
 
 #include "WorldParams.hpp"
 #include "IGraphic.hpp"
@@ -75,7 +76,7 @@ class World
     {
         uint8_t out_of_map;
         uint8_t touch_player;
-        uint8_t touch_snake_head;
+        uint8_t touch_self;
         uint8_t touch_obstacle;
     };
 
@@ -105,6 +106,12 @@ class World
 
     std::chrono::high_resolution_clock ::time_point _loop_time_ref;
 
+    std::random_device _rd;
+    std::mt19937_64 _mt_64;
+    std::uniform_int_distribution<uint64_t> _dist_board_w;
+    std::uniform_int_distribution<uint64_t> _dist_board_h;
+    std::uniform_int_distribution<uint64_t> _dist_obstacle;
+
     void _load_dyn_lib();
     void _clear_dyn_lib();
     void _interpret_events();
@@ -125,14 +132,19 @@ class World
     void _set_sfml();
     void _set_sdl();
 
+    // Moving snake
     void _move_snakes();
+    uint8_t _will_snake_eat_food(Snake const &snake,
+                                 glm::ivec2 &food_eaten_pos);
 
     // Win conditions handling
     void _check_player_state();
     void _should_game_end();
 
     // Generating board
-    void _generate_obstacles();
+    void _generate_random_position(Snake &target,
+                                   glm::vec3 const &color,
+                                   uint64_t nb_to_add);
     void _reset_board();
 };
 

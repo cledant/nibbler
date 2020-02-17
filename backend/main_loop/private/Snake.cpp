@@ -1,5 +1,6 @@
 #include "Snake.hpp"
 
+#include <algorithm>
 #include <cstring>
 
 Snake::Snake()
@@ -116,8 +117,7 @@ Snake::addToSnake(glm::ivec2 const &pos, glm::vec3 const &color)
 void
 Snake::removeFromSnake(glm::ivec2 const &pos)
 {
-    if (_cur_size == 1) {
-        _snake_pos[0] = glm::ivec2(100);
+    if (!_cur_size) {
         return;
     }
     uint32_t i;
@@ -139,12 +139,39 @@ Snake::removeFromSnake(glm::ivec2 const &pos)
 }
 
 uint8_t
-Snake::isInsideSnake(glm::ivec2 const &pos)
+Snake::isInsideSnake(glm::ivec2 const &pos) const
 {
     for (auto const &it : _snake_pos) {
         if (it == pos) {
             return (1);
         }
+    }
+    return (0);
+}
+
+uint8_t
+Snake::isInFrontOfHead(glm::ivec2 const &pos) const
+{
+    auto to_test = _snake_pos[_cur_size - 1] + _offset[_dir];
+
+    if (to_test == pos) {
+        return (1);
+    }
+    return (0);
+}
+
+uint8_t
+Snake::isSelfTouching() const
+{
+    uint64_t start = 1;
+
+    for (auto const &it : _snake_pos) {
+        for (uint64_t i = start; i < _cur_size; ++i) {
+            if (it == _snake_pos[i]) {
+                return (1);
+            }
+        }
+        ++start;
     }
     return (0);
 }

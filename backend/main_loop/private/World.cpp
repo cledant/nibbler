@@ -1,7 +1,6 @@
 #include <functional>
 #include <iostream>
 #include <cstring>
-#include <random>
 
 #include "World.hpp"
 
@@ -22,6 +21,11 @@ World::World(WorldParams const &params)
   , _paused(0)
   , _nb_player(_params.game_type + 1)
   , _loop_time_ref(std::chrono::high_resolution_clock::now())
+  , _rd()
+  , _mt_64(_rd())
+  , _dist_board_w(1, _params.board_w - 2)
+  , _dist_board_h(1, _params.board_h - 2)
+  , _dist_obstacle(0, _board_size / 20)
 {
     _reset_board();
 }
@@ -72,6 +76,10 @@ World::run()
             _move_snakes();
             _check_player_state();
             _should_game_end();
+            if (!_food.getSnakeCurrentSize()) {
+                _generate_random_position(
+                  _food, glm::vec3(1.0f, 0.0f, 0.0f), 1);
+            }
             if (!_game_ended) {
                 _gfx_interface->clear();
                 _gfx_interface->drawBoard();
@@ -83,6 +91,9 @@ World::run()
                 _gfx_interface->drawSnake(_obstacle.getSnakePosArray(),
                                           _obstacle.getSnakeColorArray(),
                                           _obstacle.getSnakeCurrentSize());
+                _gfx_interface->drawSnake(_food.getSnakePosArray(),
+                                          _food.getSnakeColorArray(),
+                                          _food.getSnakeCurrentSize());
                 _gfx_interface->render();
             }
             _loop_time_ref = now;
@@ -326,10 +337,29 @@ World::_move_snakes()
           now - _player_mvt_timer.time_ref[i];
 
         if (time_diff.count() > _player_mvt_timer.timer_values[i]) {
-            _player[i].moveSnakeWithCurrentDirection();
+            glm::ivec2 food_eaten_pos(-1);
+
+            if (_will_snake_eat_food(_player[i], food_eaten_pos)) {
+                _player[i].addToSnake(food_eaten_pos);
+            } else {
+                _player[i].moveSnakeWithCurrentDirection();
+            }
             _player_mvt_timer.time_ref[i] = now;
         }
     }
+}
+
+uint8_t
+World::_will_snake_eat_food(Snake const &snake, glm::ivec2 &food_eaten_pos)
+{
+    for (auto const &it : _food.getSnakePosArray()) {
+        if (snake.isInFrontOfHead(it)) {
+            food_eaten_pos = it;
+            _food.removeFromSnake(it);
+            return (1);
+        }
+    }
+    return (0);
 }
 
 void
@@ -354,76 +384,61 @@ World::_check_player_state()
             _player_win_con[i].touch_obstacle = 1;
             continue;
         }
+
+        // Check if players touch itself
+        if (_player[i].isSelfTouching()) {
+            _player_win_con[i].touch_self = 1;
+            continue;
+        }
     }
 }
 
 void
 World::_should_game_end()
 {
+    static const struct WinCondition not_lost = { 0, 0, 0, 0 };
+
     if (_game_ended) {
         return;
     }
 
-    // Outside map
-    if (_player_win_con[PLAYER_1].out_of_map &&
-        _player_win_con[PLAYER_2].out_of_map) {
-        _game_ended = 1;
-        std::cout << "Draw: Both Players out of map" << std::endl;
-        return;
-    } else if (_player_win_con[PLAYER_1].out_of_map) {
-        _game_ended = 1;
-        std::cout << "Player 1 Lost: Out of map" << std::endl;
-        return;
-    } else if (_player_win_con[PLAYER_2].out_of_map) {
-        _game_ended = 1;
-        std::cout << "Player 2 Lost: Out of map" << std::endl;
-        return;
-    }
+    uint64_t p1_lost = memcmp(
+      &_player_win_con[PLAYER_1], &not_lost, sizeof(struct WinCondition));
+    uint64_t p2_lost = memcmp(
+      &_player_win_con[PLAYER_2], &not_lost, sizeof(struct WinCondition));
 
-    // Obstacle
-    if (_player_win_con[PLAYER_1].touch_obstacle &&
-        _player_win_con[PLAYER_2].touch_obstacle) {
+    if (p1_lost && p2_lost) {
         _game_ended = 1;
-        std::cout << "Draw: Both Players touched obstacle" << std::endl;
-        return;
-    } else if (_player_win_con[PLAYER_1].touch_obstacle) {
+        std::cout << "Draw" << std::endl;
+    } else if (p1_lost) {
         _game_ended = 1;
-        std::cout << "Player 1 Lost: Touched obstacle" << std::endl;
-        return;
-    } else if (_player_win_con[PLAYER_2].touch_obstacle) {
+        std::cout << "Player 1 lost" << std::endl;
+    } else if (p2_lost) {
         _game_ended = 1;
-        std::cout << "Player 2 Lost: Touched obstacle" << std::endl;
+        std::cout << "Player 2 lost" << std::endl;
+    } else {
         return;
     }
 }
 
 void
-World::_generate_obstacles()
+World::_generate_random_position(Snake &target,
+                                 glm::vec3 const &color,
+                                 uint64_t nb_to_add)
 {
-    std::random_device rd;
-    std::mt19937_64 mt_64(rd());
-    std::uniform_int_distribution<uint64_t> dist_obstacle(0, _board_size / 20);
-    std::uniform_int_distribution<uint64_t> dist_board_w(1,
-                                                         _params.board_w - 2);
-    std::uniform_int_distribution<uint64_t> dist_board_h(1,
-                                                         _params.board_h - 2);
-
-    uint64_t nb_obstacles = dist_obstacle(mt_64);
-
-    for (uint64_t i = 0; i < nb_obstacles; ++i) {
+    for (uint64_t i = 0; i < nb_to_add; ++i) {
         uint8_t valid_position = 0;
 
         while (!valid_position) {
             auto new_obstacle =
-              glm::ivec2(dist_board_w(mt_64), dist_board_h(mt_64));
+              glm::ivec2(_dist_board_w(_mt_64), _dist_board_h(_mt_64));
 
             if (!_player[PLAYER_1].isInsideSnake(new_obstacle) &&
                 !_player[PLAYER_2].isInsideSnake(new_obstacle) &&
                 !_obstacle.isInsideSnake(new_obstacle) &&
                 !_food.isInsideSnake(new_obstacle)) {
                 valid_position = 1;
-                _obstacle.addToSnake(new_obstacle,
-                                     glm::vec3{ 0.33f, 0.33f, 0.33f });
+                target.addToSnake(new_obstacle, color);
             }
         }
     }
@@ -468,8 +483,10 @@ World::_reset_board()
     if (_params.obstacles) {
         _obstacle.init(
           glm::vec3{ 0.33f, 0.33f, 0.33f }, _params.board_w, _params.board_h);
-        _generate_obstacles();
+        _generate_random_position(
+          _obstacle, glm::vec3(0.33f), _dist_obstacle(_mt_64));
     }
+    _food.init(glm::vec3{ 1.0f, 0.0f, 0.0f }, _params.board_w, _params.board_h);
     std::memset(&_player_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
     std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
     _paused = 0;
