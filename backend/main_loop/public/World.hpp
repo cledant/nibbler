@@ -93,6 +93,9 @@ class World
 
     std::array<Snake, NB_PLAYER_MAX> _player;
     std::array<WinCondition, NB_PLAYER_MAX> _player_win_con;
+    std::array<enum Snake::snakeDirection, NB_PLAYER_MAX>
+      _player_previous_frame_dir;
+    std::array<uint64_t, NB_PLAYER_MAX> _player_score;
     SnakeTimers _player_mvt_timer;
     uint8_t _is_map_full;
     uint8_t _game_ended;
@@ -131,6 +134,8 @@ class World
     void _set_glfw();
     void _set_sfml();
     void _set_sdl();
+
+    inline uint64_t _total_used_board();
 
     // Moving snake
     void _move_snakes();

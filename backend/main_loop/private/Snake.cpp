@@ -48,6 +48,12 @@ Snake::getSnakeHeadPos() const
     return (_snake_pos[_cur_size - 1]);
 }
 
+glm::ivec2
+Snake::getInFrontOfSnakeHeadPos() const
+{
+    return (_snake_pos[_cur_size - 1] + _offset[_dir]);
+}
+
 enum Snake::snakeDirection
 Snake::getSnakeDirection() const
 {
@@ -141,8 +147,8 @@ Snake::removeFromSnake(glm::ivec2 const &pos)
 uint8_t
 Snake::isInsideSnake(glm::ivec2 const &pos) const
 {
-    for (auto const &it : _snake_pos) {
-        if (it == pos) {
+    for (uint64_t i = 0; i < _cur_size; ++i) {
+        if (_snake_pos[i] == pos) {
             return (1);
         }
     }
@@ -165,9 +171,9 @@ Snake::isSelfTouching() const
 {
     uint64_t start = 1;
 
-    for (auto const &it : _snake_pos) {
+    for (uint64_t j = 0; j < _cur_size; ++j) {
         for (uint64_t i = start; i < _cur_size; ++i) {
-            if (it == _snake_pos[i]) {
+            if (_snake_pos[j] == _snake_pos[i]) {
                 return (1);
             }
         }

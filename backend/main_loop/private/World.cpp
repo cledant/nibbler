@@ -1,5 +1,6 @@
 #include <functional>
 #include <iostream>
+#include <algorithm>
 #include <cstring>
 
 #include "World.hpp"
@@ -195,6 +196,9 @@ World::_p1_up()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_UP]) {
+        if (_player_previous_frame_dir[PLAYER_1] == Snake::DOWN) {
+            return;
+        }
         _player[PLAYER_1].setSnakeDirection(Snake::UP);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
@@ -206,6 +210,9 @@ World::_p1_right()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_RIGHT]) {
+        if (_player_previous_frame_dir[PLAYER_1] == Snake::LEFT) {
+            return;
+        }
         _player[PLAYER_1].setSnakeDirection(Snake::RIGHT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
@@ -217,6 +224,9 @@ World::_p1_down()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_DOWN]) {
+        if (_player_previous_frame_dir[PLAYER_1] == Snake::UP) {
+            return;
+        }
         _player[PLAYER_1].setSnakeDirection(Snake::DOWN);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
@@ -228,6 +238,9 @@ World::_p1_left()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_LEFT]) {
+        if (_player_previous_frame_dir[PLAYER_1] == Snake::RIGHT) {
+            return;
+        }
         _player[PLAYER_1].setSnakeDirection(Snake::LEFT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
@@ -240,6 +253,9 @@ World::_p2_up()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_UP] &&
         _params.game_type == Gametype::TWO_PLAYER) {
+        if (_player_previous_frame_dir[PLAYER_2] == Snake::DOWN) {
+            return;
+        }
         _player[PLAYER_2].setSnakeDirection(Snake::UP);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
@@ -252,6 +268,9 @@ World::_p2_right()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_RIGHT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
+        if (_player_previous_frame_dir[PLAYER_2] == Snake::LEFT) {
+            return;
+        }
         _player[PLAYER_2].setSnakeDirection(Snake::RIGHT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
@@ -264,6 +283,9 @@ World::_p2_down()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_DOWN] &&
         _params.game_type == Gametype::TWO_PLAYER) {
+        if (_player_previous_frame_dir[PLAYER_2] == Snake::UP) {
+            return;
+        }
         _player[PLAYER_2].setSnakeDirection(Snake::DOWN);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
@@ -276,6 +298,9 @@ World::_p2_left()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_LEFT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
+        if (_player_previous_frame_dir[PLAYER_2] == Snake::RIGHT) {
+            return;
+        }
         _player[PLAYER_2].setSnakeDirection(Snake::LEFT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
@@ -324,6 +349,14 @@ World::_set_sdl()
     }
 }
 
+uint64_t
+World::_total_used_board()
+{
+    return (_food.getSnakeCurrentSize() + _obstacle.getSnakeCurrentSize() +
+            _player[PLAYER_1].getSnakeCurrentSize() +
+            _player[PLAYER_2].getSnakeCurrentSize());
+}
+
 void
 World::_move_snakes()
 {
@@ -341,9 +374,11 @@ World::_move_snakes()
 
             if (_will_snake_eat_food(_player[i], food_eaten_pos)) {
                 _player[i].addToSnake(food_eaten_pos);
+                _player_score[i] += 1;
             } else {
                 _player[i].moveSnakeWithCurrentDirection();
             }
+            _player_previous_frame_dir[i] = _player[i].getSnakeDirection();
             _player_mvt_timer.time_ref[i] = now;
         }
     }
@@ -352,10 +387,14 @@ World::_move_snakes()
 uint8_t
 World::_will_snake_eat_food(Snake const &snake, glm::ivec2 &food_eaten_pos)
 {
-    for (auto const &it : _food.getSnakePosArray()) {
-        if (snake.isInFrontOfHead(it)) {
-            food_eaten_pos = it;
-            _food.removeFromSnake(it);
+    auto next_head_pos = snake.getInFrontOfSnakeHeadPos();
+    auto food_array = _food.getSnakePosArray();
+    auto food_size = _food.getSnakeCurrentSize();
+
+    for (uint64_t i = 0; i < food_size; ++i) {
+        if (food_array[i] == next_head_pos) {
+            _food.removeFromSnake(next_head_pos);
+            food_eaten_pos = next_head_pos;
             return (1);
         }
     }
@@ -391,6 +430,16 @@ World::_check_player_state()
             continue;
         }
     }
+    if (_nb_player > 1) {
+        if (_player[PLAYER_1].isInsideSnake(
+              _player[PLAYER_2].getSnakeHeadPos())) {
+            _player_win_con[PLAYER_2].touch_player = 1;
+        }
+        if (_player[PLAYER_2].isInsideSnake(
+              _player[PLAYER_1].getSnakeHeadPos())) {
+            _player_win_con[PLAYER_1].touch_player = 1;
+        }
+    }
 }
 
 void
@@ -409,15 +458,19 @@ World::_should_game_end()
 
     if (p1_lost && p2_lost) {
         _game_ended = 1;
-        std::cout << "Draw" << std::endl;
+        std::cout << "Draw : Both players lost" << std::endl;
     } else if (p1_lost) {
         _game_ended = 1;
         std::cout << "Player 1 lost" << std::endl;
     } else if (p2_lost) {
         _game_ended = 1;
         std::cout << "Player 2 lost" << std::endl;
-    } else {
-        return;
+    } else if (_nb_player == 1 && _total_used_board() == _board_size) {
+        _game_ended = 1;
+        std::cout << "Player 1 won" << std::endl;
+    } else if (_nb_player == 2 && _total_used_board() == _board_size) {
+        _game_ended = 1;
+        std::cout << "Draw : Both players alive" << std::endl;
     }
 }
 
@@ -462,6 +515,8 @@ World::_reset_board()
         _player_mvt_timer.time_ref[PLAYER_1] =
           std::chrono::high_resolution_clock::now();
         _player_mvt_timer.timer_values[PLAYER_1] = DEFAULT_SNAKE_TIMER_SECONDS;
+        _player[PLAYER_2].init(
+          glm::vec3(1.0f), _params.board_w, _params.board_h);
     } else {
         _player[PLAYER_1].init(
           glm::uvec2{ _params.board_w / 4, _params.board_h / 2 },
@@ -480,15 +535,19 @@ World::_reset_board()
           std::chrono::high_resolution_clock::now();
         _player_mvt_timer.timer_values[PLAYER_2] = DEFAULT_SNAKE_TIMER_SECONDS;
     }
+    _obstacle.init(
+      glm::vec3{ 0.33f, 0.33f, 0.33f }, _params.board_w, _params.board_h);
+    _food.init(glm::vec3{ 1.0f, 0.0f, 0.0f }, _params.board_w, _params.board_h);
     if (_params.obstacles) {
-        _obstacle.init(
-          glm::vec3{ 0.33f, 0.33f, 0.33f }, _params.board_w, _params.board_h);
         _generate_random_position(
           _obstacle, glm::vec3(0.33f), _dist_obstacle(_mt_64));
     }
-    _food.init(glm::vec3{ 1.0f, 0.0f, 0.0f }, _params.board_w, _params.board_h);
     std::memset(&_player_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
     std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
+    std::memset(&_player_previous_frame_dir,
+                Snake::UP,
+                sizeof(enum Snake::snakeDirection) * NB_PLAYER_MAX);
+    std::memset(&_player_score, 0, sizeof(uint64_t) * NB_PLAYER_MAX);
     _paused = 0;
     _game_ended = 0;
 }

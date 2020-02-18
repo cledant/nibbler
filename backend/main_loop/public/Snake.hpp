@@ -35,6 +35,7 @@ class Snake
     [[nodiscard]] uint32_t getSnakeCurrentSize() const;
     [[nodiscard]] uint32_t getSnakeMaxSize() const;
     [[nodiscard]] glm::ivec2 const &getSnakeHeadPos() const;
+    [[nodiscard]] glm::ivec2 getInFrontOfSnakeHeadPos() const;
     [[nodiscard]] enum snakeDirection getSnakeDirection() const;
 
     void init(glm::ivec2 const &start_pos,
