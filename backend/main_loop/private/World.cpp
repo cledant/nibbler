@@ -369,6 +369,8 @@ World::_move_snakes()
             if (_will_snake_eat_food(_player[i], food_eaten_pos)) {
                 _player[i].addToSnake(food_eaten_pos);
                 _player_score[i] += 1;
+                _player_mvt_timer.timer_values[i] =
+                  _player_timers[_player_score[i]];
             } else {
                 _player[i].moveSnakeWithCurrentDirection();
             }
