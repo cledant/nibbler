@@ -80,46 +80,51 @@ class World
         uint8_t touch_obstacle;
     };
 
+    // Game related variables
     WorldParams _params;
     uint64_t _board_size;
+    uint8_t _paused;
+    uint8_t _nb_player;
+    uint8_t _is_map_full;
+    uint8_t _game_ended;
 
+    // System related variables
     std::string _home;
+    std::array<std::string, NB_GFX_LIB> _path_gfx_lib;
     DynLibLoader<IGraphic> _gfx_loader;
     IGraphic *_gfx_interface;
+    uint8_t _is_init;
+    std::chrono::high_resolution_clock ::time_point _loop_time_ref;
 
-    std::array<std::string, NB_GFX_LIB> _path_gfx_lib;
+    // Event related variables
     std::array<uint8_t, IGraphicConstants::NB_EVENT> _events;
     EventTimers _event_timers;
 
+    // Player related variables
     std::array<Snake, NB_PLAYER_MAX> _player;
     std::array<WinCondition, NB_PLAYER_MAX> _player_win_con;
     std::array<enum Snake::snakeDirection, NB_PLAYER_MAX>
       _player_previous_frame_dir;
     std::array<uint64_t, NB_PLAYER_MAX> _player_score;
     SnakeTimers _player_mvt_timer;
-    uint8_t _is_map_full;
-    uint8_t _game_ended;
 
+    // Board critter related variables
     Snake _food;
     Snake _obstacle;
 
-    uint8_t _is_init;
-    uint8_t _paused;
-    uint8_t _nb_player;
-
-    std::chrono::high_resolution_clock ::time_point _loop_time_ref;
-
+    // Ramndom generation related variables
     std::random_device _rd;
     std::mt19937_64 _mt_64;
     std::uniform_int_distribution<uint64_t> _dist_board_w;
     std::uniform_int_distribution<uint64_t> _dist_board_h;
     std::uniform_int_distribution<uint64_t> _dist_obstacle;
 
+    // Dyanamic lib related
     void _load_dyn_lib();
     void _clear_dyn_lib();
-    void _interpret_events();
 
     // Event handling functions
+    void _interpret_events();
     void _close_win_event();
     void _pause();
     void _toggle_fullscreen();
@@ -135,14 +140,13 @@ class World
     void _set_sfml();
     void _set_sdl();
 
-    inline uint64_t _total_used_board();
-
     // Moving snake
     void _move_snakes();
     uint8_t _will_snake_eat_food(Snake const &snake,
                                  glm::ivec2 &food_eaten_pos);
 
     // Win conditions handling
+    inline uint64_t _current_used_board();
     void _check_player_state();
     void _should_game_end();
 

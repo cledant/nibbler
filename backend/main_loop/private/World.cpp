@@ -1,6 +1,5 @@
 #include <functional>
 #include <iostream>
-#include <algorithm>
 #include <cstring>
 
 #include "World.hpp"
@@ -8,20 +7,23 @@
 World::World(WorldParams const &params)
   : _params(params)
   , _board_size(params.board_h * params.board_w)
+  , _paused(0)
+  , _nb_player(_params.game_type + 1)
+  , _is_map_full(0)
+  , _game_ended(0)
   , _home()
+  , _path_gfx_lib()
   , _gfx_loader()
   , _gfx_interface(nullptr)
-  , _path_gfx_lib()
+  , _is_init(0)
+  , _loop_time_ref(std::chrono::high_resolution_clock::now())
   , _events()
   , _event_timers()
   , _player()
   , _player_win_con()
-  , _is_map_full(0)
-  , _game_ended(0)
-  , _is_init(0)
-  , _paused(0)
-  , _nb_player(_params.game_type + 1)
-  , _loop_time_ref(std::chrono::high_resolution_clock::now())
+  , _player_previous_frame_dir()
+  , _player_score()
+  , _player_mvt_timer()
   , _rd()
   , _mt_64(_rd())
   , _dist_board_w(1, _params.board_w - 2)
@@ -349,14 +351,6 @@ World::_set_sdl()
     }
 }
 
-uint64_t
-World::_total_used_board()
-{
-    return (_food.getSnakeCurrentSize() + _obstacle.getSnakeCurrentSize() +
-            _player[PLAYER_1].getSnakeCurrentSize() +
-            _player[PLAYER_2].getSnakeCurrentSize());
-}
-
 void
 World::_move_snakes()
 {
@@ -401,6 +395,14 @@ World::_will_snake_eat_food(Snake const &snake, glm::ivec2 &food_eaten_pos)
     return (0);
 }
 
+uint64_t
+World::_current_used_board()
+{
+    return (_food.getSnakeCurrentSize() + _obstacle.getSnakeCurrentSize() +
+            _player[PLAYER_1].getSnakeCurrentSize() +
+            _player[PLAYER_2].getSnakeCurrentSize());
+}
+
 void
 World::_check_player_state()
 {
@@ -408,6 +410,7 @@ World::_check_player_state()
         return;
     }
 
+#ifdef NDEBUG
     for (uint8_t i = 0; i < _nb_player; ++i) {
         auto head_pos = _player[i].getSnakeHeadPos();
 
@@ -440,6 +443,7 @@ World::_check_player_state()
             _player_win_con[PLAYER_1].touch_player = 1;
         }
     }
+#endif
 }
 
 void
@@ -465,10 +469,14 @@ World::_should_game_end()
     } else if (p2_lost) {
         _game_ended = 1;
         std::cout << "Player 2 lost" << std::endl;
-    } else if (_nb_player == 1 && _total_used_board() == _board_size) {
+    } else if (_nb_player == 1 &&
+               (_current_used_board() - _food.getSnakeCurrentSize()) ==
+                 _board_size) {
         _game_ended = 1;
         std::cout << "Player 1 won" << std::endl;
-    } else if (_nb_player == 2 && _total_used_board() == _board_size) {
+    } else if (_nb_player == 2 &&
+               (_current_used_board() - _food.getSnakeCurrentSize()) ==
+                 _board_size) {
         _game_ended = 1;
         std::cout << "Draw : Both players alive" << std::endl;
     }
