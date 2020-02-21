@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-constexpr double
+constexpr uint64_t
 factorial(uint64_t i)
 {
     if (!i) {
@@ -22,10 +22,22 @@ power(double x, uint64_t y)
 }
 
 constexpr double
+exponential_recursive_taylor(double x, double acc, uint64_t i)
+{
+    if (!i) {
+        return (acc);
+    }
+    acc = (1.0 + ((x * acc) / static_cast<double>(i)));
+    return (exponential_recursive_taylor(x, acc, i - 1));
+}
+
+constexpr double
 exponential(double x)
 {
-    return (1.0 + x + power(x, 2) / factorial(2) + power(x, 3) / factorial(3) +
-            power(x, 4) / factorial(4) + power(x, 5) / factorial(5));
+    if (x < -10.0) {
+        return (0.0);
+    }
+    return (exponential_recursive_taylor(x, 1.0, 64));
 }
 
 #endif
