@@ -26,8 +26,8 @@ World::World(WorldParams const &params)
   , _player_mvt_timer()
   , _rd()
   , _mt_64(_rd())
-  , _dist_board_w(1, _params.board_w - 2)
-  , _dist_board_h(1, _params.board_h - 2)
+  , _dist_board_w(0, _params.board_w - 1)
+  , _dist_board_h(0, _params.board_h - 1)
   , _dist_obstacle(0, _board_size / 20)
 {
     _reset_board();
@@ -79,7 +79,8 @@ World::run()
             _move_snakes();
             _check_player_state();
             _should_game_end();
-            if (!_food.getSnakeCurrentSize()) {
+            if (!_food.getSnakeCurrentSize() &&
+                _current_used_board() < _board_size) {
                 _generate_random_position(
                   _food, glm::vec3(1.0f, 0.0f, 0.0f), 1);
             }
@@ -490,9 +491,7 @@ World::_generate_random_position(Snake &target,
                                  uint64_t nb_to_add)
 {
     for (uint64_t i = 0; i < nb_to_add; ++i) {
-        uint8_t valid_position = 0;
-
-        while (!valid_position) {
+        while (true) {
             auto new_obstacle =
               glm::ivec2(_dist_board_w(_mt_64), _dist_board_h(_mt_64));
 
@@ -500,8 +499,8 @@ World::_generate_random_position(Snake &target,
                 !_player[PLAYER_2].isInsideSnake(new_obstacle) &&
                 !_obstacle.isInsideSnake(new_obstacle) &&
                 !_food.isInsideSnake(new_obstacle)) {
-                valid_position = 1;
                 target.addToSnake(new_obstacle, color);
+                break;
             }
         }
     }
