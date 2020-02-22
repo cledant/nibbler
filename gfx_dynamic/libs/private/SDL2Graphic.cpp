@@ -144,6 +144,18 @@ SDL2Graphic::drawSnake(
 }
 
 void
+SDL2Graphic::drawText(std::string const &str,
+                      glm::vec3 const &color,
+                      glm::vec2 const &pos,
+                      float scale)
+{
+    (void)str;
+    (void)color;
+    (void)pos;
+    (void)scale;
+}
+
+void
 SDL2Graphic::render()
 {
     SDL_GL_SwapWindow(_win.win);

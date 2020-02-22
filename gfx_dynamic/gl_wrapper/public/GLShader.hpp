@@ -27,6 +27,9 @@ class GLShader
     void clear();
     void use() const;
     void setVec2(std::string const &name, glm::vec2 const &data);
+    void setVec3(std::string const &name, glm::vec3 const &data);
+    void setMat4(std::string const &name, glm::mat4 const &data);
+    void setInt(std::string const &name, int data);
 
   private:
     void _readFile(std::string const &path, std::string &content) const;
@@ -37,6 +40,7 @@ class GLShader
                                         int32_t gs,
                                         int32_t fs) const;
     [[nodiscard]] std::string _shaderError(uint32_t shader) const;
+    void _setUniform(std::string const &name);
 
     uint8_t _is_init;
     uint32_t _program;

@@ -30,6 +30,10 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sfml ${CMAKE_BINARY_DIR}/s
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sdl2 ${CMAKE_BINARY_DIR}/sdl2/build)
 
+#Setup freetype
+option(BUILD_SHARED_LIBS "" ON)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/freetype ${CMAKE_BINARY_DIR}/external/freetype/build)
+
 #gfx_dynamic libs
 add_subdirectory(gfx_dynamic/libs)
 add_subdirectory(gfx_dynamic/gl_wrapper)

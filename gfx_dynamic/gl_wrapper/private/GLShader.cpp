@@ -28,8 +28,8 @@ GLShader::operator=(GLShader &&rhs) noexcept
 
 void
 GLShader::init(std::string const &path_vs,
-             std::string const &path_fs,
-             std::string const &prog_name)
+               std::string const &path_fs,
+               std::string const &prog_name)
 {
     if (_is_init) {
         return;
@@ -58,9 +58,9 @@ GLShader::init(std::string const &path_vs,
 
 void
 GLShader::init(std::string const &path_vs,
-             std::string const &path_gs,
-             std::string const &path_fs,
-             std::string const &prog_name)
+               std::string const &path_gs,
+               std::string const &path_fs,
+               std::string const &prog_name)
 {
     if (_is_init) {
         return;
@@ -113,16 +113,32 @@ GLShader::use() const
 void
 GLShader::setVec2(std::string const &name, glm::vec2 const &data)
 {
-    auto entry = _uniform_id.find(name);
-    if (entry == _uniform_id.end()) {
-        int32_t id = glGetUniformLocation(_program, name.c_str());
-        if (id < 0) {
-            throw std::runtime_error("GLShader: Invalid uniforn name: " + name);
-        }
-        _uniform_id[name] = id;
-    }
+    _setUniform(name);
     glUniform2fv(
       _uniform_id[name], 1, reinterpret_cast<GLfloat const *>(&data));
+}
+
+void
+GLShader::setVec3(std::string const &name, glm::vec3 const &data)
+{
+    _setUniform(name);
+    glUniform3fv(
+      _uniform_id[name], 1, reinterpret_cast<GLfloat const *>(&data));
+}
+
+void
+GLShader::setMat4(std::string const &name, glm::mat4 const &data)
+{
+    _setUniform(name);
+    glUniformMatrix4fv(
+      _uniform_id[name], 1, GL_FALSE, reinterpret_cast<const GLfloat *>(&data));
+}
+
+void
+GLShader::setInt(std::string const &name, int data)
+{
+    _setUniform(name);
+    glUniform1i(_uniform_id[name], data);
 }
 
 void
@@ -150,7 +166,8 @@ GLShader::_loadShader(std::string const &path, int32_t shader_type) const
     int32_t success;
     uint32_t shader = glCreateShader(shader_type);
     if (!shader) {
-        throw std::runtime_error("GLShader: Failed to allocate shader: " + path);
+        throw std::runtime_error("GLShader: Failed to allocate shader: " +
+                                 path);
     }
     glShaderSource(shader, 1, &c_shader_code, nullptr);
     glCompileShader(shader);
@@ -214,4 +231,17 @@ GLShader::_shaderError(uint32_t shader) const
     glGetShaderInfoLog(shader, 4095, &msg_len, msg);
     msg[msg_len] = '\0';
     return (std::string(msg));
+}
+
+void
+GLShader::_setUniform(std::string const &name)
+{
+    auto entry = _uniform_id.find(name);
+    if (entry == _uniform_id.end()) {
+        int32_t id = glGetUniformLocation(_program, name.c_str());
+        if (id < 0) {
+            throw std::runtime_error("GLShader: Invalid uniforn name: " + name);
+        }
+        _uniform_id[name] = id;
+    }
 }

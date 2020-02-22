@@ -124,6 +124,18 @@ SFMLGraphic::drawSnake(
 }
 
 void
+SFMLGraphic::drawText(std::string const &str,
+                      glm::vec3 const &color,
+                      glm::vec2 const &pos,
+                      float scale)
+{
+    (void)str;
+    (void)color;
+    (void)pos;
+    (void)scale;
+}
+
+void
 SFMLGraphic::drawSnake(
   std::array<glm::ivec2, IGraphicConstants::MAX_SNAKE_SIZE> const &pos,
   std::array<glm::vec3, IGraphicConstants::MAX_SNAKE_SIZE> const &color,

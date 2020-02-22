@@ -175,6 +175,18 @@ GlfwGraphic::drawSnake(
 }
 
 void
+GlfwGraphic::drawText(std::string const &str,
+                      glm::vec3 const &color,
+                      glm::vec2 const &pos,
+                      float scale)
+{
+    (void)str;
+    (void)color;
+    (void)pos;
+    (void)scale;
+}
+
+void
 GlfwGraphic::render()
 {
     glfwSwapBuffers(_win.win);
