@@ -49,3 +49,5 @@ add_dependencies(nibbler gfx_dyn dyn_lib_loader gfx_dyn_glfw gfx_dyn_sfml gfx_dy
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/font DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/fonts/Roboto-Light.ttf DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_fonts)

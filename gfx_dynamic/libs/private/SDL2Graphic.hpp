@@ -7,6 +7,7 @@
 #include "GLSnake.hpp"
 #include "GLBoard.hpp"
 #include "GLShader.hpp"
+#include "GLFont.hpp"
 
 class SDL2Graphic : public IGraphic
 {
@@ -79,6 +80,7 @@ class SDL2Graphic : public IGraphic
     GLShader _gl_snake_shader;
     GLBoard _gl_board;
     GLSnake _gl_snake;
+    GLFont _gl_font;
 
     void _computeSquareRatio();
     void _computeBoardSize();

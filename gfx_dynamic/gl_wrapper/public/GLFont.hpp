@@ -16,7 +16,7 @@ class GLFont
 {
   public:
     GLFont();
-    virtual ~GLFont();
+    virtual ~GLFont() = default;
     GLFont(GLFont const &src) = delete;
     GLFont &operator=(GLFont const &rhs) = delete;
     GLFont(GLFont &&src) noexcept;
@@ -61,18 +61,5 @@ class GLFont
     uint32_t _vao;
     uint32_t _vbo;
 };
-
-void
-GLShader::_setUniform(std::string const &name)
-{
-    auto entry = _uniform_id.find(name);
-    if (entry == _uniform_id.end()) {
-        int32_t id = glGetUniformLocation(_program, name.c_str());
-        if (id < 0) {
-            throw std::runtime_error("GLShader: Invalid uniforn name: " + name);
-        }
-        _uniform_id[name] = id;
-    }
-}
 
 #endif

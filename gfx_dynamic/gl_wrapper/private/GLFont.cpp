@@ -13,15 +13,6 @@ GLFont::GLFont()
   , _vbo(0)
 {}
 
-GLFont::~GLFont()
-{
-    glDeleteVertexArrays(1, &_vao);
-    glDeleteBuffers(1, &_vbo);
-    for (auto &it : _char_list) {
-        glDeleteTextures(1, &it.second.tex);
-    }
-}
-
 GLFont::GLFont(GLFont &&src) noexcept
   : _is_init(0)
   , _font_size(1)
@@ -74,6 +65,8 @@ void
 GLFont::clear()
 {
     _is_init = 0;
+    glDeleteVertexArrays(1, &_vao);
+    glDeleteBuffers(1, &_vbo);
     for (auto &it : _char_list) {
         glDeleteTextures(1, &it.second.tex);
     }

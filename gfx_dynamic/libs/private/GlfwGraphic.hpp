@@ -8,6 +8,7 @@
 #include "GLSnake.hpp"
 #include "GLBoard.hpp"
 #include "GLShader.hpp"
+#include "GLFont.hpp"
 
 class GlfwGraphic : public IGraphic
 {
@@ -82,6 +83,7 @@ class GlfwGraphic : public IGraphic
     GLShader _gl_snake_shader;
     GLBoard _gl_board;
     GLSnake _gl_snake;
+    GLFont _gl_font;
 
     void _initCallbacks();
     void _computeSquareRatio();

@@ -85,6 +85,12 @@ GlfwGraphic::createWindow(std::string &&name)
           "draw_rectangle");
         _gl_snake.init();
         _gl_board.init();
+        _gl_font.init(
+          _home + "/.nibbler/nibbler_fonts/Roboto-Light.ttf",
+          _home + "/.nibbler/nibbler_shaders/font/font_vs.glsl",
+          _home + "/.nibbler/nibbler_shaders/font/font_fs.glsl",
+          glm::vec2(IGraphicConstants::WIN_W, IGraphicConstants::WIN_H),
+          24);
     }
 }
 
@@ -94,6 +100,7 @@ GlfwGraphic::deleteWindow()
     _gl_board.clear();
     _gl_snake.clear();
     _gl_snake_shader.clear();
+    _gl_font.clear();
     if (!_win.win) {
         glfwDestroyWindow(_win.win);
         _win.win = nullptr;
@@ -180,10 +187,7 @@ GlfwGraphic::drawText(std::string const &str,
                       glm::vec2 const &pos,
                       float scale)
 {
-    (void)str;
-    (void)color;
-    (void)pos;
-    (void)scale;
+    _gl_font.drawText(str, color, pos, scale);
 }
 
 void
@@ -198,8 +202,6 @@ GlfwGraphic::clear()
     glClearColor(0.086f, 0.317f, 0.427f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
-
-#include <iostream>
 
 void
 GlfwGraphic::toggleFullscreen()
@@ -258,6 +260,7 @@ GlfwGraphic::_initCallbacks()
     auto window_size_callback = [](GLFWwindow *win, int w, int h) {
         THIS_WIN_PTR->_win.h = h;
         THIS_WIN_PTR->_win.w = w;
+        THIS_WIN_PTR->_gl_font.setOrthographicProjection(glm::vec2(w, h));
     };
     glfwSetWindowSizeCallback(_win.win, window_size_callback);
 

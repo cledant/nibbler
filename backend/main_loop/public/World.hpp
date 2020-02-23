@@ -169,6 +169,9 @@ class World
                                    glm::vec3 const &color,
                                    uint64_t nb_to_add);
     void _reset_board();
+
+    // UI
+    void _draw_ui();
 };
 
 #endif

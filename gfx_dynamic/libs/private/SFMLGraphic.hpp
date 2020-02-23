@@ -8,6 +8,7 @@
 #include "GLSnake.hpp"
 #include "GLBoard.hpp"
 #include "GLShader.hpp"
+#include "GLFont.hpp"
 
 class SFMLGraphic : public IGraphic
 {
@@ -76,6 +77,7 @@ class SFMLGraphic : public IGraphic
     GLShader _gl_snake_shader;
     GLBoard _gl_board;
     GLSnake _gl_snake;
+    GLFont _gl_font;
 
     uint8_t _should_close;
 

@@ -45,6 +45,7 @@ SFMLGraphic::deleteWindow()
     _gl_board.clear();
     _gl_snake.clear();
     _gl_snake_shader.clear();
+    _gl_font.clear();
     _win.win.close();
 }
 
@@ -129,10 +130,7 @@ SFMLGraphic::drawText(std::string const &str,
                       glm::vec2 const &pos,
                       float scale)
 {
-    (void)str;
-    (void)color;
-    (void)pos;
-    (void)scale;
+    _gl_font.drawText(str, color, pos, scale);
 }
 
 void
@@ -242,6 +240,11 @@ SFMLGraphic::_createWindow()
       "draw_rectangle");
     _gl_snake.init();
     _gl_board.init();
+    _gl_font.init(_home + "/.nibbler/nibbler_fonts/Roboto-Light.ttf",
+                  _home + "/.nibbler/nibbler_shaders/font/font_vs.glsl",
+                  _home + "/.nibbler/nibbler_shaders/font/font_fs.glsl",
+                  glm::vec2(_win.w, _win.h),
+                  24);
 }
 
 extern "C" IGraphic *

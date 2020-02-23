@@ -98,6 +98,7 @@ World::run()
                 _gfx_interface->drawSnake(_food.getSnakePosArray(),
                                           _food.getSnakeColorArray(),
                                           _food.getSnakeCurrentSize());
+                _draw_ui();
                 _gfx_interface->render();
             }
             _loop_time_ref = now;
@@ -559,4 +560,11 @@ World::_reset_board()
     std::memset(&_player_score, 0, sizeof(uint64_t) * NB_PLAYER_MAX);
     _paused = 0;
     _game_ended = 0;
+}
+
+void
+World::_draw_ui()
+{
+    _gfx_interface->drawText(
+      "Test", glm::vec3(1.0f), glm::vec2(10.0f, 30.0f), 1.0f);
 }
