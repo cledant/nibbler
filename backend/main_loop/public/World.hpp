@@ -38,11 +38,17 @@ class World
     static double constexpr DEFAULT_SNAKE_TIMER_SECONDS =
       FRAME_LENGTH_SECONDS * 60;
     static uint8_t constexpr NB_EVENT_TIMER_TYPES = 3;
+    static constexpr double BONUS_DURATION = 30.0;
 
     // Player related
     static constexpr uint8_t NB_PLAYER_MAX = 2;
     static constexpr uint64_t NORMAL_FOOD_VALUE = 100;
     static constexpr uint64_t BONUS_FOOD_VALUE = 500;
+
+    // Bonus related
+    static constexpr uint64_t MAX_BONUS_FOOD_NB = 2;
+    static constexpr uint64_t MAX_BONUS_SPAWN_CHANCE = 3600;
+    static constexpr uint64_t MAX_BONUS_STD_DEV = 200;
 
     enum EventTimersTypes
     {
@@ -137,6 +143,12 @@ class World
     // Board critter related variables
     Snake _food;
     Snake _obstacle;
+    Snake _bonus_food;
+
+    // Bonus food related variables
+    uint64_t _bonus_spawn_chance;
+    uint8_t _bonus_food_active;
+    double _current_bonus_food_timer;
 
     // Ramndom generation related variables
     std::random_device _rd;
@@ -144,6 +156,8 @@ class World
     std::uniform_int_distribution<uint64_t> _dist_board_w;
     std::uniform_int_distribution<uint64_t> _dist_board_h;
     std::uniform_int_distribution<uint64_t> _dist_obstacle;
+    std::normal_distribution<> _dist_chance_bonus;
+    std::uniform_int_distribution<uint64_t> _dist_nb_bonus;
 
     // Dyanamic lib related
     void _load_dyn_lib();
@@ -170,6 +184,8 @@ class World
     void _move_snakes();
     uint8_t _will_snake_eat_food(Snake const &snake,
                                  glm::ivec2 &food_eaten_pos);
+    uint8_t _will_snake_eat_bonus_food(Snake const &snake,
+                                       glm::ivec2 &food_eaten_pos);
 
     // Win conditions handling
     inline uint64_t _current_used_board();
@@ -187,6 +203,10 @@ class World
     void _draw_interruption_ui();
     void _draw_game_end_single_player_ui();
     void _draw_game_end_multi_player_ui();
+
+    // Bonus food related
+    void _respawn_food();
+    void _handle_bonus_food(double elapsed_time);
 };
 
 #endif

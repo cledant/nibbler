@@ -22,14 +22,20 @@ World::World(WorldParams const &params)
   , _event_timers()
   , _player()
   , _player_win_con()
+  , _player_has_lost()
   , _player_previous_frame_dir()
   , _player_score()
   , _player_mvt_timer()
+  , _bonus_spawn_chance(MAX_BONUS_SPAWN_CHANCE)
+  , _bonus_food_active(0)
+  , _current_bonus_food_timer(0.0)
   , _rd()
   , _mt_64(_rd())
   , _dist_board_w(0, _params.board_w - 1)
   , _dist_board_h(0, _params.board_h - 1)
   , _dist_obstacle(0, _board_size / 20)
+  , _dist_chance_bonus(MAX_BONUS_SPAWN_CHANCE / 2.0, MAX_BONUS_STD_DEV)
+  , _dist_nb_bonus(1, MAX_BONUS_FOOD_NB)
 {
     _reset_board();
 }
@@ -81,11 +87,8 @@ World::run()
                 _move_snakes();
                 _check_player_state();
                 _should_game_end();
-                if (!_food.getSnakeCurrentSize() &&
-                    _current_used_board() < _board_size) {
-                    _generate_random_position(
-                      _food, glm::vec3(1.0f, 0.0f, 0.0f), 1);
-                }
+                _respawn_food();
+                _handle_bonus_food(loop_diff.count());
                 if (!_paused) {
                     _game_length += loop_diff.count();
                 }
@@ -103,6 +106,9 @@ World::run()
             _gfx_interface->drawSnake(_food.getSnakePosArray(),
                                       _food.getSnakeColorArray(),
                                       _food.getSnakeCurrentSize());
+            _gfx_interface->drawSnake(_bonus_food.getSnakePosArray(),
+                                      _bonus_food.getSnakeColorArray(),
+                                      _bonus_food.getSnakeCurrentSize());
             _draw_stats_ui();
             _draw_interruption_ui();
             _gfx_interface->render();
@@ -378,6 +384,11 @@ World::_move_snakes()
                 _player_score[i] += NORMAL_FOOD_VALUE;
                 _player_mvt_timer.timer_values[i] =
                   _player_timers[_player[i].getSnakeCurrentSize()];
+            } else if (_will_snake_eat_bonus_food(_player[i], food_eaten_pos)) {
+                _player[i].addToSnake(food_eaten_pos);
+                _player_score[i] += BONUS_FOOD_VALUE;
+                _player_mvt_timer.timer_values[i] =
+                  _player_timers[_player[i].getSnakeCurrentSize()];
             } else {
                 _player[i].moveSnakeWithCurrentDirection();
             }
@@ -404,10 +415,29 @@ World::_will_snake_eat_food(Snake const &snake, glm::ivec2 &food_eaten_pos)
     return (0);
 }
 
+uint8_t
+World::_will_snake_eat_bonus_food(Snake const &snake,
+                                  glm::ivec2 &food_eaten_pos)
+{
+    auto next_head_pos = snake.getInFrontOfSnakeHeadPos();
+    auto food_array = _bonus_food.getSnakePosArray();
+    auto food_size = _bonus_food.getSnakeCurrentSize();
+
+    for (uint64_t i = 0; i < food_size; ++i) {
+        if (food_array[i] == next_head_pos) {
+            _bonus_food.removeFromSnake(next_head_pos);
+            food_eaten_pos = next_head_pos;
+            return (1);
+        }
+    }
+    return (0);
+}
+
 uint64_t
 World::_current_used_board()
 {
-    return (_food.getSnakeCurrentSize() + _obstacle.getSnakeCurrentSize() +
+    return (_food.getSnakeCurrentSize() + _bonus_food.getSnakeCurrentSize() +
+            _obstacle.getSnakeCurrentSize() +
             _player[PLAYER_1].getSnakeCurrentSize() +
             _player[PLAYER_2].getSnakeCurrentSize());
 }
@@ -469,19 +499,10 @@ World::_should_game_end()
     _player_has_lost[PLAYER_2] = memcmp(
       &_player_win_con[PLAYER_2], &not_lost, sizeof(struct WinCondition));
 
-    if (_player_has_lost[PLAYER_1] && _player_has_lost[PLAYER_2]) {
+    if (_player_has_lost[PLAYER_1] || _player_has_lost[PLAYER_2]) {
         _game_ended = 1;
-    } else if (_player_has_lost[PLAYER_1]) {
-        _game_ended = 1;
-    } else if (_player_has_lost[PLAYER_2]) {
-        _game_ended = 1;
-    } else if (_nb_player == 1 &&
-               (_current_used_board() - _food.getSnakeCurrentSize()) ==
-                 _board_size) {
-        _game_ended = 1;
-    } else if (_nb_player == 2 &&
-               (_current_used_board() - _food.getSnakeCurrentSize()) ==
-                 _board_size) {
+    } else if ((_current_used_board() - _food.getSnakeCurrentSize() -
+                _bonus_food.getSnakeCurrentSize()) == _board_size) {
         _game_ended = 1;
     }
 }
@@ -492,14 +513,15 @@ World::_generate_random_position(Snake &target,
                                  uint64_t nb_to_add)
 {
     for (uint64_t i = 0; i < nb_to_add; ++i) {
-        while (true) {
+        while (_current_used_board() < _board_size) {
             auto new_obstacle =
               glm::ivec2(_dist_board_w(_mt_64), _dist_board_h(_mt_64));
 
             if (!_player[PLAYER_1].isInsideSnake(new_obstacle) &&
                 !_player[PLAYER_2].isInsideSnake(new_obstacle) &&
                 !_obstacle.isInsideSnake(new_obstacle) &&
-                !_food.isInsideSnake(new_obstacle)) {
+                !_food.isInsideSnake(new_obstacle) &&
+                !_bonus_food.isInsideSnake(new_obstacle)) {
                 target.addToSnake(new_obstacle, color);
                 break;
             }
@@ -548,6 +570,9 @@ World::_reset_board()
     _obstacle.init(
       glm::vec3{ 0.33f, 0.33f, 0.33f }, _params.board_w, _params.board_h);
     _food.init(glm::vec3{ 1.0f, 0.0f, 0.0f }, _params.board_w, _params.board_h);
+    _bonus_food.init(
+      glm::vec3{ 0.5f, 0.0f, 0.0f }, _params.board_w, _params.board_h);
+    _bonus_food_active = 0;
     if (_params.obstacles) {
         _generate_random_position(
           _obstacle, glm::vec3(0.33f), _dist_obstacle(_mt_64));
@@ -562,6 +587,9 @@ World::_reset_board()
     _paused = 0;
     _game_ended = 0;
     _game_length = 0.0f;
+    _bonus_food_active = 0;
+    _bonus_spawn_chance = MAX_BONUS_SPAWN_CHANCE;
+    _current_bonus_food_timer = 0.0;
 }
 
 void
@@ -706,10 +734,10 @@ World::_draw_game_end_multi_player_ui()
                    (!_player_has_lost[PLAYER_1] &&
                     !_player_has_lost[PLAYER_2])) {
             if (_player_score[PLAYER_1] > _player_score[PLAYER_2]) {
-                _gfx_interface->drawText(player_2_won.text,
-                                         player_2_won.color,
-                                         player_2_won.pos,
-                                         player_2_won.scale);
+                _gfx_interface->drawText(player_1_won.text,
+                                         player_1_won.color,
+                                         player_1_won.pos,
+                                         player_1_won.scale);
             } else if (_player_score[PLAYER_2] > _player_score[PLAYER_1]) {
                 _gfx_interface->drawText(player_2_won.text,
                                          player_2_won.color,
@@ -719,6 +747,44 @@ World::_draw_game_end_multi_player_ui()
                 _gfx_interface->drawText(
                   draw.text, draw.color, draw.pos, draw.scale);
             }
+        }
+    }
+}
+
+void
+World::_respawn_food()
+{
+    if (!_food.getSnakeCurrentSize() && _current_used_board() < _board_size) {
+        _generate_random_position(_food, glm::vec3(1.0f, 0.0f, 0.0f), 1);
+    }
+}
+
+void
+World::_handle_bonus_food(double elapsed_time)
+{
+    if (_paused) {
+        return;
+    }
+
+    if (!_bonus_food_active) {
+        if (_dist_chance_bonus(_mt_64) > _bonus_spawn_chance) {
+            _bonus_food_active = 1;
+            _current_bonus_food_timer = BONUS_DURATION;
+            _generate_random_position(
+              _bonus_food, glm::vec3(0.5f, 0.0f, 0.0f), _dist_nb_bonus(_mt_64));
+        } else if (_bonus_spawn_chance) {
+            --_bonus_spawn_chance;
+        } else {
+            _bonus_spawn_chance = MAX_BONUS_SPAWN_CHANCE;
+        }
+    } else {
+        _current_bonus_food_timer -= elapsed_time;
+        if (!_bonus_food.getSnakeCurrentSize() ||
+            _current_bonus_food_timer <= 0.0) {
+            _bonus_food_active = 0;
+            _bonus_spawn_chance = MAX_BONUS_SPAWN_CHANCE;
+            _bonus_food.init(
+              glm::vec3{ 0.5f, 0.0f, 0.0f }, _params.board_w, _params.board_h);
         }
     }
 }
