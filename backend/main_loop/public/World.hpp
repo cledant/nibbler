@@ -41,6 +41,8 @@ class World
 
     // Player related
     static constexpr uint8_t NB_PLAYER_MAX = 2;
+    static constexpr uint64_t NORMAL_FOOD_VALUE = 100;
+    static constexpr uint64_t BONUS_FOOD_VALUE = 500;
 
     enum EventTimersTypes
     {
@@ -81,6 +83,14 @@ class World
         uint8_t touch_obstacle;
     };
 
+    struct UiElement
+    {
+        std::string text;
+        glm::vec3 color;
+        glm::vec2 pos;
+        float scale;
+    };
+
     // Game related variables
     WorldParams _params;
     uint64_t _board_size;
@@ -88,6 +98,7 @@ class World
     uint8_t _nb_player;
     uint8_t _is_map_full;
     uint8_t _game_ended;
+    double _game_length;
 
     // System related variables
     std::string _home;
@@ -104,6 +115,7 @@ class World
     // Player related variables
     std::array<Snake, NB_PLAYER_MAX> _player;
     std::array<WinCondition, NB_PLAYER_MAX> _player_win_con;
+    std::array<uint8_t, NB_PLAYER_MAX> _player_has_lost;
     std::array<enum Snake::snakeDirection, NB_PLAYER_MAX>
       _player_previous_frame_dir;
     std::array<uint64_t, NB_PLAYER_MAX> _player_score;
@@ -171,7 +183,10 @@ class World
     void _reset_board();
 
     // UI
-    void _draw_ui();
+    void _draw_stats_ui();
+    void _draw_interruption_ui();
+    void _draw_game_end_single_player_ui();
+    void _draw_game_end_multi_player_ui();
 };
 
 #endif

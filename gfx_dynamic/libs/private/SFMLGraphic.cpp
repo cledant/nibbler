@@ -244,7 +244,7 @@ SFMLGraphic::_createWindow()
                   _home + "/.nibbler/nibbler_shaders/font/font_vs.glsl",
                   _home + "/.nibbler/nibbler_shaders/font/font_fs.glsl",
                   glm::vec2(_win.w, _win.h),
-                  24);
+                  48);
 }
 
 extern "C" IGraphic *

@@ -90,7 +90,7 @@ GlfwGraphic::createWindow(std::string &&name)
           _home + "/.nibbler/nibbler_shaders/font/font_vs.glsl",
           _home + "/.nibbler/nibbler_shaders/font/font_fs.glsl",
           glm::vec2(IGraphicConstants::WIN_W, IGraphicConstants::WIN_H),
-          24);
+          48);
     }
 }
 
