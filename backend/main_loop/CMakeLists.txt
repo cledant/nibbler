@@ -3,6 +3,9 @@ project(binary_main_loop)
 
 add_library(main_loop STATIC
 		private/World.cpp
+		private/World_events.cpp
+		private/World_ui.cpp
+		private/World_board.cpp
 		private/Snake.cpp)
 target_include_directories(main_loop
 		PUBLIC

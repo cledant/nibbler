@@ -38,7 +38,7 @@ class World
     static double constexpr DEFAULT_SNAKE_TIMER_SECONDS =
       FRAME_LENGTH_SECONDS * 60;
     static uint8_t constexpr NB_EVENT_TIMER_TYPES = 3;
-    static constexpr double BONUS_DURATION = 30.0;
+    static constexpr double BONUS_DURATION = 15.0;
 
     // Player related
     static constexpr uint8_t NB_PLAYER_MAX = 2;
@@ -46,9 +46,8 @@ class World
     static constexpr uint64_t BONUS_FOOD_VALUE = 500;
 
     // Bonus related
-    static constexpr uint64_t MAX_BONUS_FOOD_NB = 2;
     static constexpr uint64_t MAX_BONUS_SPAWN_CHANCE = 3600;
-    static constexpr uint64_t MAX_BONUS_STD_DEV = 200;
+    static constexpr uint64_t MAX_BONUS_STD_DEV = 300;
 
     enum EventTimersTypes
     {
@@ -150,7 +149,7 @@ class World
     uint8_t _bonus_food_active;
     double _current_bonus_food_timer;
 
-    // Ramndom generation related variables
+    // Random generation related variables
     std::random_device _rd;
     std::mt19937_64 _mt_64;
     std::uniform_int_distribution<uint64_t> _dist_board_w;
@@ -159,7 +158,7 @@ class World
     std::normal_distribution<> _dist_chance_bonus;
     std::uniform_int_distribution<uint64_t> _dist_nb_bonus;
 
-    // Dyanamic lib related
+    // Dynamic lib related
     void _load_dyn_lib();
     void _clear_dyn_lib();
 
@@ -188,7 +187,7 @@ class World
                                        glm::ivec2 &food_eaten_pos);
 
     // Win conditions handling
-    inline uint64_t _current_used_board();
+    uint64_t _current_used_board();
     void _check_player_state();
     void _should_game_end();
 
@@ -196,7 +195,10 @@ class World
     void _generate_random_position(Snake &target,
                                    glm::vec3 const &color,
                                    uint64_t nb_to_add);
-    void _reset_board();
+    void _reset_game();
+    void _reset_players();
+    void _reset_win_con();
+    void _reset_board_critters();
 
     // UI
     void _draw_stats_ui();
