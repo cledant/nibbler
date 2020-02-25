@@ -19,17 +19,20 @@ class Board
     Board(Board &&src) = delete;
     Board &operator=(Board &&rhs) = delete;
 
-
-
-    [[nodiscard]] uint64_t CurrentUsedBoard() const;
-    void CheckPlayerState(
+    [[nodiscard]] uint64_t currentUsedBoard() const;
+    [[nodiscard]] uint8_t isFullNoFood() const;
+    void checkPlayerState(
       uint8_t nb_player,
       std::array<WinCondition, NB_PLAYER_MAX> &player_win_con);
-    void DrawBoardElements(uint8_t nb_player, IGraphic *gfx_interface);
-    void DrawBoardStat(uint8_t nb_player, IGraphic *gfx_interface);
-    void RespawnFood();
-    void HandleBonusFood(double elapsed_time);
-    void ResetBoard(uint8_t generate_obstacles, uint8_t nb_player);
+    void drawBoardElements(uint8_t nb_player, IGraphic *gfx_interface);
+    void drawBoardStat(uint8_t nb_player, IGraphic *gfx_interface);
+    void respawnFood();
+    void handleBonusFood(double elapsed_time);
+    void resetBoard(uint8_t generate_obstacles, uint8_t nb_player);
+    std::array<Snake, NB_PLAYER_MAX> &updatePlayers();
+    std::array<Snake, NB_PLAYER_MAX> const &getPlayers() const;
+    Snake &updateFood();
+    Snake &updateBonusFood();
 
   private:
     std::array<Snake, NB_PLAYER_MAX> _player;

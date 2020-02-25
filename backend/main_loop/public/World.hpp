@@ -88,15 +88,8 @@ class World
     void _set_sfml();
     void _set_sdl();
 
-    // Moving snake
-    void _move_snakes();
-    uint8_t _will_snake_eat_food(Snake const &snake,
-                                 glm::ivec2 &food_eaten_pos);
-    uint8_t _will_snake_eat_bonus_food(Snake const &snake,
-                                       glm::ivec2 &food_eaten_pos);
-
-    void _should_game_end();
-
+    // Game related
+    void _should_game_end(Players &players, Board const &board);
     void _reset_game();
 
     // UI

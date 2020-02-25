@@ -68,19 +68,20 @@ World::run()
             _gfx_interface->getEvents(_events);
             _interpret_events();
             if (!_game_ended && !_paused) {
-                _move_snakes();
-                _check_player_state();
-                _should_game_end();
-                _board.RespawnFood();
-                _board.HandleBonusFood(loop_diff.count());
+                _players.moveSnakes(_board, _nb_player);
+                _board.checkPlayerState(
+                  _nb_player, _players.updatePlayersWinConditionStates());
+                _should_game_end(_players, _board);
+                _board.respawnFood();
+                _board.handleBonusFood(loop_diff.count());
                 _game_length += loop_diff.count();
             }
             if (_gfx_interface) {
                 _gfx_interface->clear();
                 _gfx_interface->drawBoard();
-                _board.DrawBoardElements(_nb_player, _gfx_interface);
-                _board.DrawBoardStat(_nb_player, _gfx_interface);
-                _players.DrawPlayerStats(_nb_player, _gfx_interface);
+                _board.drawBoardElements(_nb_player, _gfx_interface);
+                _board.drawBoardStat(_nb_player, _gfx_interface);
+                _players.drawPlayerStats(_nb_player, _gfx_interface);
                 _draw_game_stats_ui();
                 _draw_interruption_ui();
                 _gfx_interface->render();
@@ -114,91 +115,18 @@ World::_clear_dyn_lib()
     }
 }
 
-// Moving snake
+// Game related
 void
-World::_move_snakes()
+World::_should_game_end(Players &players, Board const &board)
 {
-    auto now = std::chrono::high_resolution_clock::now();
-
-    for (uint8_t i = 0; i < _nb_player; ++i) {
-        std::chrono::duration<double> time_diff =
-          now - _player_mvt_timer.time_ref[i];
-
-        if (time_diff.count() > _player_mvt_timer.timer_values[i]) {
-            glm::ivec2 food_eaten_pos(-1);
-
-            if (_will_snake_eat_food(_player[i], food_eaten_pos)) {
-                _player[i].addToSnake(food_eaten_pos);
-                _player_score[i] += NORMAL_FOOD_VALUE;
-                _player_mvt_timer.timer_values[i] =
-                  _player_timers[_player[i].getSnakeCurrentSize()];
-            } else if (_will_snake_eat_bonus_food(_player[i], food_eaten_pos)) {
-                _player[i].addToSnake(food_eaten_pos);
-                _player_score[i] += BONUS_FOOD_VALUE;
-                _player_mvt_timer.timer_values[i] =
-                  _player_timers[_player[i].getSnakeCurrentSize()];
-            } else {
-                _player[i].moveSnakeWithCurrentDirection();
-            }
-            _player_previous_frame_dir[i] = _player[i].getSnakeDirection();
-            _player_mvt_timer.time_ref[i] = now;
-        }
-    }
-}
-
-uint8_t
-World::_will_snake_eat_food(Snake const &snake, glm::ivec2 &food_eaten_pos)
-{
-    auto next_head_pos = snake.getInFrontOfSnakeHeadPos();
-    auto food_array = _food.getSnakePosArray();
-    auto food_size = _food.getSnakeCurrentSize();
-
-    for (uint64_t i = 0; i < food_size; ++i) {
-        if (food_array[i] == next_head_pos) {
-            _food.removeFromSnake(next_head_pos);
-            food_eaten_pos = next_head_pos;
-            return (1);
-        }
-    }
-    return (0);
-}
-
-uint8_t
-World::_will_snake_eat_bonus_food(Snake const &snake,
-                                  glm::ivec2 &food_eaten_pos)
-{
-    auto next_head_pos = snake.getInFrontOfSnakeHeadPos();
-    auto food_array = _bonus_food.getSnakePosArray();
-    auto food_size = _bonus_food.getSnakeCurrentSize();
-
-    for (uint64_t i = 0; i < food_size; ++i) {
-        if (food_array[i] == next_head_pos) {
-            _bonus_food.removeFromSnake(next_head_pos);
-            food_eaten_pos = next_head_pos;
-            return (1);
-        }
-    }
-    return (0);
-}
-
-void
-World::_should_game_end()
-{
-    static const struct WinCondition not_lost = { 0, 0, 0, 0 };
-
     if (_game_ended) {
         return;
     }
 
-    _player_has_lost[PLAYER_1] = memcmp(
-      &_player_win_con[PLAYER_1], &not_lost, sizeof(struct WinCondition));
-    _player_has_lost[PLAYER_2] = memcmp(
-      &_player_win_con[PLAYER_2], &not_lost, sizeof(struct WinCondition));
-
-    if (_player_has_lost[PLAYER_1] || _player_has_lost[PLAYER_2]) {
+    auto const &have_player_lost = players.havePlayersLost();
+    if (have_player_lost[PLAYER_1] || have_player_lost[PLAYER_2]) {
         _game_ended = 1;
-    } else if ((_current_used_board() - _food.getSnakeCurrentSize() -
-                _bonus_food.getSnakeCurrentSize()) == _board_size) {
+    } else if (board.isFullNoFood()) {
         _game_ended = 1;
     }
 }
@@ -213,13 +141,14 @@ World::_reset_game()
                                std::chrono::high_resolution_clock::now(),
                                std::chrono::high_resolution_clock::now() };
     std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
-    _players.ResetPlayers(_nb_player);
-    _board.ResetBoard(_params.obstacles, _nb_player);
+    _players.resetPlayers(_nb_player);
+    _board.resetBoard(_params.obstacles, _nb_player);
     _paused = 0;
     _game_ended = 0;
     _game_length = 0.0f;
 }
 
+// UI
 void
 World::_draw_game_stats_ui()
 {
@@ -262,6 +191,6 @@ World::_draw_interruption_ui()
           pause.text, pause.color, pause.pos, pause.scale);
     }
     if (_game_ended) {
-        _players.DrawConclusion(_nb_player, _gfx_interface);
+        _players.drawConclusion(_nb_player, _gfx_interface);
     }
 }

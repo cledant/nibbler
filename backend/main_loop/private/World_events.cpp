@@ -74,10 +74,13 @@ World::_p1_up()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_UP]) {
-        if (_player_previous_frame_dir[PLAYER_1] == Snake::DOWN) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_1] == Snake::DOWN) {
             return;
         }
-        _player[PLAYER_1].setSnakeDirection(Snake::UP);
+        player[PLAYER_1].setSnakeDirection(Snake::UP);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -88,10 +91,13 @@ World::_p1_right()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_RIGHT]) {
-        if (_player_previous_frame_dir[PLAYER_1] == Snake::LEFT) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_1] == Snake::LEFT) {
             return;
         }
-        _player[PLAYER_1].setSnakeDirection(Snake::RIGHT);
+        player[PLAYER_1].setSnakeDirection(Snake::RIGHT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -102,10 +108,13 @@ World::_p1_down()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_DOWN]) {
-        if (_player_previous_frame_dir[PLAYER_1] == Snake::UP) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_1] == Snake::UP) {
             return;
         }
-        _player[PLAYER_1].setSnakeDirection(Snake::DOWN);
+        player[PLAYER_1].setSnakeDirection(Snake::DOWN);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -116,10 +125,13 @@ World::_p1_left()
 {
     if (!_paused && _event_timers.accept_event[P1] &&
         _events[IGraphicTypes::P1_LEFT]) {
-        if (_player_previous_frame_dir[PLAYER_1] == Snake::RIGHT) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_1] == Snake::RIGHT) {
             return;
         }
-        _player[PLAYER_1].setSnakeDirection(Snake::LEFT);
+        player[PLAYER_1].setSnakeDirection(Snake::LEFT);
         _event_timers.updated[P1] = 1;
         _event_timers.accept_event[P1] = 0;
     }
@@ -131,10 +143,13 @@ World::_p2_up()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_UP] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        if (_player_previous_frame_dir[PLAYER_2] == Snake::DOWN) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_2] == Snake::DOWN) {
             return;
         }
-        _player[PLAYER_2].setSnakeDirection(Snake::UP);
+        player[PLAYER_2].setSnakeDirection(Snake::UP);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -146,10 +161,13 @@ World::_p2_right()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_RIGHT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        if (_player_previous_frame_dir[PLAYER_2] == Snake::LEFT) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_2] == Snake::LEFT) {
             return;
         }
-        _player[PLAYER_2].setSnakeDirection(Snake::RIGHT);
+        player[PLAYER_2].setSnakeDirection(Snake::RIGHT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -161,10 +179,13 @@ World::_p2_down()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_DOWN] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        if (_player_previous_frame_dir[PLAYER_2] == Snake::UP) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_2] == Snake::UP) {
             return;
         }
-        _player[PLAYER_2].setSnakeDirection(Snake::DOWN);
+        player[PLAYER_2].setSnakeDirection(Snake::DOWN);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }
@@ -176,10 +197,13 @@ World::_p2_left()
     if (!_paused && _event_timers.accept_event[P2] &&
         _events[IGraphicTypes::P2_LEFT] &&
         _params.game_type == Gametype::TWO_PLAYER) {
-        if (_player_previous_frame_dir[PLAYER_2] == Snake::RIGHT) {
+        auto &player = _board.updatePlayers();
+        auto &previous_dir = _players.getSnakesPreviousDirection();
+
+        if (previous_dir[PLAYER_2] == Snake::RIGHT) {
             return;
         }
-        _player[PLAYER_2].setSnakeDirection(Snake::LEFT);
+        player[PLAYER_2].setSnakeDirection(Snake::LEFT);
         _event_timers.updated[P2] = 1;
         _event_timers.accept_event[P2] = 0;
     }

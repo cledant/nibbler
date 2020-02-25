@@ -18,7 +18,7 @@ Board::Board(int32_t board_w, int32_t board_h)
 {}
 
 uint64_t
-Board::CurrentUsedBoard() const
+Board::currentUsedBoard() const
 {
     return (_food.getSnakeCurrentSize() + _bonus_food.getSnakeCurrentSize() +
             _obstacle.getSnakeCurrentSize() +
@@ -26,13 +26,25 @@ Board::CurrentUsedBoard() const
             _player[PLAYER_2].getSnakeCurrentSize());
 }
 
+uint8_t
+Board::isFullNoFood() const
+{
+    if ((_obstacle.getSnakeCurrentSize() +
+         _player[PLAYER_1].getSnakeCurrentSize() +
+         _player[PLAYER_2].getSnakeCurrentSize() - _food.getSnakeCurrentSize() -
+         _bonus_food.getSnakeCurrentSize()) < _board_size) {
+        return (0);
+    }
+    return (1);
+}
+
 void
-Board::CheckPlayerState(uint8_t nb_player,
+Board::checkPlayerState(uint8_t nb_player,
                         std::array<WinCondition, NB_PLAYER_MAX> &player_win_con)
 {
 #ifdef NDEBUG
     for (uint8_t i = 0; i < nb_player; ++i) {
-        auto head_pos = _player[i].getSnakeHeadPos();
+        auto const &head_pos = _player[i].getSnakeHeadPos();
 
         // Check if player is inside board
         if (head_pos.x < 0 || head_pos.y < 0 || head_pos.x >= _board_w ||
@@ -67,7 +79,7 @@ Board::CheckPlayerState(uint8_t nb_player,
 }
 
 void
-Board::DrawBoardElements(uint8_t nb_player, IGraphic *gfx_interface)
+Board::drawBoardElements(uint8_t nb_player, IGraphic *gfx_interface)
 {
     for (uint8_t i = 0; i < nb_player; ++i) {
         gfx_interface->drawSnake(_player[i].getSnakePosArray(),
@@ -86,7 +98,7 @@ Board::DrawBoardElements(uint8_t nb_player, IGraphic *gfx_interface)
 }
 
 void
-Board::DrawBoardStat(uint8_t nb_player, IGraphic *gfx_interface)
+Board::drawBoardStat(uint8_t nb_player, IGraphic *gfx_interface)
 {
     static const UiElement player_1_snake_size = {
         "Snake size: ", glm::vec3(1.0f), glm::vec2(ALIGN_FIRST_TAB, 95.0f), 0.5f
@@ -114,15 +126,15 @@ Board::DrawBoardStat(uint8_t nb_player, IGraphic *gfx_interface)
 }
 
 void
-Board::RespawnFood()
+Board::respawnFood()
 {
-    if (!_food.getSnakeCurrentSize() && CurrentUsedBoard() < _board_size) {
+    if (!_food.getSnakeCurrentSize() && currentUsedBoard() < _board_size) {
         _generate_random_position(_food, glm::vec3(1.0f, 0.0f, 0.0f), 1);
     }
 }
 
 void
-Board::HandleBonusFood(double elapsed_time)
+Board::handleBonusFood(double elapsed_time)
 {
     if (!_bonus_food_active) {
         if (_dist_chance_bonus(_mt_64) > _bonus_spawn_chance) {
@@ -147,7 +159,7 @@ Board::HandleBonusFood(double elapsed_time)
 }
 
 void
-Board::ResetBoard(uint8_t generate_obstacles, uint8_t nb_player)
+Board::resetBoard(uint8_t generate_obstacles, uint8_t nb_player)
 {
     if (nb_player == 1) {
         _player[PLAYER_1].init(glm::uvec2{ _board_w / 2, _board_h / 2 },
@@ -178,13 +190,37 @@ Board::ResetBoard(uint8_t generate_obstacles, uint8_t nb_player)
     _current_bonus_food_timer = 0.0;
 }
 
+std::array<Snake, NB_PLAYER_MAX> &
+Board::updatePlayers()
+{
+    return (_player);
+}
+
+std::array<Snake, NB_PLAYER_MAX> const &
+Board::getPlayers() const
+{
+    return (_player);
+}
+
+Snake &
+Board::updateFood()
+{
+    return (_food);
+}
+
+Snake &
+Board::updateBonusFood()
+{
+    return (_bonus_food);
+}
+
 void
 Board::_generate_random_position(Snake &target,
                                  glm::vec3 const &color,
                                  uint64_t nb_to_add)
 {
     for (uint64_t i = 0; i < nb_to_add; ++i) {
-        while (CurrentUsedBoard() < _board_size) {
+        while (currentUsedBoard() < _board_size) {
             auto new_obstacle =
               glm::ivec2(_dist_board_w(_mt_64), _dist_board_h(_mt_64));
 

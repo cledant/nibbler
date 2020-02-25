@@ -11,7 +11,7 @@ Players::Players()
 {}
 
 void
-Players::ResetPlayers(uint8_t nb_players)
+Players::resetPlayers(uint8_t nb_players)
 {
     if (nb_players == 1) {
         _player_mvt_timer.time_ref[PLAYER_1] =
@@ -35,7 +35,7 @@ Players::ResetPlayers(uint8_t nb_players)
 }
 
 void
-Players::DrawConclusion(uint8_t nb_player, IGraphic *gfx_interface)
+Players::drawConclusion(uint8_t nb_player, IGraphic *gfx_interface)
 {
     if (nb_player == 1) {
         _draw_game_end_single_player_ui(gfx_interface);
@@ -45,7 +45,7 @@ Players::DrawConclusion(uint8_t nb_player, IGraphic *gfx_interface)
 }
 
 void
-Players::DrawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface)
+Players::drawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface)
 {
     static const UiElement player_1_snake_score = {
         "Score: ", glm::vec3(1.0f), glm::vec2(ALIGN_FIRST_TAB, 120.0f), 0.5f
@@ -66,6 +66,66 @@ Players::DrawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface)
                                 player_2_snake_score.pos,
                                 player_2_snake_score.scale);
     }
+}
+
+void
+Players::moveSnakes(Board &board, uint8_t nb_players)
+{
+    auto now = std::chrono::high_resolution_clock::now();
+    auto &player = board.updatePlayers();
+    auto &bonus_food = board.updateBonusFood();
+    auto &food = board.updateFood();
+
+    for (uint8_t i = 0; i < nb_players; ++i) {
+        std::chrono::duration<double> time_diff =
+          now - _player_mvt_timer.time_ref[i];
+
+        if (time_diff.count() > _player_mvt_timer.timer_values[i]) {
+            glm::ivec2 food_eaten_pos(-1);
+
+            if (_will_snake_eat_food(player[i], food, food_eaten_pos)) {
+                player[i].addToSnake(food_eaten_pos);
+                _player_score[i] += NORMAL_FOOD_VALUE;
+                _player_mvt_timer.timer_values[i] =
+                  _player_timers[player[i].getSnakeCurrentSize()];
+            } else if (_will_snake_eat_food(
+                         player[i], bonus_food, food_eaten_pos)) {
+                player[i].addToSnake(food_eaten_pos);
+                _player_score[i] += BONUS_FOOD_VALUE;
+                _player_mvt_timer.timer_values[i] =
+                  _player_timers[player[i].getSnakeCurrentSize()];
+            } else {
+                player[i].moveSnakeWithCurrentDirection();
+            }
+            _player_previous_frame_dir[i] = player[i].getSnakeDirection();
+            _player_mvt_timer.time_ref[i] = now;
+        }
+    }
+}
+
+std::array<enum Snake::snakeDirection, NB_PLAYER_MAX> const &
+Players::getSnakesPreviousDirection() const
+{
+    return (_player_previous_frame_dir);
+}
+
+std::array<WinCondition, NB_PLAYER_MAX> &
+Players::updatePlayersWinConditionStates()
+{
+    return (_player_win_con);
+}
+
+std::array<uint8_t, NB_PLAYER_MAX> const &
+Players::havePlayersLost()
+{
+    static const struct WinCondition not_lost = { 0, 0, 0, 0 };
+
+    _player_has_lost[PLAYER_1] = memcmp(
+      &_player_win_con[PLAYER_1], &not_lost, sizeof(struct WinCondition));
+    _player_has_lost[PLAYER_2] = memcmp(
+      &_player_win_con[PLAYER_2], &not_lost, sizeof(struct WinCondition));
+
+    return (_player_has_lost);
 }
 
 void
@@ -133,4 +193,23 @@ Players::_draw_game_end_multi_player_ui(IGraphic *gfx_interface)
               draw.text, draw.color, draw.pos, draw.scale);
         }
     }
+}
+
+uint8_t
+Players::_will_snake_eat_food(Snake const &snake,
+                              Snake &food,
+                              glm::ivec2 &food_eaten_pos)
+{
+    auto const &next_head_pos = snake.getInFrontOfSnakeHeadPos();
+    auto const &food_array = food.getSnakePosArray();
+    auto const &food_size = food.getSnakeCurrentSize();
+
+    for (uint64_t i = 0; i < food_size; ++i) {
+        if (food_array[i] == next_head_pos) {
+            food.removeFromSnake(next_head_pos);
+            food_eaten_pos = next_head_pos;
+            return (1);
+        }
+    }
+    return (0);
 }

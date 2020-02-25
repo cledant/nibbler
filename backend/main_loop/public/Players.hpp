@@ -8,6 +8,7 @@
 #include "WorldParams.hpp"
 #include "WorldTypes.hpp"
 #include "Snake.hpp"
+#include "Board.hpp"
 #include "math_utility.hpp"
 
 class Players
@@ -20,9 +21,14 @@ class Players
     Players(Players &&src) = delete;
     Players &operator=(Players &&rhs) = delete;
 
-    void ResetPlayers(uint8_t nb_players);
-    void DrawConclusion(uint8_t nb_player, IGraphic *gfx_interface);
-    void DrawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface);
+    void resetPlayers(uint8_t nb_players);
+    void drawConclusion(uint8_t nb_player, IGraphic *gfx_interface);
+    void drawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface);
+    void moveSnakes(Board &board, uint8_t nb_players);
+    [[nodiscard]] std::array<enum Snake::snakeDirection, NB_PLAYER_MAX> const &
+    getSnakesPreviousDirection() const;
+    std::array<WinCondition, NB_PLAYER_MAX> &updatePlayersWinConditionStates();
+    std::array<uint8_t, NB_PLAYER_MAX> const &havePlayersLost();
 
   private:
     struct SnakeTimers
@@ -55,6 +61,10 @@ class Players
 
     void _draw_game_end_single_player_ui(IGraphic *gfx_interface);
     void _draw_game_end_multi_player_ui(IGraphic *gfx_interface);
+
+    static uint8_t _will_snake_eat_food(Snake const &snake,
+                                        Snake &food,
+                                        glm::ivec2 &food_eaten_pos);
 };
 
 #endif
