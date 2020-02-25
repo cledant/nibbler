@@ -195,8 +195,8 @@ Board::resetBoard(uint8_t generate_obstacles, uint8_t nb_player)
     _bonus_food.init(glm::vec3{ 0.5f, 0.0f, 0.0f }, _board_w, _board_h);
     _bonus_food_active = 0;
     if (generate_obstacles) {
-        _generate_random_position(
-          _obstacle, glm::vec3(0.33f), _dist_obstacle(_mt_64));
+        //     _generate_obstacles(glm::vec3(0.33f), _dist_obstacle(_mt_64));
+        _generate_obstacles(glm::vec3(0.33f), 5);
     }
     _bonus_food_active = 0;
     _bonus_spawn_chance = MAX_BONUS_SPAWN_CHANCE;
@@ -249,4 +249,76 @@ Board::_generate_random_position(Snake &target,
             }
         }
     }
+}
+
+void
+Board::_generate_obstacles(glm::vec3 const &color, uint64_t nb_to_add)
+{
+    for (uint64_t i = 0; i < nb_to_add; ++i) {
+        uint64_t watchdog = DEFAULT_WATCHDOG;
+
+        while (currentUsedBoard() < _board_size) {
+            auto new_obstacle =
+              glm::ivec2(_dist_board_w(_mt_64), _dist_board_h(_mt_64));
+
+            --watchdog;
+            if (!watchdog) {
+                return;
+            }
+
+            if (!_valid_obstacle(new_obstacle)) {
+                continue;
+            }
+            if (!_player[PLAYER_1].isInsideSnake(new_obstacle) &&
+                !_player[PLAYER_2].isInsideSnake(new_obstacle) &&
+                !_food.isInsideSnake(new_obstacle) &&
+                !_bonus_food.isInsideSnake(new_obstacle) &&
+                !_obstacle.isInsideSnake(new_obstacle)) {
+                _obstacle.addToSnake(new_obstacle, color);
+                break;
+            }
+        }
+    }
+}
+
+uint8_t
+Board::_valid_obstacle(glm::ivec2 const &pos)
+{
+    std::array<glm::ivec2, 12> const forbidden_corners = {
+        glm::ivec2{ 0, 1 },
+        glm::ivec2{ 1, 0 },
+        glm::ivec2{ _board_w - 2, 0 },
+        glm::ivec2{ _board_w - 1, 1 },
+        glm::ivec2{ 0, _board_h - 2 },
+        glm::ivec2{ 1, _board_h - 1 },
+        glm::ivec2{ _board_w - 2, _board_h - 1 },
+        glm::ivec2{ _board_w - 1, _board_h - 2 },
+        glm::ivec2{ 0, 0 },
+        glm::ivec2{ _board_w - 1, _board_h - 1 },
+        glm::ivec2{ 0, _board_h - 1 },
+        glm::ivec2{ _board_w - 1, 0 }
+    };
+
+    for (auto const &it : forbidden_corners) {
+        if (it == pos) {
+            return (0);
+        }
+    }
+
+    std::array<glm::ivec2, 8> const forbidden_pos = {
+        glm::ivec2(pos.x + 2, pos.y),     glm::ivec2(pos.x, pos.y + 2),
+        glm::ivec2(pos.x - 2, pos.y),     glm::ivec2(pos.x, pos.y - 2),
+        glm::ivec2(pos.x + 1, pos.y + 1), glm::ivec2(pos.x + 1, pos.y - 1),
+        glm::ivec2(pos.x - 1, pos.y + 1), glm::ivec2(pos.x - 1, pos.y - 1)
+    };
+
+    for (auto const &it : forbidden_pos) {
+        if (it.x < 0 || it.x >= _board_w || it.y < 0 || it.y >= _board_h) {
+            continue;
+        }
+        if (_obstacle.isInsideSnake(it)) {
+            return (0);
+        }
+    }
+    return (1);
 }

@@ -41,6 +41,7 @@ class Board
     static constexpr double BONUS_DURATION = 15.0;
     static constexpr double BLINK_START = 5.0;
     static constexpr uint64_t BLINK_FRAME_MAX = 30;
+    static constexpr uint64_t DEFAULT_WATCHDOG = 10000;
 
     std::array<Snake, NB_PLAYER_MAX> _player;
     Snake _food;
@@ -70,6 +71,8 @@ class Board
     void _generate_random_position(Snake &target,
                                    glm::vec3 const &color,
                                    uint64_t nb_to_add);
+    void _generate_obstacles(glm::vec3 const &color, uint64_t nb_to_add);
+    uint8_t _valid_obstacle(glm::ivec2 const &pos);
 };
 
 #endif
