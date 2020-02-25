@@ -39,6 +39,8 @@ class Board
     static constexpr uint64_t MAX_BONUS_SPAWN_CHANCE = 3600;
     static constexpr uint64_t MAX_BONUS_STD_DEV = 300;
     static constexpr double BONUS_DURATION = 15.0;
+    static constexpr double BLINK_START = 5.0;
+    static constexpr uint64_t BLINK_FRAME_MAX = 30;
 
     std::array<Snake, NB_PLAYER_MAX> _player;
     Snake _food;
@@ -53,6 +55,8 @@ class Board
     uint64_t _bonus_spawn_chance;
     uint8_t _bonus_food_active;
     double _current_bonus_food_timer;
+    uint8_t _display_bonus_food;
+    uint64_t _blink_frame_counter;
 
     // Random generation related variables
     std::random_device _rd;

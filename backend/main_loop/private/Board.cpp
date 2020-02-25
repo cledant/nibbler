@@ -8,6 +8,8 @@ Board::Board(int32_t board_w, int32_t board_h)
   , _bonus_spawn_chance(MAX_BONUS_SPAWN_CHANCE)
   , _bonus_food_active(0)
   , _current_bonus_food_timer(0.0)
+  , _display_bonus_food(1)
+  , _blink_frame_counter(BLINK_FRAME_MAX)
   , _rd()
   , _mt_64(_rd())
   , _dist_board_w(0, board_w - 1)
@@ -92,9 +94,11 @@ Board::drawBoardElements(uint8_t nb_player, IGraphic *gfx_interface)
     gfx_interface->drawSnake(_food.getSnakePosArray(),
                              _food.getSnakeColorArray(),
                              _food.getSnakeCurrentSize());
-    gfx_interface->drawSnake(_bonus_food.getSnakePosArray(),
-                             _bonus_food.getSnakeColorArray(),
-                             _bonus_food.getSnakeCurrentSize());
+    if (_display_bonus_food) {
+        gfx_interface->drawSnake(_bonus_food.getSnakePosArray(),
+                                 _bonus_food.getSnakeColorArray(),
+                                 _bonus_food.getSnakeCurrentSize());
+    }
 }
 
 void
@@ -140,6 +144,8 @@ Board::handleBonusFood(double elapsed_time)
         if (_dist_chance_bonus(_mt_64) > _bonus_spawn_chance) {
             _bonus_food_active = 1;
             _current_bonus_food_timer = BONUS_DURATION;
+            _display_bonus_food = 1;
+            _blink_frame_counter = BLINK_FRAME_MAX;
             _generate_random_position(
               _bonus_food, glm::vec3(0.5f, 0.0f, 0.0f), _dist_nb_bonus(_mt_64));
         } else if (_bonus_spawn_chance) {
@@ -149,6 +155,13 @@ Board::handleBonusFood(double elapsed_time)
         }
     } else {
         _current_bonus_food_timer -= elapsed_time;
+        if (_current_bonus_food_timer < BLINK_START) {
+            --_blink_frame_counter;
+            if (!_blink_frame_counter) {
+                _display_bonus_food = !_display_bonus_food;
+                _blink_frame_counter = BLINK_FRAME_MAX;
+            }
+        }
         if (!_bonus_food.getSnakeCurrentSize() ||
             _current_bonus_food_timer <= 0.0) {
             _bonus_food_active = 0;
@@ -188,6 +201,8 @@ Board::resetBoard(uint8_t generate_obstacles, uint8_t nb_player)
     _bonus_food_active = 0;
     _bonus_spawn_chance = MAX_BONUS_SPAWN_CHANCE;
     _current_bonus_food_timer = 0.0;
+    _display_bonus_food = 1;
+    _blink_frame_counter = BLINK_FRAME_MAX;
 }
 
 std::array<Snake, NB_PLAYER_MAX> &
