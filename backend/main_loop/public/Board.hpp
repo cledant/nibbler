@@ -30,11 +30,16 @@ class Board
     void handleBonusFood(double elapsed_time);
     void resetBoard(uint8_t generate_obstacles, uint8_t nb_player);
     std::array<Snake, NB_PLAYER_MAX> &updatePlayers();
-    std::array<Snake, NB_PLAYER_MAX> const &getPlayers() const;
+    [[nodiscard]] std::array<Snake, NB_PLAYER_MAX> const &getPlayers() const;
     Snake &updateFood();
     Snake &updateBonusFood();
 
   private:
+    // Bonus related
+    static constexpr uint64_t MAX_BONUS_SPAWN_CHANCE = 3600;
+    static constexpr uint64_t MAX_BONUS_STD_DEV = 300;
+    static constexpr double BONUS_DURATION = 15.0;
+
     std::array<Snake, NB_PLAYER_MAX> _player;
     Snake _food;
     Snake _obstacle;

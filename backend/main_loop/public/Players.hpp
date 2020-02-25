@@ -5,7 +5,6 @@
 #include <chrono>
 
 #include "IGraphic.hpp"
-#include "WorldParams.hpp"
 #include "WorldTypes.hpp"
 #include "Snake.hpp"
 #include "Board.hpp"
@@ -31,6 +30,14 @@ class Players
     std::array<uint8_t, NB_PLAYER_MAX> const &havePlayersLost();
 
   private:
+    // Score related
+    static constexpr uint64_t NORMAL_FOOD_VALUE = 100;
+    static constexpr uint64_t BONUS_FOOD_VALUE = 500;
+
+    // Timer related
+    static double constexpr DEFAULT_SNAKE_TIMER_SECONDS =
+      FRAME_LENGTH_SECONDS * 60;
+
     struct SnakeTimers
     {
         std::array<std::chrono::high_resolution_clock::time_point,

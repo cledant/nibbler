@@ -27,6 +27,13 @@ class World
     void run();
 
   private:
+    static uint32_t constexpr NB_GFX_LIB = 3;
+
+    // Event related
+    static uint8_t constexpr NB_EVENT_TIMER_TYPES = 3;
+    static double constexpr SYSTEM_TIMER_SECONDS = 1.0;
+    static double constexpr PLAYER_TIMER_SECONDS = FRAME_LENGTH_SECONDS;
+
     enum EventTimersTypes
     {
         SYSTEM = 0,

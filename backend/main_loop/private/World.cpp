@@ -19,7 +19,7 @@ World::World(WorldParams const &params)
   , _events()
   , _event_timers()
   , _players()
-  , _board(params.board_h, params.board_w)
+  , _board(params.board_w, params.board_h)
 {
     _reset_game();
 }

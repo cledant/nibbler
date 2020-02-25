@@ -2,6 +2,8 @@
 
 #include "Players.hpp"
 
+#include "WorldParams.hpp"
+
 Players::Players()
   : _player_win_con()
   , _player_has_lost()
