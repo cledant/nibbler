@@ -38,6 +38,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/freetype ${CMAKE_BINARY_DI
 add_subdirectory(gfx_dynamic/libs)
 add_subdirectory(gfx_dynamic/gl_wrapper)
 
+#audio_dynamic libs
+add_subdirectory(audio_dynamic/libs)
+
 #backend libs
 add_subdirectory(backend/dyn_lib_loader)
 add_subdirectory(backend/main_loop)
@@ -51,3 +54,4 @@ target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=n
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/font DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/fonts/Roboto-Light.ttf DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_fonts)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/sounds DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_sounds)

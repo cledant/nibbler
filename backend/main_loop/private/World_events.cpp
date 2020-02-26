@@ -216,8 +216,8 @@ World::_set_glfw()
         _events[IGraphicTypes::SET_GLFW]) {
         _params.gfx_lib = GFX_GLFW;
         _paused = 1;
-        _clear_dyn_lib();
-        _load_dyn_lib();
+        _clear_gfx_dyn_lib();
+        _load_gfx_dyn_lib();
         _event_timers.accept_event[SYSTEM] = 0;
         _event_timers.updated[SYSTEM] = 1;
     }
@@ -230,8 +230,8 @@ World::_set_sfml()
         _events[IGraphicTypes::SET_SFML]) {
         _params.gfx_lib = GFX_SFML;
         _paused = 1;
-        _clear_dyn_lib();
-        _load_dyn_lib();
+        _clear_gfx_dyn_lib();
+        _load_gfx_dyn_lib();
         _event_timers.accept_event[SYSTEM] = 0;
         _event_timers.updated[SYSTEM] = 1;
     }
@@ -244,8 +244,8 @@ World::_set_sdl()
         _events[IGraphicTypes::SET_SDL]) {
         _params.gfx_lib = GFX_SDL;
         _paused = 1;
-        _clear_dyn_lib();
-        _load_dyn_lib();
+        _clear_gfx_dyn_lib();
+        _load_gfx_dyn_lib();
         _event_timers.accept_event[SYSTEM] = 0;
         _event_timers.updated[SYSTEM] = 1;
     }

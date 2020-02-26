@@ -7,6 +7,7 @@
 #include "WorldParams.hpp"
 #include "WorldTypes.hpp"
 #include "IGraphic.hpp"
+#include "IAudio.hpp"
 #include "dyn_lib_loader.hpp"
 #include "Snake.hpp"
 #include "Board.hpp"
@@ -28,6 +29,7 @@ class World
 
   private:
     static uint32_t constexpr NB_GFX_LIB = 3;
+    static uint32_t constexpr NB_AUDIO_LIB = 3;
 
     // Event related
     static uint8_t constexpr NB_EVENT_TIMER_TYPES = 3;
@@ -62,8 +64,11 @@ class World
     // System related variables
     std::string _home;
     std::array<std::string, NB_GFX_LIB> _path_gfx_lib;
+    std::array<std::string, NB_AUDIO_LIB> _path_audio_lib;
     DynLibLoader<IGraphic> _gfx_loader;
+    DynLibLoader<IAudio> _audio_loader;
     IGraphic *_gfx_interface;
+    IAudio *_audio_interface;
     uint8_t _is_init;
     std::chrono::high_resolution_clock ::time_point _loop_time_ref;
 
@@ -75,8 +80,10 @@ class World
     Board _board;
 
     // Dynamic lib related
-    void _load_dyn_lib();
-    void _clear_dyn_lib();
+    void _load_gfx_dyn_lib();
+    void _clear_gfx_dyn_lib();
+    void _load_audio_dyn_lib();
+    void _clear_audio_dyn_lib();
 
     // Event handling functions
     void _interpret_events();

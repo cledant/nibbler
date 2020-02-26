@@ -77,6 +77,9 @@ Board::checkPlayerState(uint8_t nb_player,
             player_win_con[PLAYER_1].touch_player = 1;
         }
     }
+#else
+    static_cast<void>(nb_player);
+    static_cast<void>(player_win_con);
 #endif
 }
 

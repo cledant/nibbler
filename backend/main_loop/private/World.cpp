@@ -12,8 +12,11 @@ World::World(WorldParams const &params)
   , _game_length(0.0f)
   , _home()
   , _path_gfx_lib()
+  , _path_audio_lib()
   , _gfx_loader()
+  , _audio_loader()
   , _gfx_interface(nullptr)
+  , _audio_interface(nullptr)
   , _is_init(0)
   , _loop_time_ref(std::chrono::high_resolution_clock::now())
   , _events()
@@ -26,7 +29,8 @@ World::World(WorldParams const &params)
 
 World::~World()
 {
-    _clear_dyn_lib();
+    _clear_gfx_dyn_lib();
+    _clear_audio_dyn_lib();
 }
 
 void
@@ -44,6 +48,8 @@ World::init()
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_sfml.dylib";
         _path_gfx_lib[GFX_SDL] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl2.dylib";
+        _path_audio_lib[AUDIO_SFML] =
+          _home + "/.nibbler/nibbler_libs/libaudio_dyn_sfml.dylib";
 #else
         _path_gfx_lib[GFX_GLFW] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so";
@@ -51,8 +57,11 @@ World::init()
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_sfml.so";
         _path_gfx_lib[GFX_SDL] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl2.so";
+        _path_audio_lib[SOUND_SFML] =
+          _home + "/.nibbler/nibbler_libs/libaudio_dyn_sfml.so";
 #endif
-        _load_dyn_lib();
+        _load_gfx_dyn_lib();
+        _load_audio_dyn_lib();
         _is_init = 1;
     }
 }
@@ -93,8 +102,12 @@ World::run()
 
 // Dynamic lib related
 void
-World::_load_dyn_lib()
+World::_load_gfx_dyn_lib()
 {
+    if (_params.gfx_lib == GFX_NONE) {
+        return;
+    }
+
     if (!_gfx_interface) {
         _gfx_loader.openLib(_path_gfx_lib[_params.gfx_lib]);
         _gfx_interface = _gfx_loader.getCreator()();
@@ -104,7 +117,7 @@ World::_load_dyn_lib()
 }
 
 void
-World::_clear_dyn_lib()
+World::_clear_gfx_dyn_lib()
 {
     if (_gfx_interface) {
         _gfx_interface->deleteWindow();
@@ -112,6 +125,33 @@ World::_clear_dyn_lib()
         _gfx_loader.getDeleter()(_gfx_interface);
         _gfx_loader.closeLib();
         _gfx_interface = nullptr;
+    }
+}
+
+void
+World::_load_audio_dyn_lib()
+{
+    if (_params.sound_lib == SOUND_NONE) {
+        return;
+    }
+
+    if (!_audio_interface) {
+        _audio_loader.openLib(_path_audio_lib[_params.sound_lib]);
+        _audio_interface = _audio_loader.getCreator()();
+        _audio_interface->init(_home);
+        _audio_interface->setThemeVolume(50);
+        _audio_interface->setEatSoundVolume(50);
+    }
+}
+
+void
+World::_clear_audio_dyn_lib()
+{
+    if (_audio_interface) {
+        _audio_interface->terminate();
+        _audio_loader.getDeleter()(_audio_interface);
+        _audio_loader.closeLib();
+        _audio_interface = nullptr;
     }
 }
 
