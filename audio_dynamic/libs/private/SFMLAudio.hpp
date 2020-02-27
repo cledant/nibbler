@@ -1,7 +1,10 @@
 #ifndef SFML_AUDIO_HPP
 #define SFML_AUDIO_HPP
 
+#include <array>
+
 #include "IAudio.hpp"
+#include "IAudioConstants.hpp"
 
 class SFMLAudio : public IAudio
 {
@@ -15,20 +18,24 @@ class SFMLAudio : public IAudio
 
     void init(std::string const &home) override;
     void terminate() override;
-    void playGameTheme() override;
-    void playGameOverTheme() override;
+    void playTheme(enum IAudioTypes::NibblerTheme theme) override;
     void stopCurrentTheme() override;
     void pauseCurrentTheme() override;
-    void setThemeVolume(float value) override;
-    void playEatSound() override;
-    void stopEatSound() override;
-    void pauseEatSound() override;
-    void setEatSoundVolume(float value) override;
+    void setAllThemeVolume(float value) override;
+    void playSound(enum IAudioTypes::NibbleSoundEffect sound) override;
+    void stopAllSounds() override;
+    void pauseAllSounds() override;
+    void setAllSoundVolume(float value) override;
 
   private:
     std::string _home;
-    float _theme_volume;
-    float _eat_sound_volume;
+
+    // Theme related
+    std::array<float, IAudioConstants::NB_THEME> _theme_volume;
+    IAudioTypes::NibblerTheme _current_theme;
+
+    // Sound Related
+    std::array<float, IAudioConstants::NB_SOUND> _sound_volume;
 };
 
 #endif

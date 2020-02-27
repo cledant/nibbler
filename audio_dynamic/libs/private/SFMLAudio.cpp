@@ -4,8 +4,9 @@
 
 SFMLAudio::SFMLAudio()
   : _home()
-  , _theme_volume(50)
-  , _eat_sound_volume(50)
+  , _theme_volume({ 50 })
+  , _current_theme(IAudioTypes::GAME)
+  , _sound_volume({ 50 })
 {}
 
 void
@@ -22,12 +23,10 @@ SFMLAudio::terminate()
 }
 
 void
-SFMLAudio::playGameTheme()
-{}
-
-void
-SFMLAudio::playGameOverTheme()
-{}
+SFMLAudio::playTheme(enum IAudioTypes::NibblerTheme theme)
+{
+    (void)theme;
+}
 
 void
 SFMLAudio::stopCurrentTheme()
@@ -38,29 +37,33 @@ SFMLAudio::pauseCurrentTheme()
 {}
 
 void
-SFMLAudio::setThemeVolume(float value)
+SFMLAudio::setAllThemeVolume(float value)
 {
-    std::cout << "set theme volume at " << value << std::endl;
-    _theme_volume = value;
+    for (auto &it : _theme_volume) {
+        it = value;
+    }
 }
 
 void
-SFMLAudio::playEatSound()
-{}
-
-void
-SFMLAudio::stopEatSound()
-{}
-
-void
-SFMLAudio::pauseEatSound()
-{}
-
-void
-SFMLAudio::setEatSoundVolume(float value)
+SFMLAudio::playSound(enum IAudioTypes::NibbleSoundEffect sound)
 {
-    std::cout << "set eat sound at : " << value << std::endl;
-    _eat_sound_volume = value;
+    (void)sound;
+}
+
+void
+SFMLAudio::stopAllSounds()
+{}
+
+void
+SFMLAudio::pauseAllSounds()
+{}
+
+void
+SFMLAudio::setAllSoundVolume(float value)
+{
+    for (auto &it : _sound_volume) {
+        it = value;
+    }
 }
 
 extern "C" IAudio *

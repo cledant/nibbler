@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "IAudioTypes.hpp"
+
 class IAudio
 {
   public:
@@ -15,15 +17,14 @@ class IAudio
 
     virtual void init(std::string const &home) = 0;
     virtual void terminate() = 0;
-    virtual void playGameTheme() = 0;
-    virtual void playGameOverTheme() = 0;
+    virtual void playTheme(enum IAudioTypes::NibblerTheme theme) = 0;
     virtual void stopCurrentTheme() = 0;
     virtual void pauseCurrentTheme() = 0;
-    virtual void setThemeVolume(float value) = 0;
-    virtual void playEatSound() = 0;
-    virtual void stopEatSound() = 0;
-    virtual void pauseEatSound() = 0;
-    virtual void setEatSoundVolume(float value) = 0;
+    virtual void setAllThemeVolume(float value) = 0;
+    virtual void playSound(enum IAudioTypes::NibbleSoundEffect sound) = 0;
+    virtual void stopAllSounds() = 0;
+    virtual void pauseAllSounds() = 0;
+    virtual void setAllSoundVolume(float value) = 0;
 
     typedef IAudio *creator_t();
     typedef void deleter_t(IAudio *);

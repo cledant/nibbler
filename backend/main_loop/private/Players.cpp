@@ -71,7 +71,7 @@ Players::drawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface)
 }
 
 void
-Players::moveSnakes(Board &board, uint8_t nb_players)
+Players::moveSnakes(Board &board, uint8_t nb_players, IAudio *audio_interface)
 {
     auto now = std::chrono::high_resolution_clock::now();
     auto &player = board.updatePlayers();
@@ -90,12 +90,18 @@ Players::moveSnakes(Board &board, uint8_t nb_players)
                 _player_score[i] += NORMAL_FOOD_VALUE;
                 _player_mvt_timer.timer_values[i] =
                   _player_timers[player[i].getSnakeCurrentSize()];
+                if (audio_interface) {
+                    audio_interface->playSound(IAudioTypes::EAT);
+                }
             } else if (_will_snake_eat_food(
                          player[i], bonus_food, food_eaten_pos)) {
                 player[i].addToSnake(food_eaten_pos);
                 _player_score[i] += BONUS_FOOD_VALUE;
                 _player_mvt_timer.timer_values[i] =
                   _player_timers[player[i].getSnakeCurrentSize()];
+                if (audio_interface) {
+                    audio_interface->playSound(IAudioTypes::EAT);
+                }
             } else {
                 player[i].moveSnakeWithCurrentDirection();
             }

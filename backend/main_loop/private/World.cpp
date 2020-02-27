@@ -78,7 +78,7 @@ World::run()
             _gfx_interface->getEvents(_events);
             _interpret_events();
             if (!_game_ended && !_paused) {
-                _players.moveSnakes(_board, _nb_player);
+                _players.moveSnakes(_board, _nb_player, _audio_interface);
                 _board.checkPlayerState(
                   _nb_player, _players.updatePlayersWinConditionStates());
                 _should_game_end(_players, _board);
@@ -167,8 +167,16 @@ World::_should_game_end(Players &players, Board const &board)
     auto const &have_player_lost = players.havePlayersLost();
     if (have_player_lost[PLAYER_1] || have_player_lost[PLAYER_2]) {
         _game_ended = 1;
+        if (_audio_interface) {
+            _audio_interface->stopAllSounds();
+            _audio_interface->playTheme(IAudioTypes::GAMEOVER);
+        }
     } else if (board.isFullNoFood()) {
         _game_ended = 1;
+        if (_audio_interface) {
+            _audio_interface->stopAllSounds();
+            _audio_interface->playTheme(IAudioTypes::GAMEOVER);
+        }
     }
 }
 
@@ -187,6 +195,9 @@ World::_reset_game()
     _paused = 0;
     _game_ended = 0;
     _game_length = 0.0f;
+    if (_audio_interface) {
+        _audio_interface->playTheme(IAudioTypes::GAME);
+    }
 }
 
 // UI
@@ -244,10 +255,10 @@ World::_set_audio_volume()
     }
 
     if (_muted) {
-        _audio_interface->setEatSoundVolume(0.0);
-        _audio_interface->setThemeVolume(0.0);
+        _audio_interface->setAllSoundVolume(0.0);
+        _audio_interface->setAllThemeVolume(0.0);
     } else {
-        _audio_interface->setEatSoundVolume(50.0);
-        _audio_interface->setThemeVolume(50.0);
+        _audio_interface->setAllSoundVolume(50.0);
+        _audio_interface->setAllThemeVolume(50.0);
     }
 }

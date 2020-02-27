@@ -51,6 +51,7 @@ World::_pause()
 {
     if (_events[IGraphicTypes::NibblerEvent::PAUSE] &&
         _event_timers.accept_event[SYSTEM]) {
+        // TODO sound + theme handling
         _paused = !_paused;
         if (_game_ended) {
             _reset_game();

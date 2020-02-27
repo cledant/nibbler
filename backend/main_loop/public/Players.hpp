@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "IGraphic.hpp"
+#include "IAudio.hpp"
 #include "WorldTypes.hpp"
 #include "Snake.hpp"
 #include "Board.hpp"
@@ -23,7 +24,7 @@ class Players
     void resetPlayers(uint8_t nb_players);
     void drawConclusion(uint8_t nb_player, IGraphic *gfx_interface);
     void drawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface);
-    void moveSnakes(Board &board, uint8_t nb_players);
+    void moveSnakes(Board &board, uint8_t nb_players, IAudio *audio_interface);
     [[nodiscard]] std::array<enum Snake::snakeDirection, NB_PLAYER_MAX> const &
     getSnakesPreviousDirection() const;
     std::array<WinCondition, NB_PLAYER_MAX> &updatePlayersWinConditionStates();
