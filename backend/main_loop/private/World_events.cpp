@@ -13,7 +13,9 @@ World::_interpret_events()
                &World::_p1_left,           &World::_p2_up,
                &World::_p2_right,          &World::_p2_down,
                &World::_p2_left,           &World::_set_glfw,
-               &World::_set_sfml,          &World::_set_sdl };
+               &World::_set_sfml,          &World::_set_sdl,
+               &World::_set_audio_sfml,    &World::_set_audio_none,
+               &World::_mute_unmute };
     auto now = std::chrono::high_resolution_clock::now();
 
     for (uint8_t i = 0; i < NB_EVENT_TIMER_TYPES; ++i) {
@@ -246,6 +248,44 @@ World::_set_sdl()
         _paused = 1;
         _clear_gfx_dyn_lib();
         _load_gfx_dyn_lib();
+        _event_timers.accept_event[SYSTEM] = 0;
+        _event_timers.updated[SYSTEM] = 1;
+    }
+}
+
+void
+World::_set_audio_sfml()
+{
+    if (_params.sound_lib != SOUND_SFML && _event_timers.accept_event[SYSTEM] &&
+        _events[IGraphicTypes::SET_AUDIO_SFML]) {
+        _params.sound_lib = SOUND_SFML;
+        _clear_audio_dyn_lib();
+        _load_audio_dyn_lib();
+        _event_timers.accept_event[SYSTEM] = 0;
+        _event_timers.updated[SYSTEM] = 1;
+    }
+}
+
+void
+World::_set_audio_none()
+{
+    if (_params.sound_lib != SOUND_NONE && _event_timers.accept_event[SYSTEM] &&
+        _events[IGraphicTypes::SET_AUDIO_NONE]) {
+        _params.sound_lib = SOUND_NONE;
+        _clear_audio_dyn_lib();
+        _event_timers.accept_event[SYSTEM] = 0;
+        _event_timers.updated[SYSTEM] = 1;
+    }
+}
+
+void
+World::_mute_unmute()
+{
+    if (_event_timers.accept_event[SYSTEM] &&
+        _events[IGraphicTypes::MUTE_UNMUTE]) {
+
+        _muted = !_muted;
+        _set_audio_volume();
         _event_timers.accept_event[SYSTEM] = 0;
         _event_timers.updated[SYSTEM] = 1;
     }

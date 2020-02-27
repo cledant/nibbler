@@ -90,7 +90,7 @@ SDL2Graphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
       key_state[SDL_SCANCODE_ESCAPE];
     buffer[IGraphicTypes::NibblerEvent::PAUSE] = key_state[SDL_SCANCODE_SPACE];
     buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] =
-      key_state[SDL_SCANCODE_F5];
+      key_state[SDL_SCANCODE_F4];
     buffer[IGraphicTypes::NibblerEvent::P1_UP] = key_state[SDL_SCANCODE_W];
     buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] = key_state[SDL_SCANCODE_D];
     buffer[IGraphicTypes::NibblerEvent::P1_DOWN] = key_state[SDL_SCANCODE_S];
@@ -103,6 +103,12 @@ SDL2Graphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = key_state[SDL_SCANCODE_F1];
     buffer[IGraphicTypes::NibblerEvent::SET_SFML] = key_state[SDL_SCANCODE_F2];
     buffer[IGraphicTypes::NibblerEvent::SET_SDL] = key_state[SDL_SCANCODE_F3];
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_SFML] =
+      key_state[SDL_SCANCODE_F5];
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_NONE] =
+      key_state[SDL_SCANCODE_F6];
+    buffer[IGraphicTypes::NibblerEvent::MUTE_UNMUTE] =
+      key_state[SDL_SCANCODE_F7];
 }
 
 void

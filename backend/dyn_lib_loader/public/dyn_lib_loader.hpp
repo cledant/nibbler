@@ -54,7 +54,7 @@ DynLibLoader<T>::openLib(std::string const &libpath)
     if (_handler) {
         closeLib();
     }
-    if (!(_handler = dlopen(libpath.c_str(), RTLD_LAZY))) {
+    if (!(_handler = dlopen(libpath.c_str(), RTLD_NOW))) {
         throw std::runtime_error(dlerror());
     }
     if (!(_creator = reinterpret_cast<typename T::creator_t *>(

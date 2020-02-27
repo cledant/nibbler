@@ -19,6 +19,9 @@ enum NibblerEvent
     SET_GLFW,
     SET_SFML,
     SET_SDL,
+    SET_AUDIO_SFML,
+    SET_AUDIO_NONE,
+    MUTE_UNMUTE
 };
 
 }

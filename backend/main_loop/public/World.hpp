@@ -70,6 +70,7 @@ class World
     IGraphic *_gfx_interface;
     IAudio *_audio_interface;
     uint8_t _is_init;
+    uint8_t _muted;
     std::chrono::high_resolution_clock ::time_point _loop_time_ref;
 
     // Event related variables
@@ -101,6 +102,9 @@ class World
     void _set_glfw();
     void _set_sfml();
     void _set_sdl();
+    void _set_audio_sfml();
+    void _set_audio_none();
+    void _mute_unmute();
 
     // Game related
     void _should_game_end(Players &players, Board const &board);
@@ -109,6 +113,9 @@ class World
     // UI
     void _draw_game_stats_ui();
     void _draw_interruption_ui();
+
+    // Sound
+    void _set_audio_volume();
 };
 
 #endif

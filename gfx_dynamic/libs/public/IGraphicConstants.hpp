@@ -3,7 +3,7 @@
 
 namespace IGraphicConstants {
 
-static uint8_t constexpr NB_EVENT = 14;
+static uint8_t constexpr NB_EVENT = 17;
 static uint32_t constexpr WIN_H = 720;
 static uint32_t constexpr WIN_W = 1280;
 

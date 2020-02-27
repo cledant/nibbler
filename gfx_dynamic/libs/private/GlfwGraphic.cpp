@@ -128,7 +128,7 @@ GlfwGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     buffer[IGraphicTypes::NibblerEvent::CLOSE_WIN] =
       _input.keys[GLFW_KEY_ESCAPE];
     buffer[IGraphicTypes::NibblerEvent::PAUSE] = _input.keys[GLFW_KEY_SPACE];
-    buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] = _input.keys[GLFW_KEY_F5];
+    buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] = _input.keys[GLFW_KEY_F4];
     buffer[IGraphicTypes::NibblerEvent::P1_UP] = _input.keys[GLFW_KEY_W];
     buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] = _input.keys[GLFW_KEY_D];
     buffer[IGraphicTypes::NibblerEvent::P1_DOWN] = _input.keys[GLFW_KEY_S];
@@ -140,6 +140,11 @@ GlfwGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_F1];
     buffer[IGraphicTypes::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_F2];
     buffer[IGraphicTypes::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_F3];
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_SFML] =
+      _input.keys[GLFW_KEY_F5];
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_NONE] =
+      _input.keys[GLFW_KEY_F6];
+    buffer[IGraphicTypes::NibblerEvent::MUTE_UNMUTE] = _input.keys[GLFW_KEY_F7];
 }
 
 void

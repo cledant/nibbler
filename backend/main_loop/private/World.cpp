@@ -18,6 +18,7 @@ World::World(WorldParams const &params)
   , _gfx_interface(nullptr)
   , _audio_interface(nullptr)
   , _is_init(0)
+  , _muted(0)
   , _loop_time_ref(std::chrono::high_resolution_clock::now())
   , _events()
   , _event_timers()
@@ -139,8 +140,8 @@ World::_load_audio_dyn_lib()
         _audio_loader.openLib(_path_audio_lib[_params.sound_lib]);
         _audio_interface = _audio_loader.getCreator()();
         _audio_interface->init(_home);
-        _audio_interface->setThemeVolume(50);
-        _audio_interface->setEatSoundVolume(50);
+        _muted = 0;
+        _set_audio_volume();
     }
 }
 
@@ -232,5 +233,21 @@ World::_draw_interruption_ui()
     }
     if (_game_ended) {
         _players.drawConclusion(_nb_player, _gfx_interface);
+    }
+}
+
+void
+World::_set_audio_volume()
+{
+    if (!_audio_interface) {
+        return;
+    }
+
+    if (_muted) {
+        _audio_interface->setEatSoundVolume(0.0);
+        _audio_interface->setThemeVolume(0.0);
+    } else {
+        _audio_interface->setEatSoundVolume(50.0);
+        _audio_interface->setThemeVolume(50.0);
     }
 }

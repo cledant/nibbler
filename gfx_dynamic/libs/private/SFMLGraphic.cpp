@@ -75,7 +75,7 @@ SFMLGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     buffer[IGraphicTypes::NibblerEvent::PAUSE] =
       sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
     buffer[IGraphicTypes::NibblerEvent::TOGGLE_WIN] =
-      sf::Keyboard::isKeyPressed(sf::Keyboard::F5);
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F4);
     buffer[IGraphicTypes::NibblerEvent::P1_UP] =
       sf::Keyboard::isKeyPressed(sf::Keyboard::W);
     buffer[IGraphicTypes::NibblerEvent::P1_RIGHT] =
@@ -98,6 +98,12 @@ SFMLGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
       sf::Keyboard::isKeyPressed(sf::Keyboard::F2);
     buffer[IGraphicTypes::NibblerEvent::SET_SDL] =
       sf::Keyboard::isKeyPressed(sf::Keyboard::F3);
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_SFML] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F5);
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_NONE] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F6);
+    buffer[IGraphicTypes::NibblerEvent::MUTE_UNMUTE] =
+      sf::Keyboard::isKeyPressed(sf::Keyboard::F7);
 }
 
 void

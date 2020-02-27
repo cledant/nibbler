@@ -40,6 +40,7 @@ SFMLAudio::pauseCurrentTheme()
 void
 SFMLAudio::setThemeVolume(float value)
 {
+    std::cout << "set theme volume at " << value << std::endl;
     _theme_volume = value;
 }
 
@@ -58,6 +59,7 @@ SFMLAudio::pauseEatSound()
 void
 SFMLAudio::setEatSoundVolume(float value)
 {
+    std::cout << "set eat sound at : " << value << std::endl;
     _eat_sound_volume = value;
 }
 
