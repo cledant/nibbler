@@ -3,6 +3,10 @@
 
 #include <array>
 
+#include "SFML/Audio/Sound.hpp"
+#include "SFML/Audio/SoundBuffer.hpp"
+#include "SFML/Audio/Music.hpp"
+
 #include "IAudio.hpp"
 #include "IAudioConstants.hpp"
 
@@ -31,10 +35,13 @@ class SFMLAudio : public IAudio
     std::string _home;
 
     // Theme related
+    std::array<sf::Music, IAudioConstants::NB_THEME> _theme;
     std::array<float, IAudioConstants::NB_THEME> _theme_volume;
     IAudioTypes::NibblerTheme _current_theme;
 
     // Sound Related
+    std::array<sf::SoundBuffer, IAudioConstants::NB_SOUND> _sound_buffer;
+    std::array<sf::Sound, IAudioConstants::NB_SOUND> _sound;
     std::array<float, IAudioConstants::NB_SOUND> _sound_volume;
 };
 

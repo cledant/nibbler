@@ -4,22 +4,49 @@
 
 SFMLAudio::SFMLAudio()
   : _home()
+  , _theme()
   , _theme_volume({ 50 })
   , _current_theme(IAudioTypes::GAME)
+  , _sound_buffer()
+  , _sound()
   , _sound_volume({ 50 })
 {}
 
 void
 SFMLAudio::init(std::string const &home)
 {
+    static const char *sound_filename[] = { "eat.wav", "spawn.wav" };
+    static const char *theme_filename[] = { "game.wav", "game_over.wav" };
+
     _home = home;
-    std::cout << "Loaded SFML Sound" << std::endl;
+    std::string base_path = _home + "/.nibbler/nibbler_sounds/";
+
+    for (uint32_t i = 0; i < IAudioConstants::NB_SOUND; ++i) {
+        std::string file = base_path + sound_filename[i];
+
+        if (!_sound_buffer[i].loadFromFile(file)) {
+            throw std::runtime_error("SFML audio: failed to load:" + file);
+        }
+        _sound[i].setBuffer(_sound_buffer[i]);
+    }
+    for (uint32_t i = 0; i < IAudioConstants::NB_THEME; ++i) {
+        std::string file = base_path + theme_filename[i];
+
+        if (!_theme[i].openFromFile(file)) {
+            throw std::runtime_error("SFML audio: failed to load:" + file);
+        }
+    }
 }
 
 void
 SFMLAudio::terminate()
 {
-    std::cout << "Closed SFML Sound" << std::endl;
+    for (auto &it : _theme) {
+        it.stop();
+    }
+    for (auto &it : _sound) {
+        it.stop();
+    }
 }
 
 void

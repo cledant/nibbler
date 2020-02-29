@@ -54,4 +54,7 @@ target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=n
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/font DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/fonts/Roboto-Light.ttf DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_fonts)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/sounds DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_sounds)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/sounds/game_over.wav DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_sounds)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/sounds/game.wav DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_sounds)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/sounds/eat.wav DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_sounds)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/sounds/spawn.wav DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_sounds)
