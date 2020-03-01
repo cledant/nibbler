@@ -12,6 +12,7 @@ PaSound::PaSound()
   , _volume(1.0f)
   , _duration(1.0)
   , _current_duration(0.0)
+  , _latency_ms(2.0 * FRAMES_PER_BUFFER / SAMPLE_RATE)
 {}
 
 void
@@ -153,7 +154,6 @@ PaSound::_class_callback(void const *inputBuffer,
     static_cast<void>(timeInfo);
     static_cast<void>(statusFlags);
     auto *output = static_cast<float *>(outputBuffer);
-    auto ref = std::chrono::high_resolution_clock::now();
 
     for (uint64_t i = 0; i < framesPerBuffer; ++i) {
         if (_current_buffer_pos >= _sound_buffer_length) {
@@ -163,12 +163,9 @@ PaSound::_class_callback(void const *inputBuffer,
         *output++ = _volume * _sound_buffer[_current_buffer_pos];
         ++_current_buffer_pos;
     }
+    _current_duration = _current_duration + _latency_ms;
 
-    auto now = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> loop_diff = now - ref;
-    _current_duration = _current_duration + loop_diff.count() * 1000;
-
-    if (_current_duration.load() >= _duration) {
+    if (_current_duration >= _duration) {
         return (paComplete);
     } else {
         return (paContinue);

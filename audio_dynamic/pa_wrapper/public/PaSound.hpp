@@ -39,7 +39,7 @@ class PaSound
     std::atomic<float> _volume;
     std::atomic<double> _duration;
     std::atomic<double> _current_duration;
-
+    double _latency_ms;
 
     static int32_t _api_callback(void const *inputBuffer,
                                  void *outputBuffer,

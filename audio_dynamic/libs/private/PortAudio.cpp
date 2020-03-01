@@ -25,7 +25,7 @@ PortAudio::init(std::string const &home)
     freopen("/dev/tty", "w", stderr);
     for (auto &it : _beep) {
         it.init(Pa_GetDefaultOutputDevice());
-        it.setDuration(1.25);
+        it.setDuration(0.5);
     }
     _beep[IAudioTypes::EAT].generateBeep(2000, 20);
     _beep[IAudioTypes::PAUSE].generateBeep(20000, 1000);
