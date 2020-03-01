@@ -141,7 +141,7 @@ Board::respawnFood()
 }
 
 void
-Board::handleBonusFood(double elapsed_time)
+Board::handleBonusFood(double elapsed_time, IAudio *audio_interface)
 {
     if (!_bonus_food_active) {
         if (_dist_chance_bonus(_mt_64) > _bonus_spawn_chance) {
@@ -151,6 +151,9 @@ Board::handleBonusFood(double elapsed_time)
             _blink_frame_counter = BLINK_FRAME_MAX;
             _generate_random_position(
               _bonus_food, glm::vec3(0.5f, 0.0f, 0.0f), _dist_nb_bonus(_mt_64));
+            if (audio_interface) {
+                audio_interface->playSound(IAudioTypes::BONUS);
+            }
         } else if (_bonus_spawn_chance) {
             --_bonus_spawn_chance;
         } else {

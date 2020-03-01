@@ -16,3 +16,6 @@
 [submodule "external/freetype"]
 	path = external/freetype
 	url = git://git.sv.nongnu.org/freetype/freetype2.git
+[submodule "external/portaudio"]
+	path = external/portaudio
+	url = https://git.assembla.com/portaudio.git

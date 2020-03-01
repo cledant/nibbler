@@ -51,13 +51,20 @@ World::_pause()
 {
     if (_events[IGraphicTypes::NibblerEvent::PAUSE] &&
         _event_timers.accept_event[SYSTEM]) {
-        // TODO sound + theme handling
         _paused = !_paused;
-        if (_game_ended) {
-            _reset_game();
-        }
         _event_timers.accept_event[SYSTEM] = 0;
         _event_timers.updated[SYSTEM] = 1;
+        if (_game_ended) {
+            _reset_game();
+            return;
+        }
+
+        if (_audio_interface && _paused) {
+            _audio_interface->pauseCurrentTheme();
+            _audio_interface->playSound(IAudioTypes::PAUSE);
+        } else if (_audio_interface) {
+            _audio_interface->playTheme(IAudioTypes::GAME);
+        }
     }
 }
 

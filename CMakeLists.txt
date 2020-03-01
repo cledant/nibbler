@@ -19,9 +19,10 @@ option(GLFW_INSTALL "" ON)
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw ${CMAKE_BINARY_DIR}/external/glfw/build)
 
-#Setup SFML Window + Audio Lib
+#Setup SFML Window
 option(SFML_BUILD_GRAPHICS "" FALSE)
 option(SFML_BUILD_NETWORK "" FALSE)
+option(SFML_BUILD_AUDIO "" FALSE)
 option(SFML_BUILD_DOC "" FALSE)
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sfml ${CMAKE_BINARY_DIR}/sfml/build)
@@ -34,12 +35,19 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sdl2 ${CMAKE_BINARY_DIR}/s
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/freetype ${CMAKE_BINARY_DIR}/external/freetype/build)
 
+#Setup portaudio
+option(PA_BUILD_STATIC "" OFF)
+option(PA_BUILD_SHARED "" ON)
+OPTION(PA_ENABLE_DEBUG_OUTPUT "" OFF)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/portaudio ${CMAKE_BINARY_DIR}/external/portaudio/build)
+
 #gfx_dynamic libs
 add_subdirectory(gfx_dynamic/libs)
 add_subdirectory(gfx_dynamic/gl_wrapper)
 
 #audio_dynamic libs
 add_subdirectory(audio_dynamic/libs)
+add_subdirectory(audio_dynamic/pa_wrapper)
 
 #backend libs
 add_subdirectory(backend/dyn_lib_loader)
@@ -48,10 +56,9 @@ add_subdirectory(backend/main_loop)
 #Main binary
 add_executable(nibbler binary/private/nibbler.cpp)
 target_link_libraries(nibbler dl main_loop)
-add_dependencies(nibbler gfx_dyn dyn_lib_loader gfx_dyn_glfw gfx_dyn_sfml gfx_dyn_sdl2 main_loop)
+add_dependencies(nibbler gfx_dyn audio_dyn dyn_lib_loader gfx_dyn_glfw gfx_dyn_sfml gfx_dyn_sdl2 audio_dyn_portaudio main_loop)
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/font DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/fonts/Roboto-Light.ttf DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_fonts)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/sounds DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_sounds)

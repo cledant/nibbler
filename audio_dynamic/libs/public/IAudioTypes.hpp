@@ -10,7 +10,8 @@ enum NibblerTheme {
 
 enum NibbleSoundEffect {
     EAT = 0,
-    FOOD_SPAWN
+    PAUSE,
+    BONUS
 };
 
 };

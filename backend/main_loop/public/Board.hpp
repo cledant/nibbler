@@ -7,6 +7,7 @@
 #include "Snake.hpp"
 #include "WorldTypes.hpp"
 #include "IGraphic.hpp"
+#include "IAudio.hpp"
 
 class Board
 {
@@ -27,7 +28,7 @@ class Board
     void drawBoardElements(uint8_t nb_player, IGraphic *gfx_interface);
     void drawBoardStat(uint8_t nb_player, IGraphic *gfx_interface);
     void respawnFood();
-    void handleBonusFood(double elapsed_time);
+    void handleBonusFood(double elapsed_time, IAudio *audio_interface);
     void resetBoard(uint8_t generate_obstacles, uint8_t nb_player);
     std::array<Snake, NB_PLAYER_MAX> &updatePlayers();
     [[nodiscard]] std::array<Snake, NB_PLAYER_MAX> const &getPlayers() const;

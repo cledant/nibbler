@@ -59,7 +59,7 @@ World::init()
         _path_gfx_lib[GFX_SDL] =
           _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl2.so";
         _path_audio_lib[SOUND_SFML] =
-          _home + "/.nibbler/nibbler_libs/libaudio_dyn_sfml.so";
+          _home + "/.nibbler/nibbler_libs/libaudio_dyn_portaudio.so";
 #endif
         _load_gfx_dyn_lib();
         _load_audio_dyn_lib();
@@ -83,7 +83,7 @@ World::run()
                   _nb_player, _players.updatePlayersWinConditionStates());
                 _should_game_end(_players, _board);
                 _board.respawnFood();
-                _board.handleBonusFood(loop_diff.count());
+                _board.handleBonusFood(loop_diff.count(), _audio_interface);
                 _game_length += loop_diff.count();
             }
             if (_gfx_interface) {
@@ -165,16 +165,12 @@ World::_should_game_end(Players &players, Board const &board)
     }
 
     auto const &have_player_lost = players.havePlayersLost();
-    if (have_player_lost[PLAYER_1] || have_player_lost[PLAYER_2]) {
+    if (have_player_lost[PLAYER_1] || have_player_lost[PLAYER_2] ||
+        board.isFullNoFood()) {
         _game_ended = 1;
         if (_audio_interface) {
             _audio_interface->stopAllSounds();
-            _audio_interface->playTheme(IAudioTypes::GAMEOVER);
-        }
-    } else if (board.isFullNoFood()) {
-        _game_ended = 1;
-        if (_audio_interface) {
-            _audio_interface->stopAllSounds();
+            _audio_interface->stopCurrentTheme();
             _audio_interface->playTheme(IAudioTypes::GAMEOVER);
         }
     }

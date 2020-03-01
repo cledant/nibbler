@@ -5,17 +5,17 @@ add_library(audio_dyn INTERFACE)
 target_include_directories(audio_dyn INTERFACE
 		${CMAKE_CURRENT_SOURCE_DIR}/public)
 
-#LIB SFML
-add_library(audio_dyn_sfml SHARED
-		private/SFMLAudio.cpp)
-target_include_directories(audio_dyn_sfml
+#LIB PortAudio
+add_library(audio_dyn_portaudio SHARED
+		private/PortAudio.cpp)
+target_include_directories(audio_dyn_portaudio
 		PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/private)
-add_dependencies(audio_dyn_sfml sfml-audio sfml-system audio_dyn)
-target_link_libraries(audio_dyn_sfml PUBLIC sfml-audio sfml-system audio_dyn)
-target_compile_options(audio_dyn_sfml PUBLIC -Wall -Wextra -Werror -std=c++17 -march=native)
+add_dependencies(audio_dyn_portaudio portaudio pa_wrapper audio_dyn)
+target_link_libraries(audio_dyn_portaudio PUBLIC portaudio pa_wrapper audio_dyn)
+target_compile_options(audio_dyn_portaudio PUBLIC -Wall -Wextra -Werror -std=c++17 -march=native)
 
-set_target_properties(audio_dyn_sfml
+set_target_properties(audio_dyn_portaudio
 		PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/nibbler_libs
 		SKIP_BUILD_RPATH FALSE

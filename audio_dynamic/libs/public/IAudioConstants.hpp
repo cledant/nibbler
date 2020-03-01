@@ -4,7 +4,7 @@
 namespace IAudioConstants {
 
 static uint8_t constexpr NB_THEME = 2;
-static uint8_t constexpr NB_SOUND = 2;
+static uint8_t constexpr NB_SOUND = 3;
 
 }
 

@@ -5,16 +5,17 @@
 
 #include "IAudio.hpp"
 #include "IAudioConstants.hpp"
+#include "PaSound.hpp"
 
-class SFMLAudio : public IAudio
+class PortAudio : public IAudio
 {
   public:
-    SFMLAudio();
-    ~SFMLAudio() override = default;
-    SFMLAudio(SFMLAudio const &src) = delete;
-    SFMLAudio &operator=(SFMLAudio const &rhs) = delete;
-    SFMLAudio(SFMLAudio &&src) = delete;
-    SFMLAudio &operator=(SFMLAudio &&rhs) = delete;
+    PortAudio();
+    ~PortAudio() override = default;
+    PortAudio(PortAudio const &src) = delete;
+    PortAudio &operator=(PortAudio const &rhs) = delete;
+    PortAudio(PortAudio &&src) = delete;
+    PortAudio &operator=(PortAudio &&rhs) = delete;
 
     void init(std::string const &home) override;
     void terminate() override;
@@ -29,13 +30,9 @@ class SFMLAudio : public IAudio
 
   private:
     std::string _home;
-
-    // Theme related
-    std::array<float, IAudioConstants::NB_THEME> _theme_volume;
+    uint8_t _is_init;
     IAudioTypes::NibblerTheme _current_theme;
-
-    // Sound Related
-    std::array<float, IAudioConstants::NB_SOUND> _sound_volume;
+    std::array<PaSound, IAudioConstants::NB_SOUND> _beep;
 };
 
 #endif
