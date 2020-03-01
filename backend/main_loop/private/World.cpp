@@ -86,16 +86,14 @@ World::run()
                 _board.handleBonusFood(loop_diff.count(), _audio_interface);
                 _game_length += loop_diff.count();
             }
-            if (_gfx_interface) {
-                _gfx_interface->clear();
-                _gfx_interface->drawBoard();
-                _board.drawBoardElements(_nb_player, _gfx_interface);
-                _board.drawBoardStat(_nb_player, _gfx_interface);
-                _players.drawPlayerStats(_nb_player, _gfx_interface);
-                _draw_game_stats_ui();
-                _draw_interruption_ui();
-                _gfx_interface->render();
-            }
+            _gfx_interface->clear();
+            _gfx_interface->drawBoard();
+            _board.drawBoardElements(_nb_player, _gfx_interface);
+            _board.drawBoardStat(_nb_player, _gfx_interface);
+            _players.drawPlayerStats(_nb_player, _gfx_interface);
+            _draw_game_stats_ui();
+            _draw_interruption_ui();
+            _gfx_interface->render();
             _loop_time_ref = now;
         }
     }

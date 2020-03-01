@@ -14,6 +14,18 @@ nibbler_usage()
               << IGraphicConstants::MAX_H << std::endl;
     std::cout << "\t --duel for 2 player game" << std::endl;
     std::cout << "\t --obstacles to spawn obstacles" << std::endl;
+    std::cout << "Keys:" << std::endl;
+    std::cout << "\tESC: Quit game" << std::endl;
+    std::cout << "\tSPACE: Pause game / Restart game" << std::endl;
+    std::cout << "\tWASD: Player 1 movements" << std::endl;
+    std::cout << "\tDirection arrows: Player 2 movements" << std::endl;
+    std::cout << "\tF1: Use GLFW" << std::endl;
+    std::cout << "\tF2: Use SFML" << std::endl;
+    std::cout << "\tF3: Use SDL2" << std::endl;
+    std::cout << "\tF4: Toggle fullscreen" << std::endl;
+    std::cout << "\tF5: Load audio lib" << std::endl;
+    std::cout << "\tF6: Unload audio lib" << std::endl;
+    std::cout << "\tF7: Toggle mute" << std::endl;
 }
 
 static int32_t
