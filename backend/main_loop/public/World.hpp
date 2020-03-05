@@ -62,7 +62,7 @@ class World
     double _game_length;
 
     // System related variables
-    std::string _home;
+    std::string _prefix;
     std::array<std::string, NB_GFX_LIB> _path_gfx_lib;
     std::array<std::string, NB_AUDIO_LIB> _path_audio_lib;
     DynLibLoader<IGraphic> _gfx_loader;

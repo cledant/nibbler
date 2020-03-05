@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "World.hpp"
+#include "lib_path.hpp"
 
 World::World(WorldParams const &params)
   : _params(params)
@@ -10,7 +11,7 @@ World::World(WorldParams const &params)
   , _is_map_full(0)
   , _game_ended(0)
   , _game_length(0.0f)
-  , _home()
+  , _prefix(nibbler_lib_path::path)
   , _path_gfx_lib()
   , _path_audio_lib()
   , _gfx_loader()
@@ -38,28 +39,21 @@ void
 World::init()
 {
     if (!_is_init) {
-        _home = getenv("HOME");
-        if (_home.empty()) {
-            throw std::runtime_error("Home not set");
-        }
 #ifdef __APPLE__
         _path_gfx_lib[GFX_GLFW] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.dylib";
+          _prefix + "/nibbler_libs/libgfx_dyn_glfw.dylib";
         _path_gfx_lib[GFX_SFML] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sfml.dylib";
+          _prefix + "/nibbler_libs/libgfx_dyn_sfml.dylib";
         _path_gfx_lib[GFX_SDL] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl2.dylib";
+          _prefix + "/nibbler_libs/libgfx_dyn_sdl2.dylib";
         _path_audio_lib[AUDIO_SFML] =
-          _home + "/.nibbler/nibbler_libs/libaudio_dyn_sfml.dylib";
+          _prefix + "/nibbler_libs/libaudio_dyn_sfml.dylib";
 #else
-        _path_gfx_lib[GFX_GLFW] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_glfw.so";
-        _path_gfx_lib[GFX_SFML] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sfml.so";
-        _path_gfx_lib[GFX_SDL] =
-          _home + "/.nibbler/nibbler_libs/libgfx_dyn_sdl2.so";
+        _path_gfx_lib[GFX_GLFW] = _prefix + "/nibbler_libs/libgfx_dyn_glfw.so";
+        _path_gfx_lib[GFX_SFML] = _prefix + "/nibbler_libs/libgfx_dyn_sfml.so";
+        _path_gfx_lib[GFX_SDL] = _prefix + "/nibbler_libs/libgfx_dyn_sdl2.so";
         _path_audio_lib[SOUND_SFML] =
-          _home + "/.nibbler/nibbler_libs/libaudio_dyn_portaudio.so";
+          _prefix + "/nibbler_libs/libaudio_dyn_portaudio.so";
 #endif
         _load_gfx_dyn_lib();
         _load_audio_dyn_lib();
@@ -110,7 +104,7 @@ World::_load_gfx_dyn_lib()
     if (!_gfx_interface) {
         _gfx_loader.openLib(_path_gfx_lib[_params.gfx_lib]);
         _gfx_interface = _gfx_loader.getCreator()();
-        _gfx_interface->init(_home, _params.board_w, _params.board_h);
+        _gfx_interface->init(_prefix, _params.board_w, _params.board_h);
         _gfx_interface->createWindow("Nibbler");
     }
 }
@@ -137,7 +131,7 @@ World::_load_audio_dyn_lib()
     if (!_audio_interface) {
         _audio_loader.openLib(_path_audio_lib[_params.sound_lib]);
         _audio_interface = _audio_loader.getCreator()();
-        _audio_interface->init(_home);
+        _audio_interface->init(_prefix);
         _muted = 0;
         _set_audio_volume();
     }

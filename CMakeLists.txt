@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(nibbler)
 
+set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/.nibbler" CACHE STRING "" FORCE)
+set(NIBBLER)
+
 #Setup glm
 add_library(glm INTERFACE IMPORTED)
 set_target_properties(glm PROPERTIES

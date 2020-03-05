@@ -1,0 +1,10 @@
+#ifndef NIBBLER_LIB_PATH_HPP
+#define NIBBLER_LIB_PATH_HPP
+
+namespace nibbler_lib_path {
+
+static constexpr char const *path = "@CMAKE_INSTALL_PREFIX@";
+
+}
+
+#endif

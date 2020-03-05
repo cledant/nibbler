@@ -240,15 +240,15 @@ SFMLGraphic::_createWindow()
     }
     glViewport(0, 0, _win.w_viewport, _win.h_viewport);
     _gl_snake_shader.init(
-      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
-      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
-      _home + "/.nibbler/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
+      _home + "/nibbler_shaders/draw_rectangle/draw_rectangle_vs.glsl",
+      _home + "/nibbler_shaders/draw_rectangle/draw_rectangle_gs.glsl",
+      _home + "/nibbler_shaders/draw_rectangle/draw_rectangle_fs.glsl",
       "draw_rectangle");
     _gl_snake.init();
     _gl_board.init();
-    _gl_font.init(_home + "/.nibbler/nibbler_fonts/Roboto-Light.ttf",
-                  _home + "/.nibbler/nibbler_shaders/font/font_vs.glsl",
-                  _home + "/.nibbler/nibbler_shaders/font/font_fs.glsl",
+    _gl_font.init(_home + "/nibbler_fonts/Roboto-Light.ttf",
+                  _home + "/nibbler_shaders/font/font_vs.glsl",
+                  _home + "/nibbler_shaders/font/font_fs.glsl",
                   glm::vec2(_win.w, _win.h),
                   48);
 }
