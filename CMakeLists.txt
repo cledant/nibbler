@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(nibbler)
 
-set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/.nibbler" CACHE STRING "" FORCE)
-set(NIBBLER)
+set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/nibbler" CACHE STRING "" FORCE)
 
 #Setup glm
 add_library(glm INTERFACE IMPORTED)
@@ -62,6 +61,20 @@ target_link_libraries(nibbler dl main_loop)
 add_dependencies(nibbler gfx_dyn audio_dyn dyn_lib_loader gfx_dyn_glfw gfx_dyn_sfml gfx_dyn_sdl2 audio_dyn_portaudio main_loop)
 target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/font DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_shaders)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources/fonts/Roboto-Light.ttf DESTINATION ${CMAKE_INSTALL_PREFIX}/nibbler_fonts)
+#Copy Shaders and Fonts
+install(FILES
+			${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle/draw_rectangle_fs.glsl
+			${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle/draw_rectangle_gs.glsl
+			${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/draw_rectangle/draw_rectangle_vs.glsl
+		DESTINATION nibbler_shaders/draw_rectangle)
+install(FILES
+			${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/font/font_fs.glsl
+			${CMAKE_CURRENT_SOURCE_DIR}/ressources/shaders/font/font_vs.glsl
+		DESTINATION nibbler_shaders/font)
+install(FILES
+			${CMAKE_CURRENT_SOURCE_DIR}/ressources/fonts/Roboto-Light.ttf
+		DESTINATION nibbler_fonts)
+
+#Copy nibbler binary
+install(TARGETS nibbler
+		RUNTIME DESTINATION .)

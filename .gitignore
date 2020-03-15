@@ -22,7 +22,10 @@ Thumbs.db
 #######################
 cmake-build-debug
 cmake-build-release
-cmake-build-release-cppcheck
+cmake-build-debug-gcc
+cmake-build-release-gcc
+cmake-build-debug-clang
+cmake-build-release-clang
 .idea
 
 # CMAKE BUILD DIR #

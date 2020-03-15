@@ -21,8 +21,8 @@ Set `NIBBLER_INSTALL_FOLDER` variable in your shell environment and run `install
 
 `nibbler` will compiled into a folder named `build`
 
-A folder named `.nibbler` will be created at `NIBBLER_INSTALL_FOLDER` location and will
-contained libraries required for `nibbler`
+A folder named `nibbler` will be created at `NIBBLER_INSTALL_FOLDER` location and will
+contained libraries required for `nibbler` and its binary
 
 `cmake` and `make` will be required
 
