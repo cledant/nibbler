@@ -41,8 +41,7 @@ class Players
 
     struct SnakeTimers
     {
-        std::array<std::chrono::high_resolution_clock::time_point,
-                   NB_PLAYER_MAX>
+        std::array<std::chrono::steady_clock::time_point, NB_PLAYER_MAX>
           time_ref;
         std::array<double, NB_PLAYER_MAX> timer_values;
     };

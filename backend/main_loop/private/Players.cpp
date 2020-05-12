@@ -16,15 +16,12 @@ void
 Players::resetPlayers(uint8_t nb_players)
 {
     if (nb_players == 1) {
-        _player_mvt_timer.time_ref[PLAYER_1] =
-          std::chrono::high_resolution_clock::now();
+        _player_mvt_timer.time_ref[PLAYER_1] = std::chrono::steady_clock::now();
         _player_mvt_timer.timer_values[PLAYER_1] = DEFAULT_SNAKE_TIMER_SECONDS;
     } else {
-        _player_mvt_timer.time_ref[PLAYER_1] =
-          std::chrono::high_resolution_clock::now();
+        _player_mvt_timer.time_ref[PLAYER_1] = std::chrono::steady_clock::now();
         _player_mvt_timer.timer_values[PLAYER_1] = DEFAULT_SNAKE_TIMER_SECONDS;
-        _player_mvt_timer.time_ref[PLAYER_2] =
-          std::chrono::high_resolution_clock::now();
+        _player_mvt_timer.time_ref[PLAYER_2] = std::chrono::steady_clock::now();
         _player_mvt_timer.timer_values[PLAYER_2] = DEFAULT_SNAKE_TIMER_SECONDS;
     }
     std::memset(&_player_win_con, 0, sizeof(WinCondition) * NB_PLAYER_MAX);
@@ -73,7 +70,7 @@ Players::drawPlayerStats(uint8_t nb_player, IGraphic *gfx_interface)
 void
 Players::moveSnakes(Board &board, uint8_t nb_players, IAudio *audio_interface)
 {
-    auto now = std::chrono::high_resolution_clock::now();
+    auto now = std::chrono::steady_clock::now();
     auto &player = board.updatePlayers();
     auto &bonus_food = board.updateBonusFood();
     auto &food = board.updateFood();

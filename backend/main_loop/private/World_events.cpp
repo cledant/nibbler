@@ -16,7 +16,7 @@ World::_interpret_events()
                &World::_set_sfml,          &World::_set_sdl,
                &World::_set_audio_sfml,    &World::_set_audio_none,
                &World::_mute_unmute };
-    auto now = std::chrono::high_resolution_clock::now();
+    auto now = std::chrono::steady_clock::now();
 
     for (uint8_t i = 0; i < NB_EVENT_TIMER_TYPES; ++i) {
         std::chrono::duration<double> time_diff =

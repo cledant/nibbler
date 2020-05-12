@@ -20,7 +20,7 @@ World::World(WorldParams const &params)
   , _audio_interface(nullptr)
   , _is_init(0)
   , _muted(0)
-  , _loop_time_ref(std::chrono::high_resolution_clock::now())
+  , _loop_time_ref(std::chrono::steady_clock::now())
   , _events()
   , _event_timers()
   , _players()
@@ -65,7 +65,7 @@ void
 World::run()
 {
     while (!_gfx_interface->shouldClose()) {
-        auto now = std::chrono::high_resolution_clock::now();
+        auto now = std::chrono::steady_clock::now();
         std::chrono::duration<double> loop_diff = now - _loop_time_ref;
 
         if (loop_diff.count() > FRAME_LENGTH_SECONDS) {
@@ -174,9 +174,9 @@ World::_reset_game()
     _event_timers.timer_values = { SYSTEM_TIMER_SECONDS,
                                    PLAYER_TIMER_SECONDS,
                                    PLAYER_TIMER_SECONDS };
-    _event_timers.time_ref = { std::chrono::high_resolution_clock::now(),
-                               std::chrono::high_resolution_clock::now(),
-                               std::chrono::high_resolution_clock::now() };
+    _event_timers.time_ref = { std::chrono::steady_clock::now(),
+                               std::chrono::steady_clock::now(),
+                               std::chrono::steady_clock::now() };
     std::memset(&_events, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
     _players.resetPlayers(_nb_player);
     _board.resetBoard(_params.obstacles, _nb_player);

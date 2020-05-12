@@ -47,8 +47,7 @@ class World
     {
         std::array<uint8_t, NB_EVENT_TIMER_TYPES> accept_event;
         std::array<uint8_t, NB_EVENT_TIMER_TYPES> updated;
-        std::array<std::chrono::high_resolution_clock::time_point,
-                   NB_EVENT_TIMER_TYPES>
+        std::array<std::chrono::steady_clock::time_point, NB_EVENT_TIMER_TYPES>
           time_ref;
         std::array<double, NB_EVENT_TIMER_TYPES> timer_values;
     };
@@ -71,7 +70,7 @@ class World
     IAudio *_audio_interface;
     uint8_t _is_init;
     uint8_t _muted;
-    std::chrono::high_resolution_clock ::time_point _loop_time_ref;
+    std::chrono::steady_clock::time_point _loop_time_ref;
 
     // Event related variables
     std::array<uint8_t, IGraphicConstants::NB_EVENT> _events;
