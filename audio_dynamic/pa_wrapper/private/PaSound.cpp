@@ -128,7 +128,7 @@ PaSound::generateBeep(double fs, double f_min)
 int32_t
 PaSound::_api_callback(void const *inputBuffer,
                        void *outputBuffer,
-                       uint64_t framesPerBuffer,
+                       unsigned long framesPerBuffer,
                        PaStreamCallbackTimeInfo const *timeInfo,
                        PaStreamCallbackFlags statusFlags,
                        void *userData)
@@ -146,7 +146,7 @@ PaSound::_api_stream_finished(void *userData)
 int32_t
 PaSound::_class_callback(void const *inputBuffer,
                          void *outputBuffer,
-                         uint64_t framesPerBuffer,
+                         unsigned long framesPerBuffer,
                          PaStreamCallbackTimeInfo const *timeInfo,
                          PaStreamCallbackFlags statusFlags)
 {
@@ -155,7 +155,7 @@ PaSound::_class_callback(void const *inputBuffer,
     static_cast<void>(statusFlags);
     auto *output = static_cast<float *>(outputBuffer);
 
-    for (uint64_t i = 0; i < framesPerBuffer; ++i) {
+    for (unsigned long i = 0; i < framesPerBuffer; ++i) {
         if (_current_buffer_pos >= _sound_buffer_length) {
             _current_buffer_pos = 0;
         }

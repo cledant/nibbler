@@ -137,7 +137,7 @@ GlfwGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = _input.keys[GLFW_KEY_F1];
     buffer[IGraphicTypes::NibblerEvent::SET_SFML] = _input.keys[GLFW_KEY_F2];
     buffer[IGraphicTypes::NibblerEvent::SET_SDL] = _input.keys[GLFW_KEY_F3];
-    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_SFML] =
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_PORTAUDIO] =
       _input.keys[GLFW_KEY_F5];
     buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_NONE] =
       _input.keys[GLFW_KEY_F6];

@@ -7,14 +7,14 @@ void
 World::_interpret_events()
 {
     static const std::array<void (World::*)(), IGraphicConstants::NB_EVENT>
-      func = { &World::_close_win_event,   &World::_pause,
-               &World::_toggle_fullscreen, &World::_p1_up,
-               &World::_p1_right,          &World::_p1_down,
-               &World::_p1_left,           &World::_p2_up,
-               &World::_p2_right,          &World::_p2_down,
-               &World::_p2_left,           &World::_set_glfw,
-               &World::_set_sfml,          &World::_set_sdl,
-               &World::_set_audio_sfml,    &World::_set_audio_none,
+      func = { &World::_close_win_event,       &World::_pause,
+               &World::_toggle_fullscreen,     &World::_p1_up,
+               &World::_p1_right,              &World::_p1_down,
+               &World::_p1_left,               &World::_p2_up,
+               &World::_p2_right,              &World::_p2_down,
+               &World::_p2_left,               &World::_set_glfw,
+               &World::_set_sfml,              &World::_set_sdl,
+               &World::_set_audio_portaudio,   &World::_set_audio_none,
                &World::_mute_unmute };
     auto now = std::chrono::steady_clock::now();
 
@@ -262,11 +262,11 @@ World::_set_sdl()
 }
 
 void
-World::_set_audio_sfml()
+World::_set_audio_portaudio()
 {
-    if (_params.sound_lib != SOUND_SFML && _event_timers.accept_event[SYSTEM] &&
-        _events[IGraphicTypes::SET_AUDIO_SFML]) {
-        _params.sound_lib = SOUND_SFML;
+    if (_params.sound_lib != SOUND_PORTAUDIO && _event_timers.accept_event[SYSTEM] &&
+        _events[IGraphicTypes::SET_AUDIO_PORTAUDIO]) {
+        _params.sound_lib = SOUND_PORTAUDIO;
         _clear_audio_dyn_lib();
         _load_audio_dyn_lib();
         _event_timers.accept_event[SYSTEM] = 0;

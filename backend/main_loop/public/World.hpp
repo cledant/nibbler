@@ -101,7 +101,7 @@ class World
     void _set_glfw();
     void _set_sfml();
     void _set_sdl();
-    void _set_audio_sfml();
+    void _set_audio_portaudio();
     void _set_audio_none();
     void _mute_unmute();
 

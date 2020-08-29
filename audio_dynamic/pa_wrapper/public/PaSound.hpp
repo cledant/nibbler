@@ -43,7 +43,7 @@ class PaSound
 
     static int32_t _api_callback(void const *inputBuffer,
                                  void *outputBuffer,
-                                 uint64_t framesPerBuffer,
+                                 unsigned long framesPerBuffer,
                                  PaStreamCallbackTimeInfo const *timeInfo,
                                  PaStreamCallbackFlags statusFlags,
                                  void *userData);
@@ -51,7 +51,7 @@ class PaSound
 
     virtual int32_t _class_callback(void const *inputBuffer,
                                     void *outputBuffer,
-                                    uint64_t framesPerBuffer,
+                                    unsigned long framesPerBuffer,
                                     PaStreamCallbackTimeInfo const *timeInfo,
                                     PaStreamCallbackFlags statusFlags);
     virtual void _class_stream_finish();

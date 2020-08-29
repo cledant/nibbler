@@ -46,13 +46,13 @@ World::init()
           _prefix + "/nibbler_libs/libgfx_dyn_sfml.dylib";
         _path_gfx_lib[GFX_SDL] =
           _prefix + "/nibbler_libs/libgfx_dyn_sdl2.dylib";
-        _path_audio_lib[AUDIO_SFML] =
-          _prefix + "/nibbler_libs/libaudio_dyn_sfml.dylib";
+        _path_audio_lib[SOUND_PORTAUDIO] =
+          _prefix + "/nibbler_libs/libaudio_dyn_portaudio.dylib";
 #else
         _path_gfx_lib[GFX_GLFW] = _prefix + "/nibbler_libs/libgfx_dyn_glfw.so";
         _path_gfx_lib[GFX_SFML] = _prefix + "/nibbler_libs/libgfx_dyn_sfml.so";
         _path_gfx_lib[GFX_SDL] = _prefix + "/nibbler_libs/libgfx_dyn_sdl2.so";
-        _path_audio_lib[SOUND_SFML] =
+        _path_audio_lib[SOUND_PORTAUDIO] =
           _prefix + "/nibbler_libs/libaudio_dyn_portaudio.so";
 #endif
         _load_gfx_dyn_lib();

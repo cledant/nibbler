@@ -98,7 +98,7 @@ SFMLGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
       sf::Keyboard::isKeyPressed(sf::Keyboard::F2);
     buffer[IGraphicTypes::NibblerEvent::SET_SDL] =
       sf::Keyboard::isKeyPressed(sf::Keyboard::F3);
-    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_SFML] =
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_PORTAUDIO] =
       sf::Keyboard::isKeyPressed(sf::Keyboard::F5);
     buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_NONE] =
       sf::Keyboard::isKeyPressed(sf::Keyboard::F6);

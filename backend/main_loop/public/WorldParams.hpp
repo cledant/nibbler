@@ -15,7 +15,7 @@ enum GfxLib
 
 enum SoundLib
 {
-    SOUND_SFML = 0,
+    SOUND_PORTAUDIO = 0,
     SOUND_NONE,
 };
 

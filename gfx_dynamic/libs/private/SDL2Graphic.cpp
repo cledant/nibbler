@@ -103,7 +103,7 @@ SDL2Graphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     buffer[IGraphicTypes::NibblerEvent::SET_GLFW] = key_state[SDL_SCANCODE_F1];
     buffer[IGraphicTypes::NibblerEvent::SET_SFML] = key_state[SDL_SCANCODE_F2];
     buffer[IGraphicTypes::NibblerEvent::SET_SDL] = key_state[SDL_SCANCODE_F3];
-    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_SFML] =
+    buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_PORTAUDIO] =
       key_state[SDL_SCANCODE_F5];
     buffer[IGraphicTypes::NibblerEvent::SET_AUDIO_NONE] =
       key_state[SDL_SCANCODE_F6];

@@ -1,7 +1,11 @@
 #ifndef SDL2GRAPHIC_HPP
 #define SDL2GRAPHIC_HPP
 
+#ifdef __APPLE__
+#include "SDL.h"
+#else
 #include "SDL2/SDL.h"
+#endif
 
 #include "IGraphic.hpp"
 #include "GLSnake.hpp"
