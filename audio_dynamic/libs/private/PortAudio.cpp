@@ -2,6 +2,7 @@
 
 #include "portaudio.h"
 
+#include <stdexcept>
 #include <cstdio>
 
 PortAudio::PortAudio()

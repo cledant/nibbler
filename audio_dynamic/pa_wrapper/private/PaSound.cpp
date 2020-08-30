@@ -1,6 +1,7 @@
 #include "PaSound.hpp"
 
 #include <chrono>
+#include <stdexcept>
 #include <cmath>
 
 PaSound::PaSound()

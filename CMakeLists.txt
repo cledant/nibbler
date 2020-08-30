@@ -30,8 +30,11 @@ option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sfml ${CMAKE_BINARY_DIR}/sfml/build)
 
 #Setup SDL2
+cmake_policy(SET CMP0079 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0079 NEW)
 option(BUILD_SHARED_LIBS "" ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/sdl2 ${CMAKE_BINARY_DIR}/sdl2/build)
+target_link_libraries(SDL2 -Wl,--allow-multiple-definition)
 
 #Setup freetype
 option(BUILD_SHARED_LIBS "" ON)

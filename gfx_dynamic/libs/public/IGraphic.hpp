@@ -2,6 +2,7 @@
 #define NIBBLER_IGRAPHIC_HPP
 
 #include <array>
+#include <string>
 
 #include <cstdint>
 

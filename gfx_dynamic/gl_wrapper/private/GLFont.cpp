@@ -1,6 +1,8 @@
 #include "GLFont.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <stdexcept>
+
+#include "glm/gtc/matrix_transform.hpp"
 
 GLFont::GLFont()
   : _is_init(0)

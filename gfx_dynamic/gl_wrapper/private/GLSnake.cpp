@@ -1,5 +1,7 @@
 #include "GLSnake.hpp"
 
+#include <stdexcept>
+
 GLSnake::GLSnake()
   : _is_init(0)
   , _vbo_pos(0)
