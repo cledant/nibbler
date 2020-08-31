@@ -21,4 +21,4 @@ configure_file (
 
 add_dependencies(main_loop gfx_dyn audio_dyn dyn_lib_loader)
 target_link_libraries(main_loop PUBLIC gfx_dyn audio_dyn dyn_lib_loader)
-target_compile_options(main_loop PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
+target_compile_options(main_loop PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)

@@ -64,7 +64,7 @@ add_subdirectory(backend/main_loop)
 add_executable(nibbler binary/private/nibbler.cpp)
 target_link_libraries(nibbler dl main_loop)
 add_dependencies(nibbler gfx_dyn audio_dyn dyn_lib_loader gfx_dyn_glfw gfx_dyn_sfml gfx_dyn_sdl2 audio_dyn_portaudio main_loop)
-target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -flto)
+target_compile_options(nibbler PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)
 
 #Copy Shaders and Fonts
 install(FILES
