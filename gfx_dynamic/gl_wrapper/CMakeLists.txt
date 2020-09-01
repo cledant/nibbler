@@ -13,9 +13,4 @@ target_include_directories(glwrapper
 		${CMAKE_CURRENT_SOURCE_DIR}/private)
 add_dependencies(glwrapper glad)
 target_link_libraries(glwrapper PUBLIC glad glm gfx_dyn freetype)
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	target_compile_options(glwrapper PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -fPIC)
-else()
-	target_compile_options(glwrapper PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native)
-endif()
+target_compile_options(glwrapper PRIVATE -Wall -Wextra -Werror -std=c++17 -march=native -fPIC)
