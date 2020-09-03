@@ -37,12 +37,12 @@ class Board
 
   private:
     // Bonus related
-    static constexpr uint64_t MAX_BONUS_SPAWN_CHANCE = 3600;
-    static constexpr uint64_t MAX_BONUS_STD_DEV = 300;
-    static constexpr double BONUS_DURATION = 15.0;
-    static constexpr double BLINK_START = 5.0;
-    static constexpr uint64_t BLINK_FRAME_MAX = 30;
-    static constexpr uint64_t DEFAULT_WATCHDOG = 10000;
+    static constexpr uint64_t const MAX_BONUS_SPAWN_CHANCE = 3600;
+    static constexpr uint64_t const MAX_BONUS_STD_DEV = 300;
+    static constexpr double const BONUS_DURATION = 15.0;
+    static constexpr double const BLINK_START = 5.0;
+    static constexpr uint64_t const BLINK_FRAME_MAX = 30;
+    static constexpr uint64_t const DEFAULT_WATCHDOG = 10000;
 
     std::array<Snake, NB_PLAYER_MAX> _player;
     Snake _food;

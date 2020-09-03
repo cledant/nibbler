@@ -28,14 +28,15 @@ struct WinCondition
 };
 
 // Gfx related
-static uint16_t constexpr MAX_FPS = 60;
-static double constexpr FRAME_LENGTH_SECONDS = 1 / static_cast<float>(MAX_FPS);
+static constexpr uint16_t const MAX_FPS = 60;
+static constexpr double const FRAME_LENGTH_SECONDS =
+  1 / static_cast<float>(MAX_FPS);
 
 // Player related
 static constexpr uint8_t NB_PLAYER_MAX = 2;
 
 // Ui related
-static float constexpr ALIGN_BASE = 15.0f;
-static float constexpr ALIGN_FIRST_TAB = 30.0f;
+static constexpr float const ALIGN_BASE = 15.0f;
+static constexpr float const ALIGN_FIRST_TAB = 30.0f;
 
 #endif

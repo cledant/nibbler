@@ -22,8 +22,8 @@ class GLBoard
     void clear();
 
   private:
-    static constexpr glm::vec3 BOARD_COLOR = glm::vec3(0.0f);
-    static constexpr glm::vec2 BOARD_POS = glm::vec2(0.0f);
+    static constexpr glm::vec3 const BOARD_COLOR = glm::vec3(0.0f);
+    static constexpr glm::vec2 const BOARD_POS = glm::vec2(0.0f);
 
     [[nodiscard]] uint32_t _allocate_vbo(uint64_t type_size, void const *data) const;
     uint32_t _set_vao();

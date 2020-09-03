@@ -54,11 +54,12 @@ class Snake
     void moveSnakeWithCurrentDirection();
 
   private:
-    static constexpr std::array<glm::ivec2, 4> _offset = { glm::ivec2{ 0, -1 },
-                                                           glm::ivec2{ 0, 1 },
-                                                           glm::ivec2{ 1, 0 },
-                                                           glm::ivec2{ -1,
-                                                                       0 } };
+    static constexpr std::array<glm::ivec2, 4> const _offset = {
+        glm::ivec2{ 0, -1 },
+        glm::ivec2{ 0, 1 },
+        glm::ivec2{ 1, 0 },
+        glm::ivec2{ -1, 0 }
+    };
 
     enum snakeDirection _dir;
     glm::vec3 _head_color;

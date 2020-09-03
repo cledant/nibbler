@@ -32,11 +32,11 @@ class Players
 
   private:
     // Score related
-    static constexpr uint64_t NORMAL_FOOD_VALUE = 100;
-    static constexpr uint64_t BONUS_FOOD_VALUE = 500;
+    static constexpr uint64_t const NORMAL_FOOD_VALUE = 100;
+    static constexpr uint64_t const BONUS_FOOD_VALUE = 500;
 
     // Timer related
-    static double constexpr DEFAULT_SNAKE_TIMER_SECONDS =
+    static constexpr double const DEFAULT_SNAKE_TIMER_SECONDS =
       FRAME_LENGTH_SECONDS * 60;
 
     struct SnakeTimers

@@ -73,7 +73,7 @@ class SDL2Graphic : public IGraphic
         glm::vec2 gl_snake_board_size;
     };
 
-    static constexpr float VERTICAL_BORDER = 0.10f;
+    static constexpr float const VERTICAL_BORDER = 0.10f;
 
     std::string _home;
     Win _win;
