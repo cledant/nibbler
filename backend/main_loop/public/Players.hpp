@@ -28,7 +28,7 @@ class Players
     [[nodiscard]] std::array<enum Snake::snakeDirection, NB_PLAYER_MAX> const &
     getSnakesPreviousDirection() const;
     std::array<WinCondition, NB_PLAYER_MAX> &updatePlayersWinConditionStates();
-    std::array<uint8_t, NB_PLAYER_MAX> const &havePlayersLost();
+    std::array<uint32_t, NB_PLAYER_MAX> const &havePlayersLost();
 
   private:
     // Score related
@@ -47,7 +47,7 @@ class Players
     };
 
     std::array<WinCondition, NB_PLAYER_MAX> _player_win_con;
-    std::array<uint8_t, NB_PLAYER_MAX> _player_has_lost;
+    std::array<uint32_t, NB_PLAYER_MAX> _player_has_lost;
     std::array<enum Snake::snakeDirection, NB_PLAYER_MAX>
       _player_previous_frame_dir;
     std::array<uint64_t, NB_PLAYER_MAX> _player_score;

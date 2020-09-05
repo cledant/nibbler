@@ -120,16 +120,19 @@ Players::updatePlayersWinConditionStates()
     return (_player_win_con);
 }
 
-std::array<uint8_t, NB_PLAYER_MAX> const &
+std::array<uint32_t, NB_PLAYER_MAX> const &
 Players::havePlayersLost()
 {
-    static const struct WinCondition not_lost = { 0, 0, 0, 0 };
-
-    _player_has_lost[PLAYER_1] = memcmp(
-      &_player_win_con[PLAYER_1], &not_lost, sizeof(struct WinCondition));
-    _player_has_lost[PLAYER_2] = memcmp(
-      &_player_win_con[PLAYER_2], &not_lost, sizeof(struct WinCondition));
-
+    _player_has_lost[PLAYER_1] = _player_win_con[PLAYER_1].out_of_map |
+                                 (_player_win_con[PLAYER_1].touch_player) << 8 |
+                                 (_player_win_con[PLAYER_1].touch_self) << 16 |
+                                 (_player_win_con[PLAYER_1].touch_obstacle)
+                                   << 24;
+    _player_has_lost[PLAYER_2] = _player_win_con[PLAYER_2].out_of_map |
+                                 (_player_win_con[PLAYER_2].touch_player) << 8 |
+                                 (_player_win_con[PLAYER_2].touch_self) << 16 |
+                                 (_player_win_con[PLAYER_2].touch_obstacle)
+                                   << 24;
     return (_player_has_lost);
 }
 
