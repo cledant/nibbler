@@ -55,15 +55,21 @@ DynLibLoader<T>::openLib(std::string const &libpath)
         closeLib();
     }
     if (!(_handler = dlopen(libpath.c_str(), RTLD_NOW))) {
-        throw std::runtime_error(dlerror());
+        std::string error("Nibbler: Dynamic library error: ");
+        error += dlerror();
+        throw std::runtime_error(error);
     }
     if (!(_creator = reinterpret_cast<typename T::creator_t *>(
             dlsym(_handler, "creator")))) {
-        throw std::runtime_error(dlerror());
+        std::string error("Nibbler: Dynamic library error: ");
+        error += dlerror();
+        throw std::runtime_error(error);
     }
     if (!(_deleter = reinterpret_cast<typename T::deleter_t *>(
             dlsym(_handler, "deleter")))) {
-        throw std::runtime_error(dlerror());
+        std::string error("Nibbler: Dynamic library error: ");
+        error += dlerror();
+        throw std::runtime_error(error);
     }
 }
 
