@@ -67,7 +67,12 @@ SFMLGraphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
     auto buffer = events.data();
 
     sf::Event e = {};
-    while (_win.win.pollEvent(e));
+    while (_win.win.pollEvent(e)) {
+        if (e.type == sf::Event::Closed) {
+            triggerClose();
+        }
+    }
+
     if (!_win.win.hasFocus()) {
         std::memset(buffer, 0, sizeof(uint8_t) * IGraphicConstants::NB_EVENT);
         return;

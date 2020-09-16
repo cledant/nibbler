@@ -84,8 +84,15 @@ SDL2Graphic::getEvents(std::array<uint8_t, IGraphicConstants::NB_EVENT> &events)
 {
     auto buffer = events.data();
     SDL_PumpEvents();
-    auto const *key_state = SDL_GetKeyboardState(nullptr);
 
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
+            triggerClose();
+        }
+    }
+
+    auto const *key_state = SDL_GetKeyboardState(nullptr);
     buffer[IGraphicTypes::NibblerEvent::CLOSE_WIN] =
       key_state[SDL_SCANCODE_ESCAPE];
     buffer[IGraphicTypes::NibblerEvent::PAUSE] = key_state[SDL_SCANCODE_SPACE];
